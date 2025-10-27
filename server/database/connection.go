@@ -17,6 +17,7 @@ func InitDB() {
 		log.Fatal(err)
 	}
 	if err = DB.Ping(); err != nil {
+		//kire ki khobor
 		log.Fatal(err)
 	}
 	log.Println("Connected to PostgreSQL!")
