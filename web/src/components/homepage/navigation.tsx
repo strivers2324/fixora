@@ -1,5 +1,7 @@
+import { SignUpRolePopup } from "../signup/SignUpPopUp";
 import { Link } from "react-router-dom";
 import Fixoralogo from "../../assets/image/logo_PNG.png";
+import { Button } from "../ui/button";
 
 export default function Navigation() {
   return (
@@ -31,7 +33,7 @@ export default function Navigation() {
             About
           </Link>
           <button className="ml-3  text-white font-bold rounded-md hover:bg-teal-400 transition-colors">Login</button>
-          <button className=" text-white font-bold rounded-md hover:bg-teal-400 transition-colors">Sign up</button>
+          <SignUpRolePopup />
         </div>
 
       </div>
