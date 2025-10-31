@@ -1,18 +1,18 @@
-import "./App.css";
-import Header from "./components/header/header";
+import { Routes, Route } from "react-router-dom";
+
+import HomePage from "./components/homepage/homePage.tsx";
+
+import Navigation from "./components/homepage/navigation.tsx";
 
 function App() {
   return (
-    <div className="w-full flex-col">
-      <Header />
-      {Array.from({ length: 40 }, () => Math.floor(Math.random() * 40)).map(
-        (elem) => (
-          <div key={elem} className="font-bold my-5">
-            <h3>Just a text</h3>
-          </div>
-        )
-      )}
-    </div>
+    <>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+
+      </Routes>
+    </>
   );
 }
 
