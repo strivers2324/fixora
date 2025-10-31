@@ -1,9 +1,15 @@
-import Navigation from "./navigation";
+import Hero from "./hero.tsx";
+import ServiceSection from "./ServiceSection.tsx";
+import AboutSection from "./AboutSection.tsx";
 
-export default function Header() {
-  return (
-    <div className="flex flex-col sticky top-0 z-50">
-      <Navigation />
-    </div>
-  );
+function HomePage() {
+    return (
+        <div className="w-full flex flex-col min-h-screen">
+            <Hero />
+            <ServiceSection />
+            <AboutSection />
+        </div>
+    );
 }
+
+export default HomePage;

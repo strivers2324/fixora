@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import HomePage from "./components/homepage/homePage.tsx";
+import HomePage from "./components/homepage/homePage";
 import Navigation from "./components/homepage/navigation.tsx";
 import SpRegistrationForm from "./components/signup/serviceProvider/sp_registration_form";
 import UserRegistrationForm from "./components/signup/user/user_registration_form";
