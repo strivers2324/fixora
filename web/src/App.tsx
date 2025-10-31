@@ -1,17 +1,21 @@
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import Header from "./components/header/header";
+import Homepage from "./components/homepage/homepage";
+import SpRegistrationForm from "./components/signup/serviceProvider/sp_registration_form";
+import UserRegistrationForm from "./components/signup/user/user_registration_form";
 
 function App() {
   return (
     <div className="w-full flex-col">
-      <Header />
-      {Array.from({ length: 40 }, () => Math.floor(Math.random() * 40)).map(
-        (elem) => (
-          <div key={elem} className="font-bold my-5">
-            <h3>Just a text</h3>
-          </div>
-        )
-      )}
+      <Homepage />
+      <Routes>
+        <Route path="/sp_registration_form" element={<SpRegistrationForm />} />
+
+        <Route
+          path="/user_registration_form"
+          element={<UserRegistrationForm />}
+        />
+      </Routes>
     </div>
   );
 }
