@@ -1,5 +1,6 @@
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
 import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import Fixoralogo from "@/assets/images/Logo.png";
 import { Button } from "../../ui/button";
 
@@ -12,7 +13,7 @@ export default function Navbar() {
             <img
               src={Fixoralogo}
               alt="Fixora logo"
-              className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 object-contain mr-2 mb-0"
+              className="w-20 h-20 md:w-32 md:h-32 lg:w-30 lg:h-20 object-contain mr-2 mb-0"
             />
             <span className="mb-5 italic">Fixora</span>
           </Link>
@@ -31,13 +32,14 @@ export default function Navbar() {
           >
             Services
           </Link>
-          <Link
-            to="/about"
+
+          <HashLink
+            smooth
+            to="/#about-section"
             className="transition-colors hover:text-black/80 text-white"
           >
             About
-          </Link>
-
+          </HashLink>
           <Button className="ml-3 text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
             Login
           </Button>
