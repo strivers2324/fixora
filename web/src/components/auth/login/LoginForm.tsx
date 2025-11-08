@@ -127,7 +127,7 @@ export default function LoginForm() {
                                 <div className="text-center font-serif text-md">
                                     {"Don't have an account? "}
                                     <Link
-                                        to="/signup"
+                                        to="/UserRegistrationForm"
                                         className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
                                     >
                                         Sign up
