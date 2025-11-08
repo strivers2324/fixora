@@ -48,11 +48,12 @@ export default function LoginForm() {
                                     </p>
                                 </div>
                                 <Field>
-                                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                                    <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
                                     <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="m@example.com"
+                                        id="Phone"
+                                        type="tel"
+                                        placeholder="01XXXXXXXXX"
+                                        pattern="(\+8801[3-9]\d{8}|01[3-9]\d{8})"
                                         required
                                     />
                                 </Field>
