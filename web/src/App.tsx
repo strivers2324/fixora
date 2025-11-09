@@ -29,14 +29,8 @@ function App() {
         <Route path="/SpNumberVerification" element={<SpMobileVerification />} />
         <Route path="/SpInformation" element={<SpInformation />} />
         <Route path="/SpNIDSubmission" element={<SpNIDSubmission />} />
-        <Route
-          path="/UserRegistrationForm"
-          element={<UserRegistrationForm />}
-        />
-        <Route
-          path="/UserNumberVerification"
-          element={<UserMobileVerification />}
-        />
+        <Route path="/UserRegistrationForm" element={<UserRegistrationForm />} />
+        <Route path="/UserNumberVerification" element={<UserMobileVerification />} />
         <Route path="/UserInformation" element={<UserInformation />} />
       </Routes>
     </div>
