@@ -26,10 +26,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/SpRegistrationForm" element={<SpRegistrationForm />} />
         <Route path="/LoginForm" element={<LoginForm />} />
-        <Route
-          path="/SpNumberVerification"
-          element={<SpMobileVerification />}
-        />
+        <Route path="/SpNumberVerification" element={<SpMobileVerification />} />
         <Route path="/SpInformation" element={<SpInformation />} />
         <Route path="/SpNIDSubmission" element={<SpNIDSubmission />} />
         <Route
