@@ -1,4 +1,3 @@
-import React from 'react';
 import LogoSrc from '../../assets/images/Logo.png';
 import { FaTwitter, FaInstagram, FaLinkedin, FaCcVisa, FaCcMastercard, FaFacebook } from 'react-icons/fa';
 import BkashLogo from '../../assets/images/bkash.png';

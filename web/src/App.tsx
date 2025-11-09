@@ -6,6 +6,7 @@ import HomePage from "./components/home/HomePage";
 import SpRegistrationForm from "./components/auth/registration/service-provider/RegistrationForm";
 import UserRegistrationForm from "./components/auth/registration/user/RegistrationForm";
 import Footer from "./components/layout/Footer";
+import UserTermsPage from "./components/auth/registration/user/TermPage";
 
 function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/SpRegistrationForm" element={<SpRegistrationForm />} />
           <Route path="/UserRegistrationForm" element={<UserRegistrationForm />} />
+          <Route path="/user-terms" element={<UserTermsPage />} />
         </Routes>
       </main>
       <Footer />
