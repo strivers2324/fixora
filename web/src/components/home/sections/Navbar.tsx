@@ -27,21 +27,21 @@ export default function Navbar() {
           </HashLink>
         </div>
 
-        <div className="hidden md:flex flex-row items-center gap-x-5">
+
+        <div className="flex flex-row items-center gap-x-5">
           <HashLink
-            smooth
-            to="/#"
+            to="/"
             className="transition-colors hover:text-black/80 text-white font-semibold"
           >
             Home
           </HashLink>
 
-          <Link
-            to="/services"
+          <HashLink
+            to="/#services"
             className="transition-colors hover:text-black/80 text-white"
           >
             Services
-          </Link>
+          </HashLink>
           <HashLink
             smooth
             to="/#about-section"
