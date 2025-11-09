@@ -228,7 +228,7 @@ export default function UserInformation() {
                     type="submit"
                     className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md"
                   >
-                    Continue
+                    Finish
                   </Button>
                 </Field>
               </FieldGroup>
