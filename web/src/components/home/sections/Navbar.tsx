@@ -1,6 +1,6 @@
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
 import { Link } from "react-router-dom";
-import Fixoralogo from "@/assets/images/Logo.png";
+import Fixoralogo from "@/assets/images/LogoLogin.png";
 import { Button } from "../../ui/button";
 
 export default function Navbar() {
@@ -38,9 +38,11 @@ export default function Navbar() {
             About
           </Link>
 
-          <Button className="ml-3 text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
-            Login
-          </Button>
+          <Link to="/LoginForm">
+            <Button className="ml-3 text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
+              Login
+            </Button>
+          </Link>
           <SignUpRolePopup />
         </div>
       </div>

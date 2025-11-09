@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import logo from "@/assets/images/Logo.png";
+import logo from "@/assets/images/LogoLogin.png";
 import form1 from "@/assets/images/FormUpper.png";
 import form2 from "@/assets/images/FormLower.png";
 import {
