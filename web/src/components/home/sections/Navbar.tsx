@@ -1,4 +1,4 @@
-import { useState } from "react"; // ১. 
+import { useState } from "react";
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
@@ -15,27 +15,27 @@ export default function Navbar() {
 
   return (
     <div className="px-4 bg-teal-700 sticky top-0 z-50">
-
       <div className="flex flex-row justify-between items-center h-14">
-
         <div className="flex items-center gap-x-2 font-bold text-3xl text-white">
-          <Link to="/" className="flex items-center gap-x-2">
+          <HashLink smooth to="/#" className="flex items-center gap-x-2">
             <img
               src={Fixoralogo}
               alt="Fixora logo"
               className="h-12 w-auto object-contain"
             />
             <span className="italic">Fixora</span>
-          </Link>
+          </HashLink>
         </div>
 
         <div className="hidden md:flex flex-row items-center gap-x-5">
-          <Link
-            to="/"
+          <HashLink
+            smooth
+            to="/#"
             className="transition-colors hover:text-black/80 text-white font-semibold"
           >
             Home
-          </Link>
+          </HashLink>
+
           <Link
             to="/services"
             className="transition-colors hover:text-black/80 text-white"
@@ -67,13 +67,15 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden pb-4">
           <nav className="flex flex-col items-center gap-y-4 pt-2">
-            <Link
-              to="/"
+            <HashLink
+              smooth
+              to="/#"
               className="transition-colors hover:text-black/80 text-white font-semibold"
               onClick={closeMenu}
             >
               Home
-            </Link>
+            </HashLink>
+
             <Link
               to="/services"
               className="transition-colors hover:text-black/80 text-white"
