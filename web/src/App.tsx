@@ -6,7 +6,9 @@ import HomePage from "./components/home/HomePage";
 import SpRegistrationForm from "./components/auth/registration/service-provider/RegistrationForm.tsx";
 import UserRegistrationForm from "./components/auth/registration/user/RegistrationForm.tsx";
 import LoginForm from "./components/auth/login/LoginForm";
-import SpMobileVerification from "./components/auth/common/NumberVerification.tsx";
+import SpMobileVerification from "./components/auth/registration/service-provider/NumberVerification.tsx";
+import SpInformation from "./components/auth/registration/service-provider/SpInformation.tsx";
+import SpNIDSubmission from "./components/auth/registration/service-provider/Document.tsx";
 
 function App() {
   const location = useLocation();
@@ -24,6 +26,8 @@ function App() {
         <Route path="/UserRegistrationForm" element={<UserRegistrationForm />} />
         <Route path="/LoginForm" element={<LoginForm />} />
         <Route path="/SpNumberVerification" element={<SpMobileVerification />} />
+        <Route path="/SpInformation" element={<SpInformation />} />
+        <Route path="/SpNIDSubmission" element={<SpNIDSubmission />} />
       </Routes>
     </div>
   );
