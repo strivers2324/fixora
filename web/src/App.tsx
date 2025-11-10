@@ -11,6 +11,7 @@ import SpInformation from "./components/auth/registration/service-provider/SpInf
 import SpNIDSubmission from "./components/auth/registration/service-provider/Document.tsx";
 import UserMobileVerification from "./components/auth/registration/user/NumberVerification.tsx";
 import UserInformation from "./components/auth/registration/user/UserInformation.tsx";
+import Footer from "./components/layout/Footer";
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,7 @@ function App() {
         <Route path="/UserNumberVerification" element={<UserMobileVerification />} />
         <Route path="/UserInformation" element={<UserInformation />} />
       </Routes>
+      <Footer />
     </div>
   );
 }

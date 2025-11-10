@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 
 export default function AboutSection() {
     return (
-        <div className="py-12 pt-0 bg-[#1d4b4a] text-white">
+        <div id="about-section" className="py-12 pt-0 bg-[#1d4b4a] text-white">
             <div className="container mx-auto px-4">
-                
                 {/*  About Section  */}
                 <div className="mt-12 md:mt-20 max-w-4xl mx-auto text-left">
                     <h2 className="text-4xl font-bold mb-4">About</h2>
