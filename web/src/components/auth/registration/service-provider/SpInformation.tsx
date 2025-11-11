@@ -27,7 +27,7 @@ const districts = {
         { value: "coxsbazar", label: "Cox's Bazar" },
     ],
 };
-const policeStations: { [key: string]: { value: string; label: string }[] } = {
+const Areas: { [key: string]: { value: string; label: string }[] } = {
     dhaka: [
         { value: "motijheel", label: "Motijheel" },
         { value: "mirpur", label: "Mirpur" },
@@ -55,12 +55,12 @@ const subAreas: { [key: string]: { value: string; label: string }[] } = {
 export default function SpInformation() {
     const [name, setName] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedPoliceStation, setSelectedPoliceStation] = useState("");
+    const [selectedArea, setSelectedArea] = useState("");
     const [selectedSubArea, setSelectedSubArea] = useState("");
 
     const [nameError, setNameError] = useState("");
     const [districtError, setDistrictError] = useState("");
-    const [policeStationError, setPoliceStationError] = useState("");
+    const [AreaError, setAreaError] = useState("");
     const [subAreaError, setSubAreaError] = useState("");
 
     const navigate = useNavigate();
@@ -83,11 +83,11 @@ export default function SpInformation() {
             setDistrictError("");
         }
 
-        if (!selectedPoliceStation) {
-            setPoliceStationError("Police Station is required.");
+        if (!selectedArea) {
+            setAreaError("Area is required.");
             valid = false;
         } else {
-            setPoliceStationError("");
+            setAreaError("");
         }
 
         if (!selectedSubArea) {
@@ -135,7 +135,7 @@ export default function SpInformation() {
                                         onValueChange={(v) => {
                                             setSelectedDistrict(v);
                                             setDistrictError("");
-                                            setSelectedPoliceStation("");
+                                            setSelectedArea("");
                                             setSelectedSubArea("");
                                         }}
                                     >
@@ -153,28 +153,28 @@ export default function SpInformation() {
                                     {districtError && <span className="text-sm text-red-600">{districtError}</span>}
                                 </Field>
                                 <Field>
-                                    <FieldLabel htmlFor="police-station">Police Station</FieldLabel>
+                                    <FieldLabel htmlFor="area">Area</FieldLabel>
                                     <Select
-                                        value={selectedPoliceStation}
+                                        value={selectedArea}
                                         onValueChange={(v) => {
-                                            setSelectedPoliceStation(v);
-                                            setPoliceStationError("");
+                                            setSelectedArea(v);
+                                            setAreaError("");
                                             setSelectedSubArea("");
                                         }}
                                         disabled={!selectedDistrict}
                                     >
-                                        <SelectTrigger id="police-station">
-                                            <SelectValue placeholder="Select police station" />
+                                        <SelectTrigger id="area">
+                                            <SelectValue placeholder="Select Area" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {(policeStations[selectedDistrict] || []).map((ps) => (
+                                            {(Areas[selectedDistrict] || []).map((ps) => (
                                                 <SelectItem key={ps.value} value={ps.value}>
                                                     {ps.label}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {policeStationError && <span className="text-sm text-red-600">{policeStationError}</span>}
+                                    {AreaError && <span className="text-sm text-red-600">{AreaError}</span>}
                                 </Field>
                                 <Field>
                                     <FieldLabel htmlFor="sub-area">Sub Area</FieldLabel>
@@ -184,13 +184,13 @@ export default function SpInformation() {
                                             setSelectedSubArea(v);
                                             setSubAreaError("");
                                         }}
-                                        disabled={!selectedPoliceStation}
+                                        disabled={!selectedArea}
                                     >
                                         <SelectTrigger id="sub-area">
                                             <SelectValue placeholder="Select sub area" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {(subAreas[selectedPoliceStation] || []).map((sa) => (
+                                            {(subAreas[selectedArea] || []).map((sa) => (
                                                 <SelectItem key={sa.value} value={sa.value}>
                                                     {sa.label}
                                                 </SelectItem>

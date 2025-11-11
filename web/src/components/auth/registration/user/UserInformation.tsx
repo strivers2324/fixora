@@ -23,7 +23,7 @@ const districts = {
     { value: "coxsbazar", label: "Cox's Bazar" },
   ],
 };
-const policeStations: { [key: string]: { value: string; label: string }[] } = {
+const areas: { [key: string]: { value: string; label: string }[] } = {
   dhaka: [
     { value: "motijheel", label: "Motijheel" },
     { value: "mirpur", label: "Mirpur" },
@@ -51,12 +51,12 @@ const subAreas: { [key: string]: { value: string; label: string }[] } = {
 export default function UserInformation() {
   const [name, setName] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedPoliceStation, setSelectedPoliceStation] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
   const [selectedSubArea, setSelectedSubArea] = useState("");
 
   const [nameError, setNameError] = useState("");
   const [districtError, setDistrictError] = useState("");
-  const [policeStationError, setPoliceStationError] = useState("");
+  const [areaError, setAreaError] = useState("");
   const [subAreaError, setSubAreaError] = useState("");
 
   const navigate = useNavigate();
@@ -79,11 +79,11 @@ export default function UserInformation() {
       setDistrictError("");
     }
 
-    if (!selectedPoliceStation) {
-      setPoliceStationError("Police Station is required.");
+    if (!selectedArea) {
+      setAreaError("Area is required.");
       valid = false;
     } else {
-      setPoliceStationError("");
+      setAreaError("");
     }
 
     if (!selectedSubArea) {
@@ -145,7 +145,7 @@ export default function UserInformation() {
                     onValueChange={(v) => {
                       setSelectedDistrict(v);
                       setDistrictError("");
-                      setSelectedPoliceStation("");
+                      setSelectedArea("");
                       setSelectedSubArea("");
                     }}
                   >
@@ -169,32 +169,32 @@ export default function UserInformation() {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="police-station">
-                    Police Station
+                  <FieldLabel htmlFor="area">
+                    Area
                   </FieldLabel>
                   <Select
-                    value={selectedPoliceStation}
+                    value={selectedArea}
                     onValueChange={(v) => {
-                      setSelectedPoliceStation(v);
-                      setPoliceStationError("");
+                      setSelectedArea(v);
+                      setAreaError("");
                       setSelectedSubArea("");
                     }}
                     disabled={!selectedDistrict}
                   >
-                    <SelectTrigger id="police-station">
-                      <SelectValue placeholder="Select police station" />
+                    <SelectTrigger id="area">
+                      <SelectValue placeholder="Select Area" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(policeStations[selectedDistrict] || []).map((ps) => (
+                      {(areas[selectedDistrict] || []).map((ps) => (
                         <SelectItem key={ps.value} value={ps.value}>
                           {ps.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {policeStationError && (
+                  {areaError && (
                     <span className="text-sm text-red-600">
-                      {policeStationError}
+                      {areaError}
                     </span>
                   )}
                 </Field>
@@ -206,13 +206,13 @@ export default function UserInformation() {
                       setSelectedSubArea(v);
                       setSubAreaError("");
                     }}
-                    disabled={!selectedPoliceStation}
+                    disabled={!selectedArea}
                   >
                     <SelectTrigger id="sub-area">
                       <SelectValue placeholder="Select sub area" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(subAreas[selectedPoliceStation] || []).map((sa) => (
+                      {(subAreas[selectedArea] || []).map((sa) => (
                         <SelectItem key={sa.value} value={sa.value}>
                           {sa.label}
                         </SelectItem>
