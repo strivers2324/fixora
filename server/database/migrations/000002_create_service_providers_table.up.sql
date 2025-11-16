@@ -9,5 +9,8 @@ CREATE TABLE service_providers (
     district VARCHAR(50),
     area VARCHAR(50),
     sub_area VARCHAR(50),
+    nid_number VARCHAR(30),
+    nid_front_url TEXT,
+    nid_back_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -110,13 +110,19 @@ export function SpRegistrationForm() {
     }
 
     if (isValid) {
-      navigate("/SpNumberVerification", { state: { phone } });
+      navigate("/SpNumberVerification", {
+        state: {
+          phone,
+          password,
+          profession,
+        },
+      });
     }
   }
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center md:items-center px-4 bg-gray-200 gap-y-6 md:gap-x-8">
-      {/* left side */}
+      {/* left side*/}
       <div className="flex-1 w-full max-w-xs md:max-w-none flex flex-col items-center justify-start">
         <h2 className="text-lg md:text-2xl font-bold font-serif text-teal-700 mb-3 md:max-h-80 md:h-auto text-center md:text-left">
           Want to join Fixora as a Service Provider?
@@ -144,7 +150,7 @@ export function SpRegistrationForm() {
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
             <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
-              <FieldGroup>
+               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
                     <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
