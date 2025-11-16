@@ -24,6 +24,7 @@ func main() {
 
 	// ------ Service provider registration API route ------
 	router.POST("/api/register-service-provider", handlers.ServiceProviderRegisterHandler)
+	router.POST("/api/register-user", handlers.UserRegisterHandler)
 
 	//Serve frontend
 	router.NoRoute(func(c *gin.Context) {
