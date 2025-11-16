@@ -133,7 +133,11 @@ export default function ServiceSection() {
   };
 
   return (
-    <div className="py-12 bg-[#1d4b4a] text-white border-b border-white/30">
+    <div
+      id="services"
+      style={{ scrollMarginTop: "70px" }}
+      className="py-12 bg-[#1d4b4a] text-white border-b border-white/30"
+    >
       <style>
         {`
           .slick-dots {

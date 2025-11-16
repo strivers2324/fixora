@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
-import { Link } from "react-router-dom";
-import { HashLink } from "react-router-hash-link";
+import { Link } from "react-router-dom"; // <-- এটি Login-এর জন্য প্রয়োজন
+import { HashLink } from "react-router-hash-link"; // <-- এটি Home, About, Services-এর জন্য
 import Fixoralogo from "@/assets/images/Logo.png";
 import { Button } from "../../ui/button";
 import { Menu, X } from "lucide-react";
@@ -36,12 +36,16 @@ export default function Navbar() {
             Home
           </HashLink>
 
-          <Link
-            to="/services"
+          {/* --- ১. ডেস্কটপ সার্ভিস লিঙ্ক পরিবর্তন --- */}
+          <HashLink
+            smooth
+            to="/#services" // <-- পরিবর্তন এখানে
             className="transition-colors hover:text-black/80 text-white"
           >
             Services
-          </Link>
+          </HashLink>
+          {/* ------------------------------------- */}
+
           <HashLink
             smooth
             to="/#about-section"
@@ -78,13 +82,17 @@ export default function Navbar() {
               Home
             </HashLink>
 
-            <Link
-              to="/services"
+            {/* --- ২. মোবাইল সার্ভিস লিঙ্ক পরিবর্তন --- */}
+            <HashLink
+              smooth
+              to="/#services" // <-- পরিবর্তন এখানে
               className="transition-colors hover:text-black/80 text-white"
               onClick={closeMenu}
             >
               Services
-            </Link>
+            </HashLink>
+            {/* ------------------------------------- */}
+
             <HashLink
               smooth
               to="/#about-section"

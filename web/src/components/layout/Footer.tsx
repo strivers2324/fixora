@@ -48,7 +48,12 @@ export default function Footer({
       links: [
         { text: "Electrician", url: "/services/electrician" },
         { text: "Plumber", url: "/services/plumber" },
-        { text: "AC Mechanic", url: "/services/ac-mechanic" },
+        { text: "AC Technician", url: "/services/ac-technician" },
+        {
+          text: "Refrigerator Mechanic",
+          url: "/services/refrigerator-mechanic",
+        },
+        { text: "Carpenter", url: "/services/carpenter" },
         { text: "All Services", url: "/services" },
       ],
     },
@@ -82,7 +87,7 @@ export default function Footer({
   ],
 }: FooterProps) {
   return (
-    <footer className="py-20 bg-gray-950 text-gray-400">
+    <footer className="pt-12 pb-8 bg-gray-950 text-gray-400">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-12">
           <div className="col-span-2 lg:col-span-4">
@@ -94,20 +99,20 @@ export default function Footer({
                 src={logo.src}
                 alt={logo.alt}
                 title={logo.title}
-                className="h-10"
+                className="h-9"
               />
               <span className="text-xl font-bold text-white">{logo.title}</span>
             </a>
-            <p className="mt-4 font-medium max-w-xs">{tagline}</p>
+            <p className="mt-3 font-medium max-w-xs">{tagline}</p>
 
-            <div className="flex mt-6 space-x-5">
+            <div className="flex mt-5 space-x-4">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-300"
               >
-                <FaFacebook size={24} />
+                <FaFacebook size={20} />
                 <span className="sr-only">Facebook</span>
               </a>
               <a
@@ -116,7 +121,7 @@ export default function Footer({
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-300"
               >
-                <FaTwitter size={24} />
+                <FaTwitter size={20} />
                 <span className="sr-only">Twitter</span>
               </a>
               <a
@@ -125,7 +130,7 @@ export default function Footer({
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-300"
               >
-                <FaInstagram size={24} />
+                <FaInstagram size={20} />
                 <span className="sr-only">Instagram</span>
               </a>
               <a
@@ -134,7 +139,7 @@ export default function Footer({
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-300"
               >
-                <FaLinkedin size={24} />
+                <FaLinkedin size={20} />
                 <span className="sr-only">LinkedIn</span>
               </a>
             </div>
@@ -142,10 +147,10 @@ export default function Footer({
 
           {menuItems.map((section, sectionIdx) => (
             <div key={sectionIdx} className="col-span-1 lg:col-span-2">
-              <h3 className="mb-4 font-bold text-white">{section.title}</h3>
-              <ul className="space-y-3">
+              <h3 className="mb-3 font-bold text-white">{section.title}</h3>
+              <ul className="space-y-2 text-sm">
                 {section.links.map((link, linkIdx) => (
-                  <li key={linkIdx} className="font-medium">
+                  <li key={linkIdx} className="font-normal">
                     <a
                       href={link.url}
                       className="hover:text-white hover:underline transition-colors duration-300"
@@ -159,7 +164,7 @@ export default function Footer({
           ))}
         </div>
 
-        <div className="mt-20 flex flex-col-reverse justify-between gap-8 border-t border-gray-700 pt-8 text-sm font-medium md:flex-row md:items-center">
+        <div className="mt-10 flex flex-col-reverse justify-between gap-6 border-t border-gray-700 pt-6 text-sm font-medium md:flex-row md:items-center">
           <div className="text-center md:text-left">
             <p>{copyright}</p>
             <ul className="flex gap-4 justify-center md:justify-start mt-2">
@@ -171,14 +176,12 @@ export default function Footer({
             </ul>
           </div>
 
-          <div className="flex justify-center items-center gap-3  text-gray-500">
+          <div className="flex justify-center items-center gap-2 text-gray-500">
             <span className="hidden text-sm md:block">We accept:</span>
-
-            <FaCcVisa size={30} />
-            <FaCcMastercard size={30} />
-
-            <img src={BkashLogo} alt="bKash" className="h-7" />
-            <img src={NagadLogo} alt="Nagad" className="h-7" />
+            <FaCcVisa size={24} />
+            <FaCcMastercard size={24} />
+            <img src={BkashLogo} alt="bKash" className="h-6" />
+            <img src={NagadLogo} alt="Nagad" className="h-6" />
           </div>
         </div>
       </div>
