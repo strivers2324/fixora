@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import logo1 from "@/assets/images/LogoLogin.png";
 import {
@@ -28,6 +28,10 @@ const FormSchema = z.object({
 
 export default function SpMobileVerification() {
     const navigate = useNavigate()
+    const location = useLocation();
+
+    const { phone, password, profession } = location.state || {};
+
     const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -36,8 +40,15 @@ export default function SpMobileVerification() {
     })
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
+        // OTP validation
         if (data.pin === "1234") {
-            navigate("/SpInformation")
+            navigate("/SpInformation", {
+                state: {
+                    phone,
+                    password,
+                    profession,
+                }
+            });
         } else {
             form.setError("pin", { type: "manual", message: "Wrong OTP. Please try again." })
         }
