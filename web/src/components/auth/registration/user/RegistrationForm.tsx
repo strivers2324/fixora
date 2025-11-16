@@ -14,28 +14,29 @@ import {
 
 export function UserRegistrationForm() {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
 
+  // State
+  const [visible, setVisible] = useState(false);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+  // Submit Handler
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    let isValid = true;
+    let valid = true;
 
     // Phone Validation
     if (!phone) {
       setPhoneError("Please enter your phone number.");
-      isValid = false;
+      valid = false;
     } else if (!/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)) {
       setPhoneError("Please enter a valid Bangladeshi phone number.");
-      isValid = false;
+      valid = false;
     } else {
       setPhoneError("");
     }
@@ -43,10 +44,10 @@ export function UserRegistrationForm() {
     // Password Validation
     if (!password) {
       setPasswordError("Please enter a password.");
-      isValid = false;
+      valid = false;
     } else if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters.");
-      isValid = false;
+      valid = false;
     } else {
       setPasswordError("");
     }
@@ -54,16 +55,22 @@ export function UserRegistrationForm() {
     // Confirm Password Validation
     if (!confirmPassword) {
       setConfirmPasswordError("Please confirm your password.");
-      isValid = false;
+      valid = false;
     } else if (confirmPassword !== password) {
       setConfirmPasswordError("Passwords do not match.");
-      isValid = false;
+      valid = false;
     } else {
       setConfirmPasswordError("");
     }
 
-    if (isValid) {
-      navigate("/UserNumberVerification", { state: { phone } });
+    // If all valid, forward all needed info as state for next steps
+    if (valid) {
+      navigate("/UserNumberVerification", {
+        state: {
+          phone,
+          password,
+        },
+      });
     }
   }
 

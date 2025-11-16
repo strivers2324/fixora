@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo1 from "@/assets/images/LogoLogin.png";
 import {
@@ -28,6 +28,11 @@ const FormSchema = z.object({
 
 export default function UserMobileVerification() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // আগের স্টেট ধরে রাখো (ফোন, পাসওয়ার্ড)
+  const { phone, password } = location.state || {};
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -37,7 +42,12 @@ export default function UserMobileVerification() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     if (data.pin === "1234") {
-      navigate("/UserInformation");
+      navigate("/UserInformation", {
+        state: {
+          phone,
+          password,
+        },
+      });
     } else {
       form.setError("pin", {
         type: "manual",

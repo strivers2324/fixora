@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,10 +58,14 @@ export default function UserInformation() {
   const [districtError, setDistrictError] = useState("");
   const [areaError, setAreaError] = useState("");
   const [subAreaError, setSubAreaError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { phone, password } = location.state || {};
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let valid = true;
 
@@ -71,29 +75,63 @@ export default function UserInformation() {
     } else {
       setNameError("");
     }
-
     if (!selectedDistrict) {
       setDistrictError("District is required.");
       valid = false;
     } else {
       setDistrictError("");
     }
-
     if (!selectedArea) {
       setAreaError("Area is required.");
       valid = false;
     } else {
       setAreaError("");
     }
-
     if (!selectedSubArea) {
       setSubAreaError("Sub Area is required.");
       valid = false;
     } else {
       setSubAreaError("");
     }
+    if (!phone || !password) {
+      setSubmitError("Registration data missing. Please restart registration.");
+      valid = false;
+    } else {
+      setSubmitError("");
+    }
+
     if (valid) {
-      navigate("/congratulations");
+      setSubmitting(true);
+      try {
+        // Backend-এ সব info পাঠাও (কোনো image/file নাই!)
+        const body = {
+          phone,
+          password,
+          full_name: name,
+          district: selectedDistrict,
+          area: selectedArea,
+          sub_area: selectedSubArea,
+        };
+
+        const response = await fetch(
+          "http://localhost:8080/api/register-user",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }
+        );
+        if (response.ok) {
+          navigate("/congratulations");
+        } else {
+          const data = await response.json().catch(() => ({}));
+          setSubmitError(data.message || "Registration failed!");
+        }
+      } catch (err: any) {
+        setSubmitError("Registration failed! " + err.message);
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -169,9 +207,7 @@ export default function UserInformation() {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="area">
-                    Area
-                  </FieldLabel>
+                  <FieldLabel htmlFor="area">Area</FieldLabel>
                   <Select
                     value={selectedArea}
                     onValueChange={(v) => {
@@ -193,9 +229,7 @@ export default function UserInformation() {
                     </SelectContent>
                   </Select>
                   {areaError && (
-                    <span className="text-sm text-red-600">
-                      {areaError}
-                    </span>
+                    <span className="text-sm text-red-600">{areaError}</span>
                   )}
                 </Field>
                 <Field>
@@ -223,12 +257,20 @@ export default function UserInformation() {
                     <span className="text-sm text-red-600">{subAreaError}</span>
                   )}
                 </Field>
+
+                {submitError && (
+                  <div className="text-sm text-red-600 text-center mt-2">
+                    {submitError}
+                  </div>
+                )}
+
                 <Field>
                   <Button
                     type="submit"
                     className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md"
+                    disabled={submitting}
                   >
-                    Finish
+                    {submitting ? "Submitting..." : "Finish"}
                   </Button>
                 </Field>
               </FieldGroup>
