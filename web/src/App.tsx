@@ -49,7 +49,6 @@ function App() {
         />
         <Route path="/UserInformation" element={<UserInformation />} />
       </Routes>
-      <Footer />
     </div>
   );
 }
