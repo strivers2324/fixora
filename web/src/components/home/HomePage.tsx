@@ -1,6 +1,7 @@
 import Hero from "./sections/Hero";
 import ServiceSection from "./sections/Services";
 import AboutSection from "./sections/About";
+import Footer from "../layout/Footer";
 
 function HomePage() {
     return (
@@ -8,6 +9,7 @@ function HomePage() {
             <Hero />
             <ServiceSection />
             <AboutSection />
+                  <Footer />
         </div>
     );
 }

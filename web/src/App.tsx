@@ -40,7 +40,6 @@ function App() {
         <Route path="/UserNumberVerification" element={<UserMobileVerification />} />
         <Route path="/UserInformation" element={<UserInformation />} />
       </Routes>
-      <Footer />
     </div>
   );
 }

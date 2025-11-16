@@ -35,13 +35,14 @@ export default function Navbar() {
           >
             Home
           </HashLink>
-
-          <Link
-            to="/services"
+          <HashLink
+            smooth
+            to="/#services"
             className="transition-colors hover:text-black/80 text-white"
           >
             Services
-          </Link>
+          </HashLink>
+
           <HashLink
             smooth
             to="/#about-section"
@@ -78,13 +79,15 @@ export default function Navbar() {
               Home
             </HashLink>
 
-            <Link
-              to="/services"
+            <HashLink
+              smooth
+              to="/#services"
               className="transition-colors hover:text-black/80 text-white"
               onClick={closeMenu}
             >
               Services
-            </Link>
+            </HashLink>
+
             <HashLink
               smooth
               to="/#about-section"
