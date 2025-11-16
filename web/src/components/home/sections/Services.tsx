@@ -114,7 +114,7 @@ function SamplePrevArrow(props: any) {
 export default function ServiceSection() {
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 300,
     slidesToShow: 4,
     slidesToScroll: 4,

@@ -11,14 +11,13 @@ import SpInformation from "./components/auth/registration/service-provider/SpInf
 import SpNIDSubmission from "./components/auth/registration/service-provider/Document.tsx";
 import UserMobileVerification from "./components/auth/registration/user/NumberVerification.tsx";
 import UserInformation from "./components/auth/registration/user/UserInformation.tsx";
-import Footer from "./components/layout/Footer";
 
 function App() {
   const location = useLocation();
 
   useEffect(() => {
     if (window.history.scrollRestoration) {
-      window.history.scrollRestoration = 'manual';
+      window.history.scrollRestoration = "manual";
     }
   }, []);
 
@@ -33,11 +32,20 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/SpRegistrationForm" element={<SpRegistrationForm />} />
         <Route path="/LoginForm" element={<LoginForm />} />
-        <Route path="/SpNumberVerification" element={<SpMobileVerification />} />
+        <Route
+          path="/SpNumberVerification"
+          element={<SpMobileVerification />}
+        />
         <Route path="/SpInformation" element={<SpInformation />} />
         <Route path="/SpNIDSubmission" element={<SpNIDSubmission />} />
-        <Route path="/UserRegistrationForm" element={<UserRegistrationForm />} />
-        <Route path="/UserNumberVerification" element={<UserMobileVerification />} />
+        <Route
+          path="/UserRegistrationForm"
+          element={<UserRegistrationForm />}
+        />
+        <Route
+          path="/UserNumberVerification"
+          element={<UserMobileVerification />}
+        />
         <Route path="/UserInformation" element={<UserInformation />} />
       </Routes>
     </div>
