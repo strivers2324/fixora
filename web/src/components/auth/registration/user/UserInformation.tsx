@@ -169,9 +169,7 @@ export default function UserInformation() {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="area">
-                    Area
-                  </FieldLabel>
+                  <FieldLabel htmlFor="area">Area</FieldLabel>
                   <Select
                     value={selectedArea}
                     onValueChange={(v) => {
@@ -193,9 +191,7 @@ export default function UserInformation() {
                     </SelectContent>
                   </Select>
                   {areaError && (
-                    <span className="text-sm text-red-600">
-                      {areaError}
-                    </span>
+                    <span className="text-sm text-red-600">{areaError}</span>
                   )}
                 </Field>
                 <Field>
