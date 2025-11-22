@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type ServiceProvider struct {
+type ServiceProviderRegisterRequest struct {
 	Phone        string    `json:"phone"`
 	UUID         string    `json:"uuid"`
 	Profession   string    `json:"profession"`

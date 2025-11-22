@@ -103,7 +103,6 @@ export default function UserInformation() {
     if (valid) {
       setSubmitting(true);
       try {
-        // Backend-এ সব info পাঠাও (কোনো image/file নাই!)
         const body = {
           phone,
           password,

@@ -24,7 +24,6 @@ export function UserRegistrationForm() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
-  // Submit Handler
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 

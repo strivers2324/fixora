@@ -18,6 +18,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useState } from "react";
 
 const FormSchema = z.object({
   pin: z
@@ -29,8 +30,9 @@ const FormSchema = z.object({
 export default function UserMobileVerification() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // আগের স্টেট ধরে রাখো (ফোন, পাসওয়ার্ড)
   const { phone, password } = location.state || {};
 
   const form = useForm({
@@ -40,28 +42,58 @@ export default function UserMobileVerification() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (data.pin === "1234") {
-      navigate("/UserInformation", {
-        state: {
-          phone,
-          password,
-        },
-      });
-    } else {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitError(null);
+    let valid = true;
+
+    const values = form.getValues();
+    const pin = (values.pin ?? "").toString();
+
+    if (pin !== "1234") {
       form.setError("pin", {
         type: "manual",
         message: "Wrong OTP. Please try again.",
       });
+      return;
     }
-  }
+
+    if (valid) {
+      setSubmitting(true);
+      try {
+        const body = {
+          phone,
+          password,
+        };
+
+        const response = await fetch(
+          "http://localhost:8080/api/register-user",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }
+        );
+        if (response.ok) {
+          navigate("/congratulations");
+        } else {
+          const data = await response.json().catch(() => ({}));
+          setSubmitError(data.message || "Registration failed!");
+        }
+      } catch (err: any) {
+        setSubmitError("Registration failed! " + err.message);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit} // event-based handler used here
             className="w-full max-w-md mx-auto space-y-6 bg-white rounded-xl shadow-2xl p-8"
           >
             <div className="text-center mb-4">
@@ -74,7 +106,15 @@ export default function UserMobileVerification() {
               <p className="text-base text-gray-600 font-serif">
                 Please enter the code sent to your phone.
               </p>
+              {phone ? (
+                <p className="text-sm text-gray-600 mt-1">Verifying: {phone}</p>
+              ) : (
+                <p className="text-sm text-red-600 mt-1">
+                  Missing phone — redirecting...
+                </p>
+              )}
             </div>
+
             <FormField
               control={form.control}
               name="pin"
@@ -92,8 +132,14 @@ export default function UserMobileVerification() {
                     </InputOTP>
                   </FormControl>
                   <FormDescription className="text-center">
-                    Didn&apos;t get your code?{" "}
-                    <span className="text-teal-900 cursor-pointer hover:underline">
+                    Didn't get your code?{" "}
+                    <span
+                      className="text-teal-900 cursor-pointer hover:underline"
+                      onClick={() => {
+                        /* optionally call backend to resend; placeholder for now */
+                        console.info("Resend OTP clicked");
+                      }}
+                    >
                       Resend
                     </span>
                   </FormDescription>
@@ -101,11 +147,19 @@ export default function UserMobileVerification() {
                 </FormItem>
               )}
             />
+
+            {submitError && (
+              <div className="text-sm text-red-600 text-center">
+                {submitError}
+              </div>
+            )}
+
             <Button
               type="submit"
               className="w-full bg-teal-900 text-white hover:bg-teal-700 font-serif text-md"
+              disabled={submitting}
             >
-              Submit
+              {submitting ? "Verifying..." : "Submit"}
             </Button>
           </form>
         </Form>
