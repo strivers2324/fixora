@@ -77,12 +77,11 @@ const servicesData = [
   },
 ];
 
-// --- Custom Logic for Buttons ---
 
 function SampleNextArrow(props: any) {
   const { className, onClick } = props;
   
-  // যদি শেষ স্লাইডে থাকে, তাহলে বাটন রেন্ডার করবে না (Hidden Logic)
+
   if (className?.includes("slick-disabled")) {
     return null;
   }
@@ -107,7 +106,6 @@ function SampleNextArrow(props: any) {
 function SamplePrevArrow(props: any) {
   const { className, onClick } = props;
 
-  // যদি প্রথম স্লাইডে থাকে, তাহলে বাটন রেন্ডার করবে না (Hidden Logic)
   if (className?.includes("slick-disabled")) {
     return null;
   }
@@ -132,7 +130,7 @@ function SamplePrevArrow(props: any) {
 export default function ServiceSection() {
   const settings = {
     dots: true,
-    infinite: false, // এটা false থাকলেই শুধু disabled ক্লাস কাজ করবে
+    infinite: false,
     speed: 600,
     slidesToShow: 5,
     slidesToScroll: 5,
