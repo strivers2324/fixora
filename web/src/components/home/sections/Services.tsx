@@ -77,36 +77,54 @@ const servicesData = [
   },
 ];
 
+// --- Custom Logic for Buttons ---
+
 function SampleNextArrow(props: any) {
-  const { onClick } = props;
+  const { className, onClick } = props;
+  
+  // যদি শেষ স্লাইডে থাকে, তাহলে বাটন রেন্ডার করবে না (Hidden Logic)
+  if (className?.includes("slick-disabled")) {
+    return null;
+  }
+
   return (
     <button
-      className="absolute top-1/2 -translate-y-1/2 -right-5 z-10
-                bg-white text-[#1d4b4a] hover:bg-gray-200
-                rounded-full p-3 shadow-lg cursor-pointer transition-all
-                hidden lg:flex items-center justify-center border border-gray-300
-                hover:scale-110 active:scale-95"
+      className="absolute top-1/2 -translate-y-1/2 right-4 z-20
+                w-12 h-12 flex items-center justify-center
+                rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20
+                transition-all duration-300 ease-in-out
+                hover:bg-white hover:text-[#1d4b4a] hover:scale-110 
+                hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]
+                hidden lg:flex group cursor-pointer"
       onClick={onClick}
       aria-label="Next services"
     >
-      <BsChevronRight size={20} />
+      <BsChevronRight size={22} className="group-hover:translate-x-0.5 transition-transform duration-300" />
     </button>
   );
 }
 
 function SamplePrevArrow(props: any) {
-  const { onClick } = props;
+  const { className, onClick } = props;
+
+  // যদি প্রথম স্লাইডে থাকে, তাহলে বাটন রেন্ডার করবে না (Hidden Logic)
+  if (className?.includes("slick-disabled")) {
+    return null;
+  }
+
   return (
     <button
-      className="absolute top-1/2 -translate-y-1/2 -left-5 z-10
-                bg-white text-[#1d4b4a] hover:bg-gray-200
-                rounded-full p-3 shadow-lg cursor-pointer transition-all
-                hidden lg:flex items-center justify-center border border-gray-300
-                hover:scale-110 active:scale-95"
+      className="absolute top-1/2 -translate-y-1/2 left-4 z-20
+                w-12 h-12 flex items-center justify-center
+                rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20
+                transition-all duration-300 ease-in-out
+                hover:bg-white hover:text-[#1d4b4a] hover:scale-110 
+                hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]
+                hidden lg:flex group cursor-pointer"
       onClick={onClick}
       aria-label="Previous services"
     >
-      <BsChevronLeft size={20} />
+      <BsChevronLeft size={22} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
     </button>
   );
 }
@@ -114,14 +132,22 @@ function SamplePrevArrow(props: any) {
 export default function ServiceSection() {
   const settings = {
     dots: true,
-    infinite: false,
-    speed: 300,
-    slidesToShow: 4,
-    slidesToScroll: 4,
+    infinite: false, // এটা false থাকলেই শুধু disabled ক্লাস কাজ করবে
+    speed: 600,
+    slidesToShow: 5,
+    slidesToScroll: 5,
+    initialSlide: 0,
     arrows: true,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     responsive: [
+      {
+        breakpoint: 1536,
+        settings: {
+          slidesToShow: 5,
+          slidesToScroll: 5,
+        },
+      },
       {
         breakpoint: 1280,
         settings: {
@@ -141,8 +167,6 @@ export default function ServiceSection() {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
-          arrows: false,
-          dots: true,
         },
       },
       {
@@ -153,18 +177,7 @@ export default function ServiceSection() {
           arrows: false,
           dots: true,
           centerMode: true,
-          centerPadding: "20px",
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          arrows: false,
-          dots: true,
-          centerMode: true,
-          centerPadding: "15px",
+          centerPadding: "40px",
         },
       },
     ],
@@ -173,110 +186,96 @@ export default function ServiceSection() {
   return (
     <div
       id="services"
-      style={{ scrollMarginTop: "70px" }}
-      className="py-8 sm:py-12 bg-[#1d4b4a] text-white border-b border-white/30 overflow-hidden"
+      className="py-12 bg-[#1d4b4a] text-white border-b border-white/30 overflow-hidden relative"
     >
       <style>
         {`
           .slick-dots {
-            bottom: -35px !important;
+            bottom: -40px !important;
           }
           .slick-dots li {
-            margin: 0 3px !important;
+            margin: 0 2px !important;
           }
           .slick-dots li button:before {
-            font-size: 10px !important;
+            font-size: 8px !important;
             color: white !important;
-            opacity: 0.5 !important;
+            opacity: 0.4 !important;
           }
           .slick-dots li.slick-active button:before {
             opacity: 1 !important;
             color: white !important;
-          }
-          
-          .slick-slider {
-            width: 100% !important;
-          }
-          
-          .slick-list {
-            margin: 0 -10px;
-            padding: 10px 0 !important;
-            overflow: visible !important;
-          }
-          
-          .slick-slide {
-            padding: 0 10px;
-            height: inherit !important;
+            font-size: 10px !important;
           }
           
           .slick-track {
             display: flex !important;
-            align-items: stretch !important;
+            gap: 0;
           }
           
+          .slick-slide {
+            height: auto;
+            display: flex;
+            flex-direction: column; 
+          }
+
           .slick-slide > div {
             height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .slick-list {
+            overflow: visible;
+            margin: 0 -10px;
+            padding: 10px 0;
           }
           
-          @media (max-width: 640px) {
-            .slick-list {
-              margin: 0 -5px;
-              padding: 5px 0 !important;
-            }
-            .slick-slide {
-              padding: 0 5px;
-            }
-            .slick-slide.slick-center {
-              transform: scale(1) !important;
-            }
-          }
-          
-          .slick-prev, .slick-next {
-            display: none !important;
+          @media (min-width: 768px) {
+             .slick-list {
+                overflow: hidden;
+             }
           }
         `}
       </style>
 
-      <div className="container mx-auto px-4 sm:px-6 relative">
-        <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-            Our Services
-          </h2>
-          <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base px-4">
-            Professional services for all your home and business needs
-          </p>
-        </div>
+      <div className="container mx-auto px-4 sm:px-6 text-center mb-10 relative z-10">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+          Our Services
+        </h2>
+        <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
+          Professional services for all your home and business needs
+        </p>
+      </div>
 
-        <div className="relative max-w-full mx-auto">
-          <div className="w-full">
-            <Slider {...settings}>
-              {servicesData.map((service, index) => (
-                <div key={index} className="h-full focus:outline-none">
-                  <Link
-                    to={service.to}
-                    className="block w-full p-4 bg-[#2a9d8f] rounded-lg shadow-lg text-center
-                                 transition-all duration-200 hover:shadow-xl hover:bg-[#24867a] 
-                                 h-full flex flex-col justify-center min-h-[100px] sm:min-h-[120px]
-                                 border border-white/10 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white"
-                  >
-                    <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 text-white leading-tight">
-                      {service.title}
-                    </h3>
-                    <p className="text-xs text-gray-200 leading-tight">
-                      {service.desc}
-                    </p>
-                  </Link>
-                </div>
-              ))}
-            </Slider>
-          </div>
-        </div>
+      <div className="relative w-full">
+        <Slider {...settings}>
+          {servicesData.map((service, index) => (
+            <div key={index} className="h-full px-2 md:px-3 xl:px-4 pb-4 pt-2">
+              <Link
+                to={service.to}
+                className="flex flex-col justify-center items-center h-full min-h-[150px] sm:min-h-[160px]
+                             bg-[#2a9d8f] rounded-xl shadow-md text-center p-6
+                             transition-all duration-300 
+                             hover:shadow-2xl hover:bg-[#24867a] hover:-translate-y-2
+                             border border-white/10 group outline-none"
+              >
+                <h3 className="text-lg sm:text-xl font-bold mb-2 text-white leading-tight group-hover:text-white">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-gray-100 leading-tight opacity-90">
+                  {service.desc}
+                </p>
+              </Link>
+            </div>
+          ))}
+        </Slider>
+      </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-300 text-xs sm:text-sm lg:hidden animate-pulse">
-            ← Swipe to explore more services →
-          </p>
-        </div>
+      <div className="mt-12 text-center lg:hidden container mx-auto">
+        <p className="text-gray-400 text-xs animate-pulse flex justify-center items-center gap-2">
+          <span>Swipe for more</span>
+          <BsChevronRight size={12} />
+        </p>
       </div>
     </div>
   );
