@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type User struct {
+type UserRegisterRequest struct {
 	Phone        string    `json:"phone"`
 	UUID         string    `json:"uuid"`
 	PasswordHash string    `json:"password_hash"`

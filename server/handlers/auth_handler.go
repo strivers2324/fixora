@@ -1,0 +1,96 @@
+package handlers
+
+import (
+	"fixora-server/models"
+	"fixora-server/service"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type AuthHandler struct {
+	AuthService *service.AuthService
+}
+
+func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+	return &AuthHandler{
+		AuthService: authService,
+	}
+}
+
+func (h *AuthHandler) UserRegisterHandler(c *gin.Context) {
+	var req models.UserRegisterRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		return
+	}
+
+	if err := h.AuthService.RegisterUser(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not register"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Registration successful"})
+}
+
+func (h *AuthHandler) ServiceProviderRegisterHandler(c *gin.Context) {
+	var req models.ServiceProviderRegisterRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		return
+	}
+
+	if err := h.AuthService.RegisterServiceProvider(req); err != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not register"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Registration successful"})
+}
+
+func (h *AuthHandler) CheckUserPhoneHandler(c *gin.Context) {
+	var req struct {
+		Phone string `json:"phone"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		return
+	}
+
+	exists, err := h.AuthService.CheckUserPhone(req.Phone)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Server error checking phone"})
+		return
+	}
+
+	if exists {
+		c.JSON(http.StatusConflict, gin.H{"message": "Phone number already exists"})
+		return
+	}
+}
+
+func (h *AuthHandler) CheckServiceProviderPhoneHandler(c *gin.Context) {
+	var req struct {
+		Phone string `json:"phone"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		return
+	}
+
+	exists, err := h.AuthService.CheckServiceProviderPhone(req.Phone)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Server error checking phone"})
+		return
+	}
+
+	if exists {
+		c.JSON(http.StatusConflict, gin.H{"message": "Phone number already exists"})
+		return
+	}
+}

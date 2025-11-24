@@ -4,6 +4,9 @@ import (
 	"embed"
 	"fixora-server/database"
 	"fixora-server/handlers"
+	"fixora-server/repository"
+	"fixora-server/routes"
+	"fixora-server/service"
 	"log"
 	"net/http"
 	"strings"
@@ -20,11 +23,19 @@ func main() {
 	distFS := getFileSystem("dist")
 	router.Use(static.Serve("/", distFS))
 
-	database.InitDB()
+	db := database.InitDB()
 
-	// ------ Service provider registration API route ------
-	router.POST("/api/register-service-provider", handlers.ServiceProviderRegisterHandler)
-	router.POST("/api/register-user", handlers.UserRegisterHandler)
+	// Initialize repositories
+	authRepo := repository.NewAuthRepository(db)
+
+	// Initialize services
+	authService := service.NewAuthService(authRepo)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(authService)
+
+	// Set up routes
+	routes.SetAuthRoutes(router, authHandler)
 
 	//Serve frontend
 	router.NoRoute(func(c *gin.Context) {
