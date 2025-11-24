@@ -58,7 +58,9 @@ export function SpRegistrationForm() {
   const [agree, setAgree] = useState(false);
   const [agreeError, setAgreeError] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     let isValid = true;
@@ -73,9 +75,7 @@ export function SpRegistrationForm() {
     if (!phone) {
       setPhoneError("Please enter your phone number.");
       isValid = false;
-    } else if (
-      !/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)
-    ) {
+    } else if (!/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)) {
       setPhoneError("Please enter a valid Bangladeshi phone number.");
       isValid = false;
     } else {
@@ -110,13 +110,39 @@ export function SpRegistrationForm() {
     }
 
     if (isValid) {
-      navigate("/SpNumberVerification", {
-        state: {
-          phone,
-          password,
-          profession,
-        },
-      });
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          "http://localhost:8080/api/check-service-provider",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ phone: phone }),
+          }
+        );
+        if (response.status === 409) {
+          setPhoneError("This phone number is already registered.");
+          setIsLoading(false);
+          return;
+        }
+        if (!response.ok) {
+          console.error("Server check failed");
+          setIsLoading(false);
+          return;
+        }
+
+        navigate("/SpNumberVerification", {
+          state: {
+            phone,
+            password,
+            profession,
+          },
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -132,15 +158,27 @@ export function SpRegistrationForm() {
         </p>
         <ul className="inline-flex flex-col items-cennter gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg">
           <li className="flex items-center gap-x-3">
-            <img src={Toolbox} alt="Toolbox" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src={Toolbox}
+              alt="Toolbox"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>Own toolbox</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img src={NID} alt="NID Card" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src={NID}
+              alt="NID Card"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>National ID</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img src={Phone} alt="Smartphone" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src={Phone}
+              alt="Smartphone"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>Smartphone</span>
           </li>
         </ul>
@@ -149,14 +187,23 @@ export function SpRegistrationForm() {
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
-            <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
-               <FieldGroup>
+            <form
+              className="w-full max-w-md mx-auto"
+              onSubmit={handleSubmit}
+              noValidate
+            >
+              <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
-                    <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
+                    <img
+                      src={logo1}
+                      alt="Fixora Logo"
+                      className="h-20 w-auto"
+                    />
                   </div>
                   <p className="text-balance font-serif text-lg color-teal-900">
-                    Start earning today—join Fixora as a Service Provider and grow your income with your skills!
+                    Start earning today—join Fixora as a Service Provider and
+                    grow your income with your skills!
                   </p>
                 </div>
 
@@ -169,20 +216,25 @@ export function SpRegistrationForm() {
                     pattern="(\+8801[3-9]\d{8}|01[3-9]\d{8})"
                     required
                     value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                   <p className="text-sm text-gray-600 font-serif mt-0">
                     We'll send you an OTP to confirm your number.
                   </p>
-                  {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
+                  {phoneError && (
+                    <span className="text-sm text-red-600">{phoneError}</span>
+                  )}
                 </Field>
 
                 <Field>
                   <FieldLabel htmlFor="profession">Profession</FieldLabel>
-                  <Select value={profession} onValueChange={v => {
-                    setProfession(v);
-                    setProfError("");
-                  }}>
+                  <Select
+                    value={profession}
+                    onValueChange={(v) => {
+                      setProfession(v);
+                      setProfError("");
+                    }}
+                  >
                     <SelectTrigger id="profession">
                       <SelectValue placeholder="Select profession" />
                     </SelectTrigger>
@@ -195,7 +247,9 @@ export function SpRegistrationForm() {
                     </SelectContent>
                   </Select>
                   {profError && (
-                    <span className="text-sm text-red-600 mt-2 block">{profError}</span>
+                    <span className="text-sm text-red-600 mt-2 block">
+                      {profError}
+                    </span>
                   )}
                 </Field>
 
@@ -208,7 +262,7 @@ export function SpRegistrationForm() {
                       id="password"
                       type={visible ? "text" : "password"}
                       value={password}
-                      onChange={e => setPassword(e.target.value)}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                       className="pr-10"
                     />
@@ -235,19 +289,25 @@ export function SpRegistrationForm() {
                       )}
                     </button>
                   </div>
-                  {passwordError && <span className="text-sm text-red-600">{passwordError}</span>}
+                  {passwordError && (
+                    <span className="text-sm text-red-600">
+                      {passwordError}
+                    </span>
+                  )}
                 </Field>
 
                 <Field>
                   <div className="flex items-center">
-                    <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+                    <FieldLabel htmlFor="confirm-password">
+                      Confirm Password
+                    </FieldLabel>
                   </div>
                   <div className="relative">
                     <Input
                       id="confirm-password"
                       type={visible ? "text" : "password"}
                       value={confirmPassword}
-                      onChange={e => setConfirmPassword(e.target.value)}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       className="pr-10"
                     />
@@ -274,7 +334,11 @@ export function SpRegistrationForm() {
                       )}
                     </button>
                   </div>
-                  {confirmPasswordError && (<span className="text-sm text-red-600">{confirmPasswordError}</span>)}
+                  {confirmPasswordError && (
+                    <span className="text-sm text-red-600">
+                      {confirmPasswordError}
+                    </span>
+                  )}
                 </Field>
 
                 <Field>
@@ -285,24 +349,30 @@ export function SpRegistrationForm() {
                       required
                       className="w-4 h-4"
                       checked={agree}
-                      onChange={e => setAgree(e.target.checked)}
+                      onChange={(e) => setAgree(e.target.checked)}
                     />
                     <label htmlFor="terms" className="text-sm font-serif">
                       I agree to all the{" "}
-                      <Link to="/terms" className="text-teal-900 hover:text-teal-700 hover:underline font-serif">
+                      <Link
+                        to="/terms"
+                        className="text-teal-900 hover:text-teal-700 hover:underline font-serif"
+                      >
                         Terms & Conditions
                       </Link>
                     </label>
                   </div>
-                  {agreeError && (<span className="text-sm text-red-600">{agreeError}</span>)}
+                  {agreeError && (
+                    <span className="text-sm text-red-600">{agreeError}</span>
+                  )}
                 </Field>
 
                 <Field>
                   <Button
                     type="submit"
                     className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md w-full"
+                    disabled={isLoading}
                   >
-                    Continue
+                    {isLoading ? "Processing..." : "Continue"}
                   </Button>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">

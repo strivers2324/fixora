@@ -18,6 +18,7 @@ func NewAuthService(authRepo *repository.AuthRepository) *AuthService {
 }
 
 func (s *AuthService) RegisterUser(req models.UserRegisterRequest) error {
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.PasswordHash), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -37,6 +38,7 @@ func (s *AuthService) RegisterUser(req models.UserRegisterRequest) error {
 }
 
 func (s *AuthService) RegisterServiceProvider(req models.ServiceProviderRegisterRequest) error {
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.PasswordHash), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -57,4 +59,12 @@ func (s *AuthService) RegisterServiceProvider(req models.ServiceProviderRegister
 	}
 
 	return s.AuthRepo.CreateServiceProvider(serviceprovider)
+}
+
+func (s *AuthService) CheckUserPhone(phone string) (bool, error) {
+	return s.AuthRepo.CheckUserExists(phone)
+}
+
+func (s *AuthService) CheckServiceProviderPhone(phone string) (bool, error) {
+	return s.AuthRepo.CheckServiceProviderExists(phone)
 }

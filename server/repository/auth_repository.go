@@ -16,6 +16,28 @@ func NewAuthRepository(db *sql.DB) *AuthRepository {
 	}
 }
 
+func (r *AuthRepository) CheckUserExists(phone string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM users WHERE phone = $1)`
+	err := r.db.QueryRowContext(context.Background(), query, phone).Scan(&exists)
+
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+func (r *AuthRepository) CheckServiceProviderExists(phone string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM service_providers WHERE phone = $1)`
+	err := r.db.QueryRowContext(context.Background(), query, phone).Scan(&exists)
+
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
 func (r *AuthRepository) CreateUser(user models.UserRegisterRequest) error {
 	query := `
 		INSERT INTO users 

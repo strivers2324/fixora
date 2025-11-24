@@ -35,19 +35,17 @@ export default function UserMobileVerification() {
 
   const { phone, password } = location.state || {};
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       pin: "",
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     setSubmitError(null);
     let valid = true;
 
-    const values = form.getValues();
     const pin = (values.pin ?? "").toString();
 
     if (pin !== "1234") {
@@ -93,7 +91,7 @@ export default function UserMobileVerification() {
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Form {...form}>
           <form
-            onSubmit={handleSubmit} // event-based handler used here
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="w-full max-w-md mx-auto space-y-6 bg-white rounded-xl shadow-2xl p-8"
           >
             <div className="text-center mb-4">
@@ -106,12 +104,8 @@ export default function UserMobileVerification() {
               <p className="text-base text-gray-600 font-serif">
                 Please enter the code sent to your phone.
               </p>
-              {phone ? (
+              {phone && (
                 <p className="text-sm text-gray-600 mt-1">Verifying: {phone}</p>
-              ) : (
-                <p className="text-sm text-red-600 mt-1">
-                  Missing phone — redirecting...
-                </p>
               )}
             </div>
 
@@ -136,7 +130,6 @@ export default function UserMobileVerification() {
                     <span
                       className="text-teal-900 cursor-pointer hover:underline"
                       onClick={() => {
-                        /* optionally call backend to resend; placeholder for now */
                         console.info("Resend OTP clicked");
                       }}
                     >

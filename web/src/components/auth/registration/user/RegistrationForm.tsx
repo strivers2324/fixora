@@ -24,52 +24,73 @@ export function UserRegistrationForm() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    let valid = true;
+    let isValid = true;
 
-    // Phone Validation
     if (!phone) {
       setPhoneError("Please enter your phone number.");
-      valid = false;
+      isValid = false;
     } else if (!/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)) {
       setPhoneError("Please enter a valid Bangladeshi phone number.");
-      valid = false;
+      isValid = false;
     } else {
       setPhoneError("");
     }
 
-    // Password Validation
     if (!password) {
       setPasswordError("Please enter a password.");
-      valid = false;
+      isValid = false;
     } else if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters.");
-      valid = false;
+      isValid = false;
     } else {
       setPasswordError("");
     }
 
-    // Confirm Password Validation
     if (!confirmPassword) {
       setConfirmPasswordError("Please confirm your password.");
-      valid = false;
+      isValid = false;
     } else if (confirmPassword !== password) {
       setConfirmPasswordError("Passwords do not match.");
-      valid = false;
+      isValid = false;
     } else {
       setConfirmPasswordError("");
     }
 
-    // If all valid, forward all needed info as state for next steps
-    if (valid) {
-      navigate("/UserNumberVerification", {
-        state: {
-          phone,
-          password,
-        },
-      });
+    if (isValid) {
+      setIsLoading(true);
+      try {
+        const response = await fetch("http://localhost:8080/api/check-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phone: phone }),
+        });
+        if (response.status === 409) {
+          setPhoneError("This phone number is already registered.");
+          setIsLoading(false);
+          return;
+        }
+        if (!response.ok) {
+          console.error("Server check failed");
+          setIsLoading(false);
+          return;
+        }
+
+        navigate("/UserNumberVerification", {
+          state: {
+            phone,
+            password,
+          },
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -84,12 +105,10 @@ export function UserRegistrationForm() {
               noValidate
             >
               <FieldGroup>
-                {/* Logo */}
                 <div className="flex flex-col items-center mb-6">
                   <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
                 </div>
 
-                {/* Phone Field */}
                 <Field>
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
                   <Input
@@ -109,7 +128,6 @@ export function UserRegistrationForm() {
                   )}
                 </Field>
 
-                {/* Password Field */}
                 <Field>
                   <FieldLabel htmlFor="password">Create Password</FieldLabel>
                   <div className="relative">
@@ -151,7 +169,6 @@ export function UserRegistrationForm() {
                   )}
                 </Field>
 
-                {/* Confirm Password Field */}
                 <Field>
                   <FieldLabel htmlFor="confirm-password">
                     Confirm Password
@@ -195,13 +212,13 @@ export function UserRegistrationForm() {
                   )}
                 </Field>
 
-                {/* Continue Button */}
                 <Field>
                   <Button
                     type="submit"
                     className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md w-full"
+                    disabled={isLoading}
                   >
-                    Continue
+                    {isLoading ? "Loading..." : "Continue"}
                   </Button>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
