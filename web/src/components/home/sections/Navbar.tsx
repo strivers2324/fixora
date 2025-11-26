@@ -34,7 +34,7 @@ export default function Navbar() {
           <HashLink smooth to="/#about-section" className="transition-colors hover:text-black/80 text-white">
             About
           </HashLink>
-          <Link to="/LoginForm">
+          <Link to="/login">
             <Button className="ml-3 text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
               Login
             </Button>
@@ -80,7 +80,7 @@ export default function Navbar() {
 
             <div className="w-3/4 h-px bg-teal-500 my-2"></div>
 
-            <Link to="/LoginForm">
+            <Link to="/login">
               <Button className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
                 Login
               </Button>
