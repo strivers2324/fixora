@@ -5,13 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import logo1 from "@/assets/images/LogoLogin.png";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const districts = {
   dhaka: [
@@ -43,9 +37,7 @@ const subAreas: { [key: string]: { value: string; label: string }[] } = {
   ],
   gazipur_sadar: [{ value: "gazipur_main", label: "Gazipur Main" }],
   pahartali: [{ value: "pahartali_east", label: "Pahartali East" }],
-  coxsbazar_sadar: [
-    { value: "coxsbazar_central", label: "Cox's Bazar Central" },
-  ],
+  coxsbazar_sadar: [{ value: "coxsbazar_central", label: "Cox's Bazar Central" }],
 };
 
 export default function SpInformation() {
@@ -95,7 +87,7 @@ export default function SpInformation() {
     }
 
     if (valid) {
-      navigate("/SpNIDSubmission", {
+      navigate("/service-provider/nid-submission", {
         state: {
           phone,
           password,
@@ -114,19 +106,13 @@ export default function SpInformation() {
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
-            <form
-              className="w-full max-w-md mx-auto"
-              onSubmit={handleSubmit}
-              noValidate
-            >
+            <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
                     <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
                   </div>
-                  <h2 className="text-2xl font-bold font-serif text-teal-700">
-                    Create Your Account
-                  </h2>
+                  <h2 className="text-2xl font-bold font-serif text-teal-700">Create Your Account</h2>
                 </div>
                 <Field>
                   <FieldLabel htmlFor="Name">Full name</FieldLabel>
@@ -136,20 +122,18 @@ export default function SpInformation() {
                     placeholder="As per NID"
                     required
                     value={name}
-                    onChange={e => {
+                    onChange={(e) => {
                       setName(e.target.value);
                       setNameError("");
                     }}
                   />
-                  {nameError && (
-                    <span className="text-sm text-red-600">{nameError}</span>
-                  )}
+                  {nameError && <span className="text-sm text-red-600">{nameError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="district">District</FieldLabel>
                   <Select
                     value={selectedDistrict}
-                    onValueChange={v => {
+                    onValueChange={(v) => {
                       setSelectedDistrict(v);
                       setDistrictError("");
                       setSelectedArea("");
@@ -160,22 +144,22 @@ export default function SpInformation() {
                       <SelectValue placeholder="Select district" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.values(districts).flat().map(d => (
-                        <SelectItem key={d.value} value={d.value}>
-                          {d.label}
-                        </SelectItem>
-                      ))}
+                      {Object.values(districts)
+                        .flat()
+                        .map((d) => (
+                          <SelectItem key={d.value} value={d.value}>
+                            {d.label}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
-                  {districtError && (
-                    <span className="text-sm text-red-600">{districtError}</span>
-                  )}
+                  {districtError && <span className="text-sm text-red-600">{districtError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="area">Area</FieldLabel>
                   <Select
                     value={selectedArea}
-                    onValueChange={v => {
+                    onValueChange={(v) => {
                       setSelectedArea(v);
                       setAreaError("");
                       setSelectedSubArea("");
@@ -186,22 +170,20 @@ export default function SpInformation() {
                       <SelectValue placeholder="Select Area" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(Areas[selectedDistrict] || []).map(ps => (
+                      {(Areas[selectedDistrict] || []).map((ps) => (
                         <SelectItem key={ps.value} value={ps.value}>
                           {ps.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {areaError && (
-                    <span className="text-sm text-red-600">{areaError}</span>
-                  )}
+                  {areaError && <span className="text-sm text-red-600">{areaError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="sub-area">Sub Area</FieldLabel>
                   <Select
                     value={selectedSubArea}
-                    onValueChange={v => {
+                    onValueChange={(v) => {
                       setSelectedSubArea(v);
                       setSubAreaError("");
                     }}
@@ -211,22 +193,17 @@ export default function SpInformation() {
                       <SelectValue placeholder="Select sub area" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(subAreas[selectedArea] || []).map(sa => (
+                      {(subAreas[selectedArea] || []).map((sa) => (
                         <SelectItem key={sa.value} value={sa.value}>
                           {sa.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {subAreaError && (
-                    <span className="text-sm text-red-600">{subAreaError}</span>
-                  )}
+                  {subAreaError && <span className="text-sm text-red-600">{subAreaError}</span>}
                 </Field>
                 <Field>
-                  <Button
-                    type="submit"
-                    className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md"
-                  >
+                  <Button type="submit" className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md">
                     Continue
                   </Button>
                 </Field>

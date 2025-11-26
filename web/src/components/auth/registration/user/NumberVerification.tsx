@@ -4,27 +4,13 @@ import { z } from "zod";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo1 from "@/assets/images/LogoLogin.png";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { useState } from "react";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { useEffect, useState } from "react";
+import { AlertCircle } from "lucide-react";
 
 const FormSchema = z.object({
-  pin: z
-    .string()
-    .min(4, { message: "OTP must be 4 digits." })
-    .max(4, { message: "OTP must be 4 digits." }),
+  pin: z.string().min(4, { message: "OTP must be 4 digits." }).max(4, { message: "OTP must be 4 digits." }),
 });
 
 export default function UserMobileVerification() {
@@ -34,6 +20,17 @@ export default function UserMobileVerification() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { phone, password } = location.state || {};
+
+  const isMissingData = !phone || !password;
+
+  useEffect(() => {
+    if (isMissingData) {
+      const timer = setTimeout(() => {
+        navigate("/user/registration", { replace: true });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMissingData, navigate]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -64,14 +61,11 @@ export default function UserMobileVerification() {
           password,
         };
 
-        const response = await fetch(
-          "http://localhost:8080/api/register-user",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }
-        );
+        const response = await fetch("/api/register-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
         if (response.ok) {
           navigate("/congratulations");
         } else {
@@ -86,6 +80,21 @@ export default function UserMobileVerification() {
     }
   };
 
+  if (isMissingData) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
+        <div className="bg-white p-8 rounded-xl shadow-2xl text-center max-w-md w-full">
+          <div className="flex justify-center mb-4 text-amber-500">
+            <AlertCircle size={48} />
+          </div>
+          <h2 className="text-xl font-bold text-red-600 mb-2">Missing Information</h2>
+          <p className="text-gray-600">Please fill in the registration details first.</p>
+          <p className="text-sm text-gray-500 mt-4">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
@@ -98,15 +107,9 @@ export default function UserMobileVerification() {
               <div className="flex items-center justify-center mt-2 mb-4">
                 <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
               </div>
-              <h2 className="text-2xl font-bold font-serif text-teal-700">
-                Verify your phone number
-              </h2>
-              <p className="text-base text-gray-600 font-serif">
-                Please enter the code sent to your phone.
-              </p>
-              {phone && (
-                <p className="text-sm text-gray-600 mt-1">Verifying: {phone}</p>
-              )}
+              <h2 className="text-2xl font-bold font-serif text-teal-700">Verify your phone number</h2>
+              <p className="text-base text-gray-600 font-serif">Please enter the code sent to your phone.</p>
+              {phone && <p className="text-sm text-gray-600 mt-1">Verifying: {phone}</p>}
             </div>
 
             <FormField
@@ -141,11 +144,7 @@ export default function UserMobileVerification() {
               )}
             />
 
-            {submitError && (
-              <div className="text-sm text-red-600 text-center">
-                {submitError}
-              </div>
-            )}
+            {submitError && <div className="text-sm text-red-600 text-center">{submitError}</div>}
 
             <Button
               type="submit"

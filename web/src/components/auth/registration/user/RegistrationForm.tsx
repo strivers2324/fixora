@@ -5,12 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import logo1 from "@/assets/images/LogoLogin.png";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 
 export function UserRegistrationForm() {
   const navigate = useNavigate();
@@ -64,7 +59,7 @@ export function UserRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/check-user", {
+        const response = await fetch("/api/check-user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +77,7 @@ export function UserRegistrationForm() {
           return;
         }
 
-        navigate("/UserNumberVerification", {
+        navigate("/user/number-verification", {
           state: {
             phone,
             password,
@@ -99,11 +94,7 @@ export function UserRegistrationForm() {
       <div className="w-full max-w-xl py-8">
         <Card className="rounded-xl shadow-2xl bg-white">
           <CardContent className="px-6 py-10 flex flex-col justify-center">
-            <form
-              className="w-full max-w-md mx-auto"
-              onSubmit={handleSubmit}
-              noValidate
-            >
+            <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center mb-6">
                   <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
@@ -120,12 +111,8 @@ export function UserRegistrationForm() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
-                  <p className="text-sm text-gray-600 font-serif mt-0">
-                    We'll send you an OTP to confirm your number.
-                  </p>
-                  {phoneError && (
-                    <span className="text-sm text-red-600">{phoneError}</span>
-                  )}
+                  <p className="text-sm text-gray-600 font-serif mt-0">We'll send you an OTP to confirm your number.</p>
+                  {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
                 </Field>
 
                 <Field>
@@ -150,29 +137,16 @@ export function UserRegistrationForm() {
                         <Eye size={20} strokeWidth={2} />
                       ) : (
                         <Eye size={20} strokeWidth={2}>
-                          <line
-                            x1="21"
-                            y1="3"
-                            x2="3"
-                            y2="21"
-                            stroke="currentColor"
-                            strokeWidth="1.75"
-                          />
+                          <line x1="21" y1="3" x2="3" y2="21" stroke="currentColor" strokeWidth="1.75" />
                         </Eye>
                       )}
                     </button>
                   </div>
-                  {passwordError && (
-                    <span className="text-sm text-red-600">
-                      {passwordError}
-                    </span>
-                  )}
+                  {passwordError && <span className="text-sm text-red-600">{passwordError}</span>}
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="confirm-password">
-                    Confirm Password
-                  </FieldLabel>
+                  <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
                   <div className="relative">
                     <Input
                       id="confirm-password"
@@ -193,23 +167,12 @@ export function UserRegistrationForm() {
                         <Eye size={20} strokeWidth={2} />
                       ) : (
                         <Eye size={20} strokeWidth={2}>
-                          <line
-                            x1="21"
-                            y1="3"
-                            x2="3"
-                            y2="21"
-                            stroke="currentColor"
-                            strokeWidth="1.75"
-                          />
+                          <line x1="21" y1="3" x2="3" y2="21" stroke="currentColor" strokeWidth="1.75" />
                         </Eye>
                       )}
                     </button>
                   </div>
-                  {confirmPasswordError && (
-                    <span className="text-sm text-red-600">
-                      {confirmPasswordError}
-                    </span>
-                  )}
+                  {confirmPasswordError && <span className="text-sm text-red-600">{confirmPasswordError}</span>}
                 </Field>
 
                 <Field>
@@ -221,9 +184,7 @@ export function UserRegistrationForm() {
                     {isLoading ? "Loading..." : "Continue"}
                   </Button>
                 </Field>
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                  Or
-                </FieldSeparator>
+                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
                 <div className="text-center font-serif text-md">
                   {"Already have an account? "}
                   <Link

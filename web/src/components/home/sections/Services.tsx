@@ -77,10 +77,8 @@ const servicesData = [
   },
 ];
 
-
 function SampleNextArrow(props: any) {
   const { className, onClick } = props;
-  
 
   if (className?.includes("slick-disabled")) {
     return null;
@@ -182,10 +180,7 @@ export default function ServiceSection() {
   };
 
   return (
-    <div
-      id="services"
-      className="py-12 bg-[#1d4b4a] text-white border-b border-white/30 overflow-hidden relative"
-    >
+    <div id="services" className="py-12 bg-[#1d4b4a] text-white border-b border-white/30 overflow-hidden relative">
       <style>
         {`
           .slick-dots {
@@ -237,9 +232,7 @@ export default function ServiceSection() {
       </style>
 
       <div className="container mx-auto px-4 sm:px-6 text-center mb-10 relative z-10">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
-          Our Services
-        </h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">Our Services</h2>
         <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
           Professional services for all your home and business needs
         </p>
@@ -260,9 +253,7 @@ export default function ServiceSection() {
                 <h3 className="text-lg sm:text-xl font-bold mb-2 text-white leading-tight group-hover:text-white">
                   {service.title}
                 </h3>
-                <p className="text-sm text-gray-100 leading-tight opacity-90">
-                  {service.desc}
-                </p>
+                <p className="text-sm text-gray-100 leading-tight opacity-90">{service.desc}</p>
               </Link>
             </div>
           ))}

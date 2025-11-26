@@ -5,13 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import logo1 from "@/assets/images/LogoLogin.png";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const districts = {
   dhaka: [
@@ -43,9 +37,7 @@ const subAreas: { [key: string]: { value: string; label: string }[] } = {
   ],
   gazipur_sadar: [{ value: "gazipur_main", label: "Gazipur Main" }],
   pahartali: [{ value: "pahartali_east", label: "Pahartali East" }],
-  coxsbazar_sadar: [
-    { value: "coxsbazar_central", label: "Cox's Bazar Central" },
-  ],
+  coxsbazar_sadar: [{ value: "coxsbazar_central", label: "Cox's Bazar Central" }],
 };
 
 export default function UserInformation() {
@@ -112,14 +104,11 @@ export default function UserInformation() {
           sub_area: selectedSubArea,
         };
 
-        const response = await fetch(
-          "http://localhost:8080/api/register-user",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }
-        );
+        const response = await fetch("/api/register-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
         if (response.ok) {
           navigate("/congratulations");
         } else {
@@ -139,23 +128,13 @@ export default function UserInformation() {
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
-            <form
-              className="w-full max-w-md mx-auto"
-              onSubmit={handleSubmit}
-              noValidate
-            >
+            <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
-                    <img
-                      src={logo1}
-                      alt="Fixora Logo"
-                      className="h-20 w-auto"
-                    />
+                    <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
                   </div>
-                  <h2 className="text-2xl font-bold font-serif text-teal-700">
-                    Create Your Account
-                  </h2>
+                  <h2 className="text-2xl font-bold font-serif text-teal-700">Create Your Account</h2>
                 </div>
 
                 <Field>
@@ -171,9 +150,7 @@ export default function UserInformation() {
                       setNameError("");
                     }}
                   />
-                  {nameError && (
-                    <span className="text-sm text-red-600">{nameError}</span>
-                  )}
+                  {nameError && <span className="text-sm text-red-600">{nameError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="district">District</FieldLabel>
@@ -199,11 +176,7 @@ export default function UserInformation() {
                         ))}
                     </SelectContent>
                   </Select>
-                  {districtError && (
-                    <span className="text-sm text-red-600">
-                      {districtError}
-                    </span>
-                  )}
+                  {districtError && <span className="text-sm text-red-600">{districtError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="area">Area</FieldLabel>
@@ -227,9 +200,7 @@ export default function UserInformation() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {areaError && (
-                    <span className="text-sm text-red-600">{areaError}</span>
-                  )}
+                  {areaError && <span className="text-sm text-red-600">{areaError}</span>}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="sub-area">Sub Area</FieldLabel>
@@ -252,16 +223,10 @@ export default function UserInformation() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {subAreaError && (
-                    <span className="text-sm text-red-600">{subAreaError}</span>
-                  )}
+                  {subAreaError && <span className="text-sm text-red-600">{subAreaError}</span>}
                 </Field>
 
-                {submitError && (
-                  <div className="text-sm text-red-600 text-center mt-2">
-                    {submitError}
-                  </div>
-                )}
+                {submitError && <div className="text-sm text-red-600 text-center mt-2">{submitError}</div>}
 
                 <Field>
                   <Button

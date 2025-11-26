@@ -1,12 +1,5 @@
 import LogoSrc from "../../assets/images/Logo.png";
-import {
-  FaTwitter,
-  FaInstagram,
-  FaLinkedin,
-  FaCcVisa,
-  FaCcMastercard,
-  FaFacebook,
-} from "react-icons/fa";
+import { FaTwitter, FaInstagram, FaLinkedin, FaCcVisa, FaCcMastercard, FaFacebook } from "react-icons/fa";
 import BkashLogo from "../../assets/images/bkash.png";
 import NagadLogo from "../../assets/images/nagad.png";
 
@@ -91,16 +84,8 @@ export default function Footer({
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-12">
           <div className="col-span-2 lg:col-span-4">
-            <a
-              href={logo.url}
-              className="flex items-center gap-2 lg:justify-start"
-            >
-              <img
-                src={logo.src}
-                alt={logo.alt}
-                title={logo.title}
-                className="h-9"
-              />
+            <a href={logo.url} className="flex items-center gap-2 lg:justify-start">
+              <img src={logo.src} alt={logo.alt} title={logo.title} className="h-9" />
               <span className="text-xl font-bold text-white">{logo.title}</span>
             </a>
             <p className="mt-3 font-medium max-w-xs">{tagline}</p>
@@ -151,10 +136,7 @@ export default function Footer({
               <ul className="space-y-2 text-sm">
                 {section.links.map((link, linkIdx) => (
                   <li key={linkIdx} className="font-normal">
-                    <a
-                      href={link.url}
-                      className="hover:text-white hover:underline transition-colors duration-300"
-                    >
+                    <a href={link.url} className="hover:text-white hover:underline transition-colors duration-300">
                       {link.text}
                     </a>
                   </li>

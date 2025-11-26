@@ -9,19 +9,8 @@ import NID from "@/assets/images/Nid.png";
 import Phone from "@/assets/images/Smartphone.png";
 import logo1 from "@/assets/images/LogoLogin.png";
 
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const professions = [
   { value: "electrician", label: "Electrician" },
@@ -112,16 +101,13 @@ export function SpRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/check-service-provider",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ phone: phone }),
-          }
-        );
+        const response = await fetch("/api/check-service-provider", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phone: phone }),
+        });
         if (response.status === 409) {
           setPhoneError("This phone number is already registered.");
           setIsLoading(false);
@@ -133,7 +119,7 @@ export function SpRegistrationForm() {
           return;
         }
 
-        navigate("/SpNumberVerification", {
+        navigate("/service-provider/number-verification", {
           state: {
             phone,
             password,
@@ -158,27 +144,15 @@ export function SpRegistrationForm() {
         </p>
         <ul className="inline-flex flex-col items-cennter gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg">
           <li className="flex items-center gap-x-3">
-            <img
-              src={Toolbox}
-              alt="Toolbox"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain"
-            />
+            <img src={Toolbox} alt="Toolbox" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
             <span>Own toolbox</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img
-              src={NID}
-              alt="NID Card"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain"
-            />
+            <img src={NID} alt="NID Card" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
             <span>National ID</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img
-              src={Phone}
-              alt="Smartphone"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain"
-            />
+            <img src={Phone} alt="Smartphone" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
             <span>Smartphone</span>
           </li>
         </ul>
@@ -187,23 +161,14 @@ export function SpRegistrationForm() {
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
-            <form
-              className="w-full max-w-md mx-auto"
-              onSubmit={handleSubmit}
-              noValidate
-            >
+            <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
-                    <img
-                      src={logo1}
-                      alt="Fixora Logo"
-                      className="h-20 w-auto"
-                    />
+                    <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
                   </div>
                   <p className="text-balance font-serif text-lg color-teal-900">
-                    Start earning today—join Fixora as a Service Provider and
-                    grow your income with your skills!
+                    Start earning today—join Fixora as a Service Provider and grow your income with your skills!
                   </p>
                 </div>
 
@@ -218,12 +183,8 @@ export function SpRegistrationForm() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
-                  <p className="text-sm text-gray-600 font-serif mt-0">
-                    We'll send you an OTP to confirm your number.
-                  </p>
-                  {phoneError && (
-                    <span className="text-sm text-red-600">{phoneError}</span>
-                  )}
+                  <p className="text-sm text-gray-600 font-serif mt-0">We'll send you an OTP to confirm your number.</p>
+                  {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
                 </Field>
 
                 <Field>
@@ -246,11 +207,7 @@ export function SpRegistrationForm() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {profError && (
-                    <span className="text-sm text-red-600 mt-2 block">
-                      {profError}
-                    </span>
-                  )}
+                  {profError && <span className="text-sm text-red-600 mt-2 block">{profError}</span>}
                 </Field>
 
                 <Field>
@@ -277,30 +234,17 @@ export function SpRegistrationForm() {
                         <Eye size={20} strokeWidth={2} />
                       ) : (
                         <Eye size={20} strokeWidth={2}>
-                          <line
-                            x1="21"
-                            y1="3"
-                            x2="3"
-                            y2="21"
-                            stroke="currentColor"
-                            strokeWidth="1.75"
-                          />
+                          <line x1="21" y1="3" x2="3" y2="21" stroke="currentColor" strokeWidth="1.75" />
                         </Eye>
                       )}
                     </button>
                   </div>
-                  {passwordError && (
-                    <span className="text-sm text-red-600">
-                      {passwordError}
-                    </span>
-                  )}
+                  {passwordError && <span className="text-sm text-red-600">{passwordError}</span>}
                 </Field>
 
                 <Field>
                   <div className="flex items-center">
-                    <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
-                    </FieldLabel>
+                    <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
                   </div>
                   <div className="relative">
                     <Input
@@ -322,23 +266,12 @@ export function SpRegistrationForm() {
                         <Eye size={20} strokeWidth={2} />
                       ) : (
                         <Eye size={20} strokeWidth={2}>
-                          <line
-                            x1="21"
-                            y1="3"
-                            x2="3"
-                            y2="21"
-                            stroke="currentColor"
-                            strokeWidth="1.75"
-                          />
+                          <line x1="21" y1="3" x2="3" y2="21" stroke="currentColor" strokeWidth="1.75" />
                         </Eye>
                       )}
                     </button>
                   </div>
-                  {confirmPasswordError && (
-                    <span className="text-sm text-red-600">
-                      {confirmPasswordError}
-                    </span>
-                  )}
+                  {confirmPasswordError && <span className="text-sm text-red-600">{confirmPasswordError}</span>}
                 </Field>
 
                 <Field>
@@ -353,17 +286,12 @@ export function SpRegistrationForm() {
                     />
                     <label htmlFor="terms" className="text-sm font-serif">
                       I agree to all the{" "}
-                      <Link
-                        to="/terms"
-                        className="text-teal-900 hover:text-teal-700 hover:underline font-serif"
-                      >
+                      <Link to="/terms" className="text-teal-900 hover:text-teal-700 hover:underline font-serif">
                         Terms & Conditions
                       </Link>
                     </label>
                   </div>
-                  {agreeError && (
-                    <span className="text-sm text-red-600">{agreeError}</span>
-                  )}
+                  {agreeError && <span className="text-sm text-red-600">{agreeError}</span>}
                 </Field>
 
                 <Field>
@@ -375,9 +303,7 @@ export function SpRegistrationForm() {
                     {isLoading ? "Processing..." : "Continue"}
                   </Button>
                 </Field>
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                  Or
-                </FieldSeparator>
+                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
                 <div className="text-center font-serif text-md">
                   {"Already have an account? "}
                   <Link
