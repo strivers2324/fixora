@@ -5,7 +5,7 @@ import "time"
 type UserRegisterRequest struct {
 	Phone        string    `json:"phone"`
 	UUID         string    `json:"uuid"`
-	PasswordHash string    `json:"password_hash"`
+	Password     string    `json:"password"`
 	FullName     string    `json:"full_name"`
 	District     string    `json:"district"`
 	Area         string    `json:"area"`

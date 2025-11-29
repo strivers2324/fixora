@@ -13,12 +13,18 @@ import (
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 //go:embed "dist"
 var embeddedFiles embed.FS
 
 func main() {
+	//environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	router := gin.Default()
 	distFS := getFileSystem("dist")
 	router.Use(static.Serve("/", distFS))
