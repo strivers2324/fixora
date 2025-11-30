@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { Eye, User, Briefcase } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "@/lib/axios";
+import { SignUpRolePopup } from "../registration/selection/SignUpPopup";
 
 type LoginCredentials = {
   phone: string;
@@ -161,20 +162,7 @@ export default function LoginForm() {
                     </button>
                   </div>
                 </Field>
-                <Field>
-                  <div className="flex items-center gap-2">
-                    <Input id="terms" type="checkbox" required className="w-4 h-4" />
-                    <label htmlFor="terms" className="text-sm font-serif">
-                      I agree to all the{" "}
-                      <Link to="/terms" className="text-teal-900 hover:text-teal-700 hover:underline font-serif">
-                        Terms & Conditions
-                      </Link>
-                    </label>
-                  </div>
-                </Field>
-
                 {error && <div className="text-red-600 text-sm py-1 text-center">{error}</div>}
-
                 <Field>
                   <Button
                     type="submit"
@@ -187,12 +175,11 @@ export default function LoginForm() {
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
                 <div className="text-center font-serif text-md">
                   {"Don't have an account? "}
-                  <Link
-                    to="/UserRegistrationForm"
-                    className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
-                  >
-                    Sign up
-                  </Link>
+                  <SignUpRolePopup>
+                    <span className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline cursor-pointer">
+                      Sign up
+                    </span>
+                  </SignUpRolePopup>
                 </div>
               </FieldGroup>
             </form>

@@ -307,7 +307,7 @@ export function SpRegistrationForm() {
                 <div className="text-center font-serif text-md">
                   {"Already have an account? "}
                   <Link
-                    to="/LoginForm"
+                    to="/login"
                     className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
                   >
                     Log In

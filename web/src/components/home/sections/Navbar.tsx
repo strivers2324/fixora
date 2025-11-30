@@ -39,7 +39,11 @@ export default function Navbar() {
               Login
             </Button>
           </Link>
-          <SignUpRolePopup />
+          <SignUpRolePopup>
+            <Button className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
+              SignUp
+            </Button>
+          </SignUpRolePopup>
         </div>
 
         <div className="md:hidden">
@@ -85,7 +89,14 @@ export default function Navbar() {
                 Login
               </Button>
             </Link>
-            <SignUpRolePopup />
+            <SignUpRolePopup>
+              <Button
+                className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                SignUp
+              </Button>
+            </SignUpRolePopup>
           </nav>
         </div>
       )}
