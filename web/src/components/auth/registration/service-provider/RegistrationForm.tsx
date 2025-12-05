@@ -11,6 +11,7 @@ import logo1 from "@/assets/images/LogoLogin.png";
 
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RegisterServiceProvider } from "@/api/AuthApi";
 
 const professions = [
   { value: "electrician", label: "Electrician" },
@@ -101,31 +102,19 @@ export function SpRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/check-service-provider", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ phone: phone }),
+        await RegisterServiceProvider({
+          phone,
+          password,
+          profession,
         });
-        if (response.status === 409) {
-          setPhoneError("This phone number is already registered.");
-          setIsLoading(false);
-          return;
-        }
-        if (!response.ok) {
-          console.error("Server check failed");
-          setIsLoading(false);
-          return;
-        }
 
-        navigate("/service-provider/number-verification", {
+        navigate("/service_provider/number_verification", {
           state: {
             phone,
-            password,
-            profession,
           },
         });
+      } catch (error: any) {
+        setPhoneError(error.message);
       } finally {
         setIsLoading(false);
       }

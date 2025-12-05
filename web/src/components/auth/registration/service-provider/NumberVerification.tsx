@@ -8,6 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
+import { VerifyServiceProvider } from "@/api/AuthApi";
 
 const FormSchema = z.object({
   pin: z.string().min(4, { message: "OTP must be 4 digits." }).max(4, { message: "OTP must be 4 digits." }),
@@ -19,14 +20,14 @@ export default function SpMobileVerification() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { phone, password, profession } = location.state || {};
+  const { phone } = location.state || {};
 
-  const isMissingData = !phone || !password || !profession;
+  const isMissingData = !phone;
 
   useEffect(() => {
     if (isMissingData) {
       const timer = setTimeout(() => {
-        navigate("/service-provider/registration", { replace: true });
+        navigate("/service_provider/registration", { replace: true });
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -56,25 +57,10 @@ export default function SpMobileVerification() {
     if (valid) {
       setSubmitting(true);
       try {
-        const body = {
-          phone,
-          password,
-          profession,
-        };
-
-        const response = await fetch("/api/register-service-provider", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (response.ok) {
-          navigate("/congratulations");
-        } else {
-          const data = await response.json().catch(() => ({}));
-          setSubmitError(data.message || "Registration failed!");
-        }
+        await VerifyServiceProvider({ phone });
+        navigate("/congratulations");
       } catch (err: any) {
-        setSubmitError("Registration failed! " + err.message);
+        setSubmitError(err.message);
       } finally {
         setSubmitting(false);
       }
