@@ -7,31 +7,25 @@ import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { Eye, User, Briefcase } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "@/lib/axios";
 import { SignUpRolePopup } from "../registration/selection/SignUpPopup";
-
-type LoginCredentials = {
-  phone: string;
-  password: string;
-  role: "user" | "service-provider";
-};
-
-async function login(credentials: LoginCredentials) {
-  try {
-    const res = await api.post("/login", credentials);
-    return res.data;
-  } catch (error: any) {
-    const errorMessage = error.response?.data?.message || error.response?.data || "Login failed";
-    throw new Error(errorMessage);
-  }
-}
+import { login } from "@/api/AuthApi";
+import { Role } from "@/enums/UserRole";
 
 export default function LoginForm() {
   const [visible, setVisible] = useState(false);
-  const [role, setRole] = useState<"user" | "service-provider">("user");
+  const [role, setRole] = useState<Role>(Role.USER);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const ErrorMessage = (rawError: string) => {
+    const msg = rawError.toLowerCase();
+
+    if (msg.includes("network") || msg.includes("fetch") || msg.includes("connection")) {
+      return "Unable to connect. Please check your internet connection.";
+    }
+    return rawError;
+  };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,13 +36,14 @@ export default function LoginForm() {
 
     try {
       await login({ phone, password, role });
-      if (role === "user") {
-        navigate("/user-dashboard");
+      if (role === Role.USER) {
+        navigate("/user_dashboard");
       } else {
         navigate("/service-provider-dashboard");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+    } catch (err: any) {
+      const rawMessage = err.message || "An unexpected error occurred";
+      setError(ErrorMessage(rawMessage));
     } finally {
       setLoading(false);
     }
@@ -90,9 +85,9 @@ export default function LoginForm() {
                   <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg">
                     <button
                       type="button"
-                      onClick={() => setRole("user")}
+                      onClick={() => setRole(Role.USER)}
                       className={`flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                        role === "user"
+                        role === Role.USER
                           ? "bg-white text-teal-900 shadow-sm ring-1 ring-gray-200"
                           : "text-gray-500 hover:text-gray-900"
                       }`}
@@ -102,9 +97,9 @@ export default function LoginForm() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setRole("service-provider")}
+                      onClick={() => setRole(Role.SERVICE_PROVIDER)}
                       className={`flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                        role === "service-provider"
+                        role === Role.SERVICE_PROVIDER
                           ? "bg-white text-teal-900 shadow-sm ring-1 ring-gray-200"
                           : "text-gray-500 hover:text-gray-900"
                       }`}

@@ -13,7 +13,7 @@ api.interceptors.response.use(
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await axios.post("/api/refresh", {}, { withCredentials: true });
+        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
         return api(originalRequest);
       } catch (refreshError) {
         window.location.href = "/login";

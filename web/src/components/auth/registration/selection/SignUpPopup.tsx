@@ -19,7 +19,7 @@ export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) =>
 
   const handleServiceProviderSignup = () => {
     setOpen(false);
-    navigate("/service-provider/registration");
+    navigate("/service_provider/registration");
   };
 
   return (
