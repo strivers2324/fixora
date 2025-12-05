@@ -28,11 +28,31 @@ func (h *AuthHandler) UserRegisterHandler(c *gin.Context) {
 	}
 
 	if err := h.AuthService.RegisterUser(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not register"})
+		if err.Error() == "user already exists" {
+			c.JSON(http.StatusConflict, gin.H{"message": "This phone number is already registered. Please login."})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Registration failed"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "User created. Please verify OTP."})
+}
+
+func (h *AuthHandler) VerifyUserPhoneHandler(c *gin.Context) {
+	var req struct {
+		Phone string `json:"phone"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
+		return
+	}
+	if err := h.AuthService.VerifyUserPhone(req.Phone); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Verification failed"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Registration successful"})
+	c.JSON(http.StatusOK, gin.H{"message": "Phone number verified successfully"})
 }
 
 func (h *AuthHandler) ServiceProviderRegisterHandler(c *gin.Context) {
@@ -44,56 +64,33 @@ func (h *AuthHandler) ServiceProviderRegisterHandler(c *gin.Context) {
 	}
 
 	if err := h.AuthService.RegisterServiceProvider(req); err != nil {
-
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not register"})
+		if err.Error() == "provider phone already exists" {
+			c.JSON(http.StatusConflict, gin.H{"message": "This phone number is already registered. Please login."})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Registration failed"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Registration successful"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Please verify OTP."})
 }
 
-func (h *AuthHandler) CheckUserPhoneHandler(c *gin.Context) {
+func (h *AuthHandler) VerifyServiceProviderOTPHandler(c *gin.Context) {
 	var req struct {
 		Phone string `json:"phone"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
 		return
 	}
 
-	exists, err := h.AuthService.CheckUserPhone(req.Phone)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Server error checking phone"})
+	if err := h.AuthService.VerifyServiceProvider(req.Phone); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Verification failed"})
 		return
 	}
 
-	if exists {
-		c.JSON(http.StatusConflict, gin.H{"message": "Phone number already exists"})
-		return
-	}
-}
-
-func (h *AuthHandler) CheckServiceProviderPhoneHandler(c *gin.Context) {
-	var req struct {
-		Phone string `json:"phone"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
-		return
-	}
-
-	exists, err := h.AuthService.CheckServiceProviderPhone(req.Phone)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Server error checking phone"})
-		return
-	}
-
-	if exists {
-		c.JSON(http.StatusConflict, gin.H{"message": "Phone number already exists"})
-		return
-	}
+	c.JSON(http.StatusOK, gin.H{"message": "Verification successful"})
 }
 
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
@@ -114,7 +111,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	c.SetCookie("access_token", accessToken, int(15*time.Minute.Seconds()), "/", "", false, true)
 
 	//Refresh token for self identity after 15 min
-	c.SetCookie("refresh_token", refreshToken, int(15*24*time.Hour.Seconds()), "/api/refresh", "", false, true)
+	c.SetCookie("refresh_token", refreshToken, int(15*24*time.Hour.Seconds()), "/api/auth/refresh", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
 }
@@ -129,7 +126,7 @@ func (h *AuthHandler) RefreshHandler(c *gin.Context) {
 	newAccessToken, err := h.AuthService.RefreshToken(cookieToken)
 	if err != nil {
 		c.SetCookie("access_token", "", -1, "/", "", false, true)
-		c.SetCookie("refresh_token", "", -1, "/api/refresh", "", false, true)
+		c.SetCookie("refresh_token", "", -1, "/api/auth/refresh", "", false, true)
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid refresh token"})
 		return
 	}
@@ -148,7 +145,7 @@ func (h *AuthHandler) LogoutHandler(c *gin.Context) {
 	}
 
 	c.SetCookie("access_token", "", -1, "/", "", false, true)
-	c.SetCookie("refresh_token", "", -1, "/api/refresh", "", false, true)
+	c.SetCookie("refresh_token", "", -1, "/api/auth/refresh", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out"})
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,54 +25,67 @@ func NewAuthService(authRepo *repository.AuthRepository) *AuthService {
 
 func (s *AuthService) RegisterUser(req models.UserRegisterRequest) error {
 
+	exists, err := s.AuthRepo.CheckUserExists(req.Phone)
+	if err != nil {
+		return errors.New("database error, checking user")
+	}
+	if exists {
+		return errors.New("user already exists")
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return errors.New("could not hash password")
 	}
+
+	newUserID := uuid.New().String()
 
 	user := models.UserRegisterRequest{
-		Phone:     req.Phone,
-		Password:  string(hash),
-		FullName:  req.FullName,
-		District:  req.District,
-		Area:      req.Area,
-		SubArea:   req.SubArea,
-		CreatedAt: req.CreatedAt,
+		User_ID:  newUserID,
+		Phone:    req.Phone,
+		Password: string(hash),
 	}
 
-	return s.AuthRepo.CreateUser(user)
+	if err := s.AuthRepo.CreateUser(user); err != nil {
+		return errors.New("failed to create user")
+	}
+
+	return nil
+}
+
+func (s *AuthService) VerifyUserPhone(phone string) error {
+	return s.AuthRepo.VerifyUserPhone(phone)
 }
 
 func (s *AuthService) RegisterServiceProvider(req models.ServiceProviderRegisterRequest) error {
 
+	exists, err := s.AuthRepo.CheckServiceProviderExists(req.Phone)
+	if err != nil {
+		return errors.New("database error")
+	}
+	if exists {
+		return errors.New("provider phone already exists")
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
+	newUserID := uuid.New().String()
+
 	serviceprovider := models.ServiceProviderRegisterRequest{
-		Phone:       req.Phone,
-		Profession:  req.Profession,
-		Password:    string(hash),
-		FullName:    req.FullName,
-		District:    req.District,
-		Area:        req.Area,
-		SubArea:     req.SubArea,
-		NidNumber:   req.NidNumber,
-		NidFrontUrl: req.NidFrontUrl,
-		NidBackUrl:  req.NidBackUrl,
-		CreatedAt:   req.CreatedAt,
+		User_ID:    newUserID,
+		Phone:      req.Phone,
+		Profession: req.Profession,
+		Password:   string(hash),
 	}
 
 	return s.AuthRepo.CreateServiceProvider(serviceprovider)
 }
 
-func (s *AuthService) CheckUserPhone(phone string) (bool, error) {
-	return s.AuthRepo.CheckUserExists(phone)
-}
-
-func (s *AuthService) CheckServiceProviderPhone(phone string) (bool, error) {
-	return s.AuthRepo.CheckServiceProviderExists(phone)
+func (s *AuthService) VerifyServiceProvider(phone string) error {
+	return s.AuthRepo.VerifyServiceProviderPhone(phone)
 }
 
 func (s *AuthService) getSecretKey() []byte {
@@ -110,7 +124,7 @@ func (s *AuthService) Logout(token string) error {
 	return s.AuthRepo.DeleteRefreshToken(token)
 }
 
-func (s *AuthService) GenerateTokenPair(phone, role string) (string, string, error) {
+func (s *AuthService) GenerateTokenPair(phone string, role models.Role) (string, string, error) {
 	secretKey := s.getSecretKey()
 
 	// Access Token
@@ -132,7 +146,7 @@ func (s *AuthService) GenerateTokenPair(phone, role string) (string, string, err
 
 func (s *AuthService) RefreshToken(oldRefreshToken string) (string, error) {
 
-	phone, role, err := s.AuthRepo.CheckRefreshToken(oldRefreshToken)
+	phone, roleStr, err := s.AuthRepo.CheckRefreshToken(oldRefreshToken)
 	if err != nil {
 		return "", err
 	}
@@ -140,7 +154,7 @@ func (s *AuthService) RefreshToken(oldRefreshToken string) (string, error) {
 	secretKey := s.getSecretKey()
 	accessClaims := models.AppClaims{
 		Phone: phone,
-		Role:  role,
+		Role:  models.Role(roleStr),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 			Issuer:    "fixora",

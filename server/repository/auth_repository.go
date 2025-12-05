@@ -29,6 +29,28 @@ func (r *AuthRepository) CheckUserExists(phone string) (bool, error) {
 	return exists, nil
 }
 
+func (r *AuthRepository) CreateUser(user models.UserRegisterRequest) error {
+	query := `
+		INSERT INTO users 
+		(user_id, phone, password_hash, is_phone_verified)
+		VALUES ($1, $2, $3, $4)
+	`
+	_, err := r.db.ExecContext(context.Background(), query,
+		user.User_ID, user.Phone, user.Password, false,
+	)
+	return err
+}
+
+func (r *AuthRepository) VerifyUserPhone(phone string) error {
+	query := `
+		UPDATE users
+		SET is_phone_verified = TRUE
+		WHERE phone = $1
+	`
+	_, err := r.db.ExecContext(context.Background(), query, phone)
+	return err
+}
+
 func (r *AuthRepository) CheckServiceProviderExists(phone string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM service_providers WHERE phone = $1)`
@@ -40,41 +62,38 @@ func (r *AuthRepository) CheckServiceProviderExists(phone string) (bool, error) 
 	return exists, nil
 }
 
-func (r *AuthRepository) CreateUser(user models.UserRegisterRequest) error {
-	query := `
-		INSERT INTO users 
-		(phone, password_hash, full_name, district, area, sub_area)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`
-	_, err := r.db.ExecContext(context.Background(), query,
-		user.Phone, user.Password,
-		user.FullName, user.District, user.Area, user.SubArea,
-	)
-	return err
-}
-
 func (r *AuthRepository) CreateServiceProvider(sp models.ServiceProviderRegisterRequest) error {
 	query := `
 		INSERT INTO service_providers
-		(phone, profession, password_hash, full_name, district, area, sub_area, nid_number, nid_front_url, nid_back_url)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		(user_id, phone, profession, password_hash, is_phone_verified)
+		VALUES ($1, $2, $3, $4, $5)
 	`
 	_, err := r.db.ExecContext(context.Background(), query,
-		sp.Phone, sp.Profession, sp.Password,
-		sp.FullName, sp.District, sp.Area, sp.SubArea, sp.NidNumber, sp.NidFrontUrl, sp.NidBackUrl,
+		sp.User_ID, sp.Phone, sp.Profession, sp.Password, false,
 	)
 	return err
 }
 
-func (r *AuthRepository) GetloginCredentials(phone string, role string) (string, error) {
+func (r *AuthRepository) VerifyServiceProviderPhone(phone string) error {
+	query := `
+		UPDATE service_providers
+		SET is_phone_verified = TRUE
+		WHERE phone = $1
+	`
+	_, err := r.db.ExecContext(context.Background(), query, phone)
+	return err
+}
+
+func (r *AuthRepository) GetloginCredentials(phone string, role models.Role) (string, error) {
 	var passwordHash string
 	var query string
 
-	if role == "user" {
+	switch role {
+	case models.USER:
 		query = `SELECT password_hash FROM users WHERE phone = $1`
-	} else if role == "service-provider" {
+	case models.SERVICE_PROVIDER:
 		query = `SELECT password_hash FROM service_providers WHERE phone = $1`
-	} else {
+	default:
 		return "", errors.New("invalid role")
 	}
 
@@ -82,10 +101,10 @@ func (r *AuthRepository) GetloginCredentials(phone string, role string) (string,
 	return passwordHash, err
 }
 
-func (r *AuthRepository) StoreRefreshToken(phone, role, token string) error {
+func (r *AuthRepository) StoreRefreshToken(phone string, role models.Role, token string) error {
 	expiresAt := time.Now().Add(15 * 24 * time.Hour)
 	query := `INSERT INTO refresh_tokens(phone_number, role, token, expires_at) VALUES ($1, $2, $3, $4)`
-	_, err := r.db.Exec(query, phone, role, token, expiresAt)
+	_, err := r.db.Exec(query, phone, string(role), token, expiresAt)
 	return err
 }
 

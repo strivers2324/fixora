@@ -1,8 +1,5 @@
 CREATE TABLE refresh_tokens (
-    id SERIAL PRIMARY KEY,
-    phone_number VARCHAR(15) NOT NULL,
-    role VARCHAR(50) NOT NULL,
+    user_id UUID PRIMARY KEY,
     token TEXT NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    expires_at TIMESTAMP NOT NULL
 );
