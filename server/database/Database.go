@@ -20,3 +20,12 @@ func InitDB() *sql.DB {
 	log.Println("Connected to PostgreSQL!")
 	return db
 }
+
+func CloseDB(db *sql.DB) {
+	log.Println("Closing Database connection...")
+	if err := db.Close(); err != nil {
+		log.Println("Error closing database:", err)
+	} else {
+		log.Println("Database connection closed successfully.")
+	}
+}
