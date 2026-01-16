@@ -58,9 +58,9 @@ export default function SpMobileVerification() {
       setSubmitting(true);
       try {
         await VerifyServiceProvider({ phone });
-        navigate("/congratulations");
+        navigate("/service-provider-dashboard", { replace: true });
       } catch (err: any) {
-        setSubmitError(err.message);
+        setSubmitError(err.message || "Verification failed");
       } finally {
         setSubmitting(false);
       }

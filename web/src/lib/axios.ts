@@ -10,13 +10,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (originalRequest.url.includes("/login")) {
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await axios.post("/api/auth/refresh", {}, { withCredentials: true });
         return api(originalRequest);
       } catch (refreshError) {
-        window.location.href = "/login";
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = "/login";
+        }
         return Promise.reject(refreshError);
       }
     }

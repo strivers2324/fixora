@@ -57,9 +57,11 @@ export default function UserMobileVerification() {
       setSubmitting(true);
       try {
         await VerifyUserPhone({ phone });
-        navigate("/congratulations");
+        navigate("/user_dashboard", { replace: true });
       } catch (err: any) {
-        setSubmitError("Verification failed.");
+        setSubmitError(err.message || "Verification failed.");
+      } finally {
+        setSubmitting(false);
       }
     }
   };

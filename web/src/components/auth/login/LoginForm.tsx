@@ -42,8 +42,27 @@ export default function LoginForm() {
         navigate("/service-provider-dashboard");
       }
     } catch (err: any) {
-      const rawMessage = err.message || "An unexpected error occurred";
-      setError(ErrorMessage(rawMessage));
+      console.log("Status:", err.response?.status);
+      console.log("Data:", err.response?.data);
+      console.log("Code Check:", err.response?.data?.code);
+      if (err.response && err.response.status === 403 && err.response.data.code === "NOT_VERIFIED") {
+        if (role === Role.USER) {
+          navigate("/user/number_verification", {
+            state: { phone: phone },
+          });
+        } else {
+          navigate("/service_provider/number_verification", {
+            state: { phone: phone },
+          });
+        }
+        return;
+      }
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        const rawMessage = err.message || "An unexpected error occurred";
+        setError(ErrorMessage(rawMessage));
+      }
     } finally {
       setLoading(false);
     }

@@ -26,12 +26,8 @@ const handleApiError = (error: any, defaultMessage: string): never => {
 };
 
 export async function login(credentials: LoginCredentials) {
-  try {
-    const res = await api.post("/auth/login", credentials);
-    return res.data;
-  } catch (error: any) {
-    handleApiError(error, "Login failed");
-  }
+  const res = await api.post("/auth/login", credentials);
+  return res.data;
 }
 
 export async function RegisterUser(data: UserRegistrationData) {
