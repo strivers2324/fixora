@@ -10,13 +10,19 @@ const (
 )
 
 type LoginRequest struct {
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
-	Role     Role   `json:"role"`
+	Phone    string `json:"phone" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Role     Role   `json:"role" binding:"required"`
+}
+
+type LoginCredentials struct {
+	UserID          string
+	PasswordHash    string
+	IsPhoneVerified bool
 }
 
 type AppClaims struct {
-	Phone string `json:"phone"`
-	Role  Role   `json:"role"`
+	Role   Role   `json:"role"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
