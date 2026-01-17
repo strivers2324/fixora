@@ -8,6 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
+import { VerifyUserPhone } from "@/api/AuthApi";
 
 const FormSchema = z.object({
   pin: z.string().min(4, { message: "OTP must be 4 digits." }).max(4, { message: "OTP must be 4 digits." }),
@@ -19,10 +20,9 @@ export default function UserMobileVerification() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { phone, password } = location.state || {};
+  const { phone } = location.state || {};
 
-  const isMissingData = !phone || !password;
-
+  const isMissingData = !phone;
   useEffect(() => {
     if (isMissingData) {
       const timer = setTimeout(() => {
@@ -41,10 +41,10 @@ export default function UserMobileVerification() {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     setSubmitError(null);
+
     let valid = true;
 
     const pin = (values.pin ?? "").toString();
-
     if (pin !== "1234") {
       form.setError("pin", {
         type: "manual",
@@ -56,24 +56,10 @@ export default function UserMobileVerification() {
     if (valid) {
       setSubmitting(true);
       try {
-        const body = {
-          phone,
-          password,
-        };
-
-        const response = await fetch("/api/register-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (response.ok) {
-          navigate("/congratulations");
-        } else {
-          const data = await response.json().catch(() => ({}));
-          setSubmitError(data.message || "Registration failed!");
-        }
+        await VerifyUserPhone({ phone });
+        navigate("/user_dashboard", { replace: true });
       } catch (err: any) {
-        setSubmitError("Registration failed! " + err.message);
+        setSubmitError(err.message || "Verification failed.");
       } finally {
         setSubmitting(false);
       }
@@ -144,7 +130,11 @@ export default function UserMobileVerification() {
               )}
             />
 
-            {submitError && <div className="text-sm text-red-600 text-center">{submitError}</div>}
+            {submitError && (
+              <div className="p-3 rounded-md bg-red-50 border border-red-200">
+                <p className="text-sm text-red-600 text-center font-medium">{submitError}</p>
+              </div>
+            )}
 
             <Button
               type="submit"

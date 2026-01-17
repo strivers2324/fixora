@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import logo1 from "@/assets/images/LogoLogin.png";
+import { RegisterUser } from "@/api/AuthApi";
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 
 export function UserRegistrationForm() {
@@ -59,30 +60,14 @@ export function UserRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/check-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ phone: phone }),
-        });
-        if (response.status === 409) {
-          setPhoneError("This phone number is already registered.");
-          setIsLoading(false);
-          return;
-        }
-        if (!response.ok) {
-          console.error("Server check failed");
-          setIsLoading(false);
-          return;
-        }
-
-        navigate("/user/number-verification", {
+        await RegisterUser({ phone, password });
+        navigate("/user/number_verification", {
           state: {
             phone,
-            password,
           },
         });
+      } catch (error: any) {
+        setPhoneError(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -188,7 +173,7 @@ export function UserRegistrationForm() {
                 <div className="text-center font-serif text-md">
                   {"Already have an account? "}
                   <Link
-                    to="/LoginForm"
+                    to="/login"
                     className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
                   >
                     Log In

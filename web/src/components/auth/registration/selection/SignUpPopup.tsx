@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import popupupper from "@/assets/images/Popup.png";
 import { useNavigate } from "react-router-dom";
 
-export const SignUpRolePopup: React.FC = () => {
+interface SignUpRolePopupProps {
+  children: React.ReactNode;
+}
+
+export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) => {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
@@ -15,19 +19,12 @@ export const SignUpRolePopup: React.FC = () => {
 
   const handleServiceProviderSignup = () => {
     setOpen(false);
-    navigate("/service-provider/registration");
+    navigate("/service_provider/registration");
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors"
-          onClick={() => setOpen(true)}
-        >
-          SignUp
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md p-0 rounded-2xl overflow-hidden shadow-2xl bg-gray-300">
         <div className="relative h-32 w-70 bg-teal-900 flex items-center justify-center">
           <img src={popupupper} alt="Banner" className="absolute inset-0 w-full h-full object-cover opacity-90" />

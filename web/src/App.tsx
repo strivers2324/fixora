@@ -30,13 +30,13 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/service-provider/registration" element={<SpRegistrationForm />} />
+        <Route path="/service_provider/registration" element={<SpRegistrationForm />} />
         <Route path="/login" element={<LoginForm />} />
-        <Route path="/service-provider/number-verification" element={<SpMobileVerification />} />
-        <Route path="/service-provider/information" element={<SpInformation />} />
-        <Route path="/service-provider/nid-submission" element={<SpNIDSubmission />} />
+        <Route path="/service_provider/number_verification" element={<SpMobileVerification />} />
+        <Route path="/service_provider/information" element={<SpInformation />} />
+        <Route path="/service_provider/nid_submission" element={<SpNIDSubmission />} />
         <Route path="/user/registration" element={<UserRegistrationForm />} />
-        <Route path="/user/number-verification" element={<UserMobileVerification />} />
+        <Route path="/user/number_verification" element={<UserMobileVerification />} />
         <Route path="/user/information" element={<UserInformation />} />
       </Routes>
     </div>
