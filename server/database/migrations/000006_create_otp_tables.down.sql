@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS otp_attempts;
+DROP TABLE IF EXISTS otps;
