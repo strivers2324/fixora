@@ -7,13 +7,26 @@ import (
 )
 
 func SetAuthRoutes(router *gin.Engine, handler *handlers.AuthHandler) {
-	router.POST("/api/auth/service_provider/registration", handler.ServiceProviderRegisterHandler)
-	router.POST("/api/auth/user/registration", handler.UserRegisterHandler)
 
-	router.POST("/api/auth/user/verify", handler.VerifyUserPhoneHandler)
-	router.POST("/api/auth/service_provider/verify", handler.VerifyServiceProviderPhoneHandler)
+	authRoutes := router.Group("/api/auth")
+	{
+		authRoutes.GET("/professions", handler.GetProfessionsHandler)
+		authRoutes.POST("/service-provider/registration", handler.ServiceProviderRegisterHandler)
+		authRoutes.POST("/user/registration", handler.UserRegisterHandler)
+		authRoutes.GET("/otp/info/:otp_id", handler.GetOTPInfoHandler)
+		authRoutes.POST("/verify/otp", handler.VerifyOTPHandler)
 
-	router.POST("/api/auth/login", handler.LoginHandler)
-	router.POST("/api/auth/refresh", handler.RefreshHandler)
-	router.POST("/api/auth/logout", handler.LogoutHandler)
+		authRoutes.POST("/resend-otp", handler.ResendOTPHandler)
+		authRoutes.PUT("/update-phone", handler.UpdatePhoneHandler)
+
+		authRoutes.POST("/user/verify", handler.VerifyUserPhoneHandler)
+		authRoutes.POST("/service-provider/verify", handler.VerifyServiceProviderPhoneHandler)
+
+		authRoutes.POST("/login", handler.LoginHandler)
+		authRoutes.POST("/refresh", handler.RefreshHandler)
+		authRoutes.POST("/logout", handler.LogoutHandler)
+
+		authRoutes.POST("/forgot-password", handler.ForgotPasswordHandler)
+		authRoutes.POST("/reset-password", handler.ResetPasswordHandler)
+	}
 }
