@@ -10,11 +10,15 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (originalRequest.url.includes("/login")) {
+    if (originalRequest.url.includes("/auth/refresh")) {
       return Promise.reject(error);
     }
 
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (originalRequest.url.includes("/login") || originalRequest.url.includes("/verify")) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await axios.post("/api/auth/refresh", {}, { withCredentials: true });
@@ -27,7 +31,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
