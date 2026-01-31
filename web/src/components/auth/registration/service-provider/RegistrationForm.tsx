@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,29 +11,17 @@ import logo1 from "@/assets/images/LogoLogin.png";
 
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RegisterServiceProvider } from "@/api/AuthApi";
+import { RegisterServiceProvider, GetProfessions } from "@/api/AuthApi";
 
-const professions = [
-  { value: "electrician", label: "Electrician" },
-  { value: "ac_technician", label: "AC Technician" },
-  { value: "refrigerator_mechanic", label: "Refrigerator Mechanic" },
-  { value: "plumber", label: "Plumber" },
-  { value: "carpenter", label: "Carpenter" },
-  { value: "cctv_installer", label: "CCTV Installer" },
-  { value: "broadband_provider", label: "Broadband Internet Provider" },
-  { value: "inverter_technician", label: "IPS/Inverter Technician" },
-  { value: "washing_machine_technician", label: "Washing Machine Technician" },
-  { value: "computer_technician", label: "Computer Technician" },
-  { value: "tv_technician", label: "TV Technician" },
-  { value: "automobile_mechanic", label: "Automobile Mechanic" },
-  { value: "lift_technician", label: "Lift Technician" },
-  { value: "water_pump_technician", label: "Water Pump Technician" },
-  { value: "home_appliance_technician", label: "Home Appliance Technician" },
-];
+interface ProfessionType {
+  id: number;
+  profession_name: string;
+}
 
 export function SpRegistrationForm() {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+  const [professionsList, setProfessionsList] = useState<ProfessionType[]>([]);
   const [profession, setProfession] = useState("");
   const [profError, setProfError] = useState("");
 
@@ -50,6 +38,18 @@ export function SpRegistrationForm() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await GetProfessions();
+        setProfessionsList(data ?? []);
+      } catch (error) {
+        console.error("Failed to load professions", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -65,8 +65,8 @@ export function SpRegistrationForm() {
     if (!phone) {
       setPhoneError("Please enter your phone number.");
       isValid = false;
-    } else if (!/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)) {
-      setPhoneError("Please enter a valid Bangladeshi phone number.");
+    } else if (!/^01[3-9]\d{8}$/.test(phone)) {
+      setPhoneError("Please enter a valid 11-digit phone number (e.g., 017XXXXXXXX).");
       isValid = false;
     } else {
       setPhoneError("");
@@ -102,17 +102,22 @@ export function SpRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        await RegisterServiceProvider({
-          phone,
+        const formattedPhone = "+88" + phone;
+
+        const response = await RegisterServiceProvider({
+          phone: formattedPhone,
           password,
-          profession,
+          profession_id: parseInt(profession),
         });
 
-        navigate("/service_provider/number_verification", {
-          state: {
-            phone,
-          },
-        });
+        if (response && response.otp_id) {
+          navigate(`/service-provider/verify/otp/${response.otp_id}`, {
+            state: {
+              phone: formattedPhone,
+              from: "registration",
+            },
+          });
+        }
       } catch (error: any) {
         setPhoneError(error.message);
       } finally {
@@ -120,10 +125,9 @@ export function SpRegistrationForm() {
       }
     }
   }
-
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center md:items-center px-4 bg-gray-200 gap-y-6 md:gap-x-8">
-      {/* left side*/}
+      {/* Left Side (Info) */}
       <div className="flex-1 w-full max-w-xs md:max-w-none flex flex-col items-center justify-start">
         <h2 className="text-lg md:text-2xl font-bold font-serif text-teal-700 mb-3 md:max-h-80 md:h-auto text-center md:text-left">
           Want to join Fixora as a Service Provider?
@@ -131,7 +135,7 @@ export function SpRegistrationForm() {
         <p className="text-gray-700 font-serif text-sm md:text-base mb-4 text-center md:text-left">
           Here's what you'll need to get started:
         </p>
-        <ul className="inline-flex flex-col items-cennter gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg">
+        <ul className="inline-flex flex-col items-center gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg">
           <li className="flex items-center gap-x-3">
             <img src={Toolbox} alt="Toolbox" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
             <span>Own toolbox</span>
@@ -146,7 +150,8 @@ export function SpRegistrationForm() {
           </li>
         </ul>
       </div>
-      {/* right side */}
+
+      {/* Right Side (Form) */}
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
@@ -163,15 +168,22 @@ export function SpRegistrationForm() {
 
                 <Field>
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
-                  <Input
-                    id="Phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    pattern="(\+8801[3-9]\d{8}|01[3-9]\d{8})"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
+
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                      +88
+                    </div>
+                    <Input
+                      id="Phone"
+                      type="tel"
+                      placeholder="017XXXXXXXX"
+                      maxLength={11}
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+
                   <p className="text-sm text-gray-600 font-serif mt-0">We'll send you an OTP to confirm your number.</p>
                   {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
                 </Field>
@@ -189,11 +201,15 @@ export function SpRegistrationForm() {
                       <SelectValue placeholder="Select profession" />
                     </SelectTrigger>
                     <SelectContent>
-                      {professions.map((p) => (
-                        <SelectItem key={p.value} value={p.value}>
-                          {p.label}
-                        </SelectItem>
-                      ))}
+                      {professionsList.length > 0 ? (
+                        professionsList.map((p) => (
+                          <SelectItem key={p.id} value={String(p.id)}>
+                            {p.profession_name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-gray-500">Loading professions...</div>
+                      )}
                     </SelectContent>
                   </Select>
                   {profError && <span className="text-sm text-red-600 mt-2 block">{profError}</span>}
@@ -310,5 +326,4 @@ export function SpRegistrationForm() {
     </div>
   );
 }
-
 export default SpRegistrationForm;

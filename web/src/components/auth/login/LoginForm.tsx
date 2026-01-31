@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import logo1 from "@/assets/images/LogoLogin.png";
-import Login from "@/assets/images/LoginForm.png";
+import LoginImg from "@/assets/images/LoginForm.png";
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { SignUpRolePopup } from "../registration/selection/SignUpPopup";
 import { login } from "@/api/AuthApi";
 import { Role } from "@/enums/UserRole";
+import { useAccountStore } from "@/store/AccountStore";
 
 export default function LoginForm() {
   const [visible, setVisible] = useState(false);
@@ -17,52 +18,48 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
 
-  const ErrorMessage = (rawError: string) => {
-    const msg = rawError.toLowerCase();
-
-    if (msg.includes("network") || msg.includes("fetch") || msg.includes("connection")) {
-      return "Unable to connect. Please check your internet connection.";
-    }
-    return rawError;
-  };
+  const setLoginSuccess = useAccountStore((state) => state.setLoginSuccess);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const phone = (e.currentTarget.elements.namedItem("Phone") as HTMLInputElement).value;
+
     const password = (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
+    const formattedPhone = "+88" + phone;
 
     try {
-      await login({ phone, password, role });
-      if (role === Role.USER) {
-        navigate("/user_dashboard");
+      const res = await login({ phone: formattedPhone, password, role });
+
+      if (res && res.accountinfo) {
+        setLoginSuccess(res.accountinfo, res.otp_id);
+
+        if (res.accountinfo.is_phone_verified) {
+          navigate("/dashboard");
+        } else {
+          if (role === Role.SERVICE_PROVIDER) {
+            navigate(`/service-provider/verify/otp/${res.otp_id}`, {
+              state: {
+                phone: formattedPhone,
+                from: "login",
+              },
+            });
+          } else {
+            navigate(`/user/verify/otp/${res.otp_id}`, {
+              state: {
+                phone: formattedPhone,
+                from: "login",
+              },
+            });
+          }
+        }
       } else {
-        navigate("/service-provider-dashboard");
+        setError("Invalid response. Please try again.");
       }
     } catch (err: any) {
-      console.log("Status:", err.response?.status);
-      console.log("Data:", err.response?.data);
-      console.log("Code Check:", err.response?.data?.code);
-      if (err.response && err.response.status === 403 && err.response.data.code === "NOT_VERIFIED") {
-        if (role === Role.USER) {
-          navigate("/user/number_verification", {
-            state: { phone: phone },
-          });
-        } else {
-          navigate("/service_provider/number_verification", {
-            state: { phone: phone },
-          });
-        }
-        return;
-      }
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        const rawMessage = err.message || "An unexpected error occurred";
-        setError(ErrorMessage(rawMessage));
-      }
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -70,10 +67,9 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center px-4 bg-gray-200 gap-y-6 md:gap-x-8">
-      {/* left side */}
       <div className="flex-1 flex flex-col items-center justify-start">
         <img
-          src={Login}
+          src={LoginImg}
           alt="Login Illustration"
           className="h-24 w-auto object-contain mb-2 md:max-h-80 md:h-auto"
           draggable={false}
@@ -85,7 +81,6 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* right side */}
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
@@ -98,9 +93,7 @@ export default function LoginForm() {
                   <p className="text-muted-foreground text-balance font-serif">Login to your Fixora account</p>
                 </div>
 
-                {/*Role Selection Section*/}
                 <div className="mb-4">
-                  <FieldLabel className="mb-2 block text-center"></FieldLabel>
                   <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg">
                     <button
                       type="button"
@@ -131,15 +124,23 @@ export default function LoginForm() {
 
                 <Field>
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
-                  <Input
-                    id="Phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    pattern="(\+8801[3-9]\d{8}|01[3-9]\d{8})"
-                    required
-                    disabled={loading}
-                  />
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                      +88
+                    </div>
+                    <Input
+                      id="Phone"
+                      type="tel"
+                      placeholder="017XXXXXXXX"
+                      maxLength={11}
+                      required
+                      disabled={loading}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
                 </Field>
+
                 <Field>
                   <div className="flex items-center">
                     <FieldLabel htmlFor="password">Password</FieldLabel>
@@ -153,12 +154,12 @@ export default function LoginForm() {
                   <div className="relative">
                     <Input
                       id="password"
+                      name="password"
                       type={visible ? "text" : "password"}
                       required
                       className="pr-10"
                       disabled={loading}
                     />
-
                     <button
                       type="button"
                       aria-label={visible ? "Hide password" : "Show password"}
@@ -176,17 +177,21 @@ export default function LoginForm() {
                     </button>
                   </div>
                 </Field>
+
                 {error && <div className="text-red-600 text-sm py-1 text-center">{error}</div>}
+
                 <Field>
                   <Button
                     type="submit"
-                    className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md"
+                    className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md w-full"
                     disabled={loading}
                   >
                     {loading ? "Logging In..." : "Log In"}
                   </Button>
                 </Field>
+
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
+
                 <div className="text-center font-serif text-md">
                   {"Don't have an account? "}
                   <SignUpRolePopup>
