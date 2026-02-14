@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"errors"
-	"fixora-server/models"
-	"fixora-server/service"
 	"net/http"
 	"time"
+
+	"fixora-server/models"
+	"fixora-server/pkg/response"
+	"fixora-server/pkg/utils"
+	"fixora-server/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,150 +20,235 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 	return &AuthHandler{AuthService: authService}
 }
 
-// Register Handlers
-
 func (h *AuthHandler) UserRegisterHandler(c *gin.Context) {
 	var req models.UserRegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid request body", "BAD_REQUEST")
 		return
 	}
 
-	if err := h.AuthService.RegisterUser(c.Request.Context(), req); err != nil {
-		if errors.Is(err, service.ErrUserAlreadyExists) {
-			c.JSON(http.StatusConflict, gin.H{"message": "Phone number already registered. Please login."})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Registration failed"})
+	otpID, err := h.AuthService.RegisterUser(c.Request.Context(), req)
+	if err != nil {
+		response.HandleError(c.Writer, err)
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "User created. Please verify OTP."})
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": otpID})
 }
 
 func (h *AuthHandler) ServiceProviderRegisterHandler(c *gin.Context) {
 	var req models.ServiceProviderRegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid request body", "BAD_REQUEST")
 		return
 	}
 
-	if err := h.AuthService.RegisterServiceProvider(c.Request.Context(), req); err != nil {
-		if errors.Is(err, service.ErrUserAlreadyExists) {
-			c.JSON(http.StatusConflict, gin.H{"message": "Phone number already registered. Please login."})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Registration failed"})
+	otpID, err := h.AuthService.RegisterServiceProvider(c.Request.Context(), req)
+	if err != nil {
+		response.HandleError(c.Writer, err)
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "Please verify OTP."})
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": otpID})
 }
 
-// Verify Handlers
+func (h *AuthHandler) ResendOTPHandler(c *gin.Context) {
+	var req models.ResendOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "otp_id is required", "BAD_REQUEST")
+		return
+	}
+
+	newOtpID, err := h.AuthService.ResendOTP(c.Request.Context(), req.OtpID)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": newOtpID})
+}
+
+func (h *AuthHandler) UpdatePhoneHandler(c *gin.Context) {
+	var req models.UpdatePhoneRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid phone number or otp_id", "BAD_REQUEST")
+		return
+	}
+
+	newOtpID, err := h.AuthService.UpdatePhoneAndResendOTP(c.Request.Context(), req.OtpID, req.NewPhone)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": newOtpID})
+}
 
 func (h *AuthHandler) VerifyUserPhoneHandler(c *gin.Context) {
-	var req struct {
-		Phone string `json:"phone"`
-	}
+	var req models.OTPVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
+		response.SendError(c.Writer, http.StatusBadRequest, "otp_id and otp_code are required", "BAD_REQUEST")
 		return
 	}
 
-	accessToken, refreshToken, err := h.AuthService.VerifyUserPhone(c.Request.Context(), req.Phone)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Verification failed"})
+	if err := h.AuthService.VerifyUserPhone(c.Request.Context(), req.OtpID, req.OtpCode); err != nil {
+		response.HandleError(c.Writer, err)
 		return
 	}
 
-	h.setAuthCookies(c, accessToken, refreshToken)
-	c.JSON(http.StatusOK, gin.H{"message": "Verified and logged in", "role": models.USER})
+	response.SendSuccess(c.Writer, "", nil)
 }
 
 func (h *AuthHandler) VerifyServiceProviderPhoneHandler(c *gin.Context) {
-	var req struct {
-		Phone string `json:"phone"`
-	}
+	var req models.OTPVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
+		response.SendError(c.Writer, http.StatusBadRequest, "otp_id and otp_code are required", "BAD_REQUEST")
 		return
 	}
 
-	accessToken, refreshToken, err := h.AuthService.VerifyServiceProviderPhone(c.Request.Context(), req.Phone)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Verification failed"})
+	if err := h.AuthService.VerifyServiceProviderPhone(c.Request.Context(), req.OtpID, req.OtpCode); err != nil {
+		response.HandleError(c.Writer, err)
 		return
 	}
 
-	h.setAuthCookies(c, accessToken, refreshToken)
-	c.JSON(http.StatusOK, gin.H{"message": "Verified and logged in", "role": models.SERVICE_PROVIDER})
+	response.SendSuccess(c.Writer, "", nil)
 }
 
-// Login Handler
+func (h *AuthHandler) GetOTPInfoHandler(c *gin.Context) {
+	otpID := c.Param("otp_id")
+	if otpID == "" {
+		response.SendError(c.Writer, http.StatusBadRequest, "otp_id is required", "BAD_REQUEST")
+		return
+	}
+	expiry, phone, err := h.AuthService.OTPExpirationInfo(c.Request.Context(), otpID)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{
+		"otp_id":     otpID,
+		"expires_at": expiry.UTC(),
+		"phone":      phone,
+	})
+}
 
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid request body", "BAD_REQUEST")
 		return
 	}
 
-	accessToken, refreshToken, err := h.AuthService.Login(c.Request.Context(), req)
+	accessToken, refreshToken, phone, isVerified, otpID, profession, err := h.AuthService.Login(c.Request.Context(), req)
 	if err != nil {
-		if errors.Is(err, service.ErrNotVerified) {
-			c.JSON(http.StatusForbidden, gin.H{"message": "Account not verified", "code": "NOT_VERIFIED", "phone": req.Phone, "role": req.Role})
-			return
-		}
-		if errors.Is(err, service.ErrInvalidCredentials) {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid phone or password"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Login failed"})
+		response.HandleError(c.Writer, err)
 		return
 	}
 
-	h.setAuthCookies(c, accessToken, refreshToken)
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "role": req.Role})
-}
+	utils.SetAuthCookies(c, accessToken, refreshToken)
 
-// Token Handlers
+	accountInfo := gin.H{
+		"phone":             phone,
+		"role":              req.Role,
+		"is_phone_verified": isVerified,
+	}
+
+	if req.Role == "service_provider" {
+		accountInfo["profession"] = profession
+	}
+
+	response.SendSuccess(c.Writer, "Login successful", gin.H{
+		"accountinfo": accountInfo,
+		"otp_id":      otpID,
+	})
+}
 
 func (h *AuthHandler) RefreshHandler(c *gin.Context) {
 	cookieToken, err := c.Cookie("refresh_token")
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "No refresh token provided"})
+		response.SendError(c.Writer, http.StatusUnauthorized, "No refresh token provided", "NO_TOKEN")
 		return
 	}
 
 	newAccessToken, err := h.AuthService.RefreshToken(c.Request.Context(), cookieToken)
 	if err != nil {
-		h.clearAuthCookies(c)
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid refresh token"})
+		utils.ClearAuthCookies(c)
+		response.HandleError(c.Writer, err)
 		return
 	}
 
 	c.SetSameSite(http.SameSiteStrictMode)
 	c.SetCookie("access_token", newAccessToken, int(15*time.Minute.Seconds()), "/", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed"})
-}
 
-// Logout Handler
+	response.SendSuccess(c.Writer, "", nil)
+}
 
 func (h *AuthHandler) LogoutHandler(c *gin.Context) {
 	cookieToken, err := c.Cookie("refresh_token")
 	if err == nil {
-		_ = h.AuthService.Logout(c.Request.Context(), cookieToken)
+		if logoutErr := h.AuthService.Logout(c.Request.Context(), cookieToken); logoutErr != nil {
+			response.HandleError(c.Writer, logoutErr)
+			return
+		}
 	}
-	h.clearAuthCookies(c)
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out"})
+	utils.ClearAuthCookies(c)
+	response.SendSuccess(c.Writer, "", nil)
 }
 
-func (h *AuthHandler) setAuthCookies(c *gin.Context, accessToken, refreshToken string) {
-	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie("access_token", accessToken, int(15*time.Minute.Seconds()), "/", "", false, true)
-	c.SetCookie("refresh_token", refreshToken, int(15*24*time.Hour.Seconds()), "/api/auth/refresh", "", false, true)
+func (h *AuthHandler) ForgotPasswordHandler(c *gin.Context) {
+	var req models.ForgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid request body", "BAD_REQUEST")
+		return
+	}
+
+	otpID, err := h.AuthService.ForgotPassword(c.Request.Context(), req.Phone, req.Role)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": otpID})
 }
 
-func (h *AuthHandler) clearAuthCookies(c *gin.Context) {
-	c.SetCookie("access_token", "", -1, "/", "", false, true)
-	c.SetCookie("refresh_token", "", -1, "/api/auth/refresh", "", false, true)
+func (h *AuthHandler) VerifyOTPHandler(c *gin.Context) {
+	var req models.OTPVerifyRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "otp_id and otp_code are required", "BAD_REQUEST")
+		return
+	}
+
+	resetToken, err := h.AuthService.VerifyPasswordResetOTP(c.Request.Context(), req.OtpID, req.OtpCode)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{"reset_token": resetToken})
+}
+
+func (h *AuthHandler) ResetPasswordHandler(c *gin.Context) {
+	var req models.ResetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid request body", "BAD_REQUEST")
+		return
+	}
+
+	err := h.AuthService.ResetPassword(c.Request.Context(), req.ResetToken, req.NewPassword)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", nil)
+}
+
+func (h *AuthHandler) GetProfessionsHandler(c *gin.Context) {
+	professions, err := h.AuthService.GetProfessions(c.Request.Context())
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+	response.SendSuccess(c.Writer, "", professions)
 }
