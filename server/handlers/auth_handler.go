@@ -140,7 +140,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, phone, isVerified, otpID, err := h.AuthService.Login(c.Request.Context(), req)
+	accessToken, refreshToken, phone, isVerified, otpID, profession, err := h.AuthService.Login(c.Request.Context(), req)
 	if err != nil {
 		response.HandleError(c.Writer, err)
 		return
@@ -148,13 +148,19 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 
 	utils.SetAuthCookies(c, accessToken, refreshToken)
 
-	response.SendSuccess(c.Writer, "", gin.H{
-		"accountinfo": gin.H{
-			"phone":             phone,
-			"role":              req.Role,
-			"is_phone_verified": isVerified,
-		},
-		"otp_id": otpID,
+	accountInfo := gin.H{
+		"phone":             phone,
+		"role":              req.Role,
+		"is_phone_verified": isVerified,
+	}
+
+	if req.Role == "service_provider" {
+		accountInfo["profession"] = profession
+	}
+
+	response.SendSuccess(c.Writer, "Login successful", gin.H{
+		"accountinfo": accountInfo,
+		"otp_id":      otpID,
 	})
 }
 
@@ -213,7 +219,7 @@ func (h *AuthHandler) VerifyOTPHandler(c *gin.Context) {
 		return
 	}
 
-	resetToken, err := h.AuthService.VerifyOTP(c.Request.Context(), req.OtpID, req.OtpCode)
+	resetToken, err := h.AuthService.VerifyPasswordResetOTP(c.Request.Context(), req.OtpID, req.OtpCode)
 	if err != nil {
 		response.HandleError(c.Writer, err)
 		return

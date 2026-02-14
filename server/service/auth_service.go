@@ -50,7 +50,7 @@ func (s *AuthService) RegisterUser(ctx context.Context, req models.UserRegisterR
 		return "", apperrors.ErrInternalServer
 	}
 
-	return s.generateAndSaveOTP(ctx, userID, models.USER)
+	return s.generateAndSaveOTP(ctx, userID, models.USER, models.REGISTER)
 }
 
 func (s *AuthService) RegisterServiceProvider(ctx context.Context, req models.ServiceProviderRegisterRequest) (string, error) {
@@ -76,19 +76,19 @@ func (s *AuthService) RegisterServiceProvider(ctx context.Context, req models.Se
 		return "", apperrors.ErrInternalServer
 	}
 
-	return s.generateAndSaveOTP(ctx, providerID, models.SERVICE_PROVIDER)
+	return s.generateAndSaveOTP(ctx, providerID, models.SERVICE_PROVIDER, models.REGISTER)
 }
 
 func (s *AuthService) VerifyUserPhone(ctx context.Context, otpID, code string) error {
-	return s.verifyOTP(ctx, otpID, code, models.USER)
+	return s.VerifyPhoneNumber(ctx, otpID, code, models.USER)
 }
 
 func (s *AuthService) VerifyServiceProviderPhone(ctx context.Context, otpID, code string) error {
-	return s.verifyOTP(ctx, otpID, code, models.SERVICE_PROVIDER)
+	return s.VerifyPhoneNumber(ctx, otpID, code, models.SERVICE_PROVIDER)
 }
 
-func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (string, string, string, bool, string, error) {
-	var savedHash, userID string
+func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (string, string, string, bool, string, string, error) {
+	var savedHash, userID, profession string
 	var isVerified bool
 	var err error
 
@@ -96,33 +96,35 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 		data, err := s.AuthRepo.GetUserLoginData(ctx, req.Phone)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return "", "", "", false, "", apperrors.ErrInvalidCredentials
+				return "", "", "", false, "", "", apperrors.ErrInvalidCredentials
 			}
-			return "", "", "", false, "", apperrors.ErrInternalServer
+			return "", "", "", false, "", "", apperrors.ErrInternalServer
 		}
 		userID, savedHash, isVerified = data.UserID, data.PasswordHash, data.IsPhoneVerified
+		profession = ""
 
 	} else if req.Role == models.SERVICE_PROVIDER {
 		data, err := s.AuthRepo.GetServiceProviderLoginData(ctx, req.Phone)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return "", "", "", false, "", apperrors.ErrInvalidCredentials
+				return "", "", "", false, "", "", apperrors.ErrInvalidCredentials
 			}
-			return "", "", "", false, "", apperrors.ErrInternalServer
+			return "", "", "", false, "", "", apperrors.ErrInternalServer
 		}
 		userID, savedHash, isVerified = data.ProviderID, data.PasswordHash, data.IsPhoneVerified
+		profession = data.ProfessionName
 
 	} else {
-		return "", "", "", false, "", apperrors.NewCustomError(400, "Invalid role specified", "INVALID_ROLE")
+		return "", "", "", false, "", "", apperrors.NewCustomError(400, "Invalid role specified", "INVALID_ROLE")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(savedHash), []byte(req.Password)); err != nil {
-		return "", "", "", false, "", apperrors.ErrInvalidCredentials
+		return "", "", "", false, "", "", apperrors.ErrInvalidCredentials
 	}
 
 	accessToken, refreshToken, err := s.generateAndSaveTokens(ctx, req.Role, userID)
 	if err != nil {
-		return "", "", "", false, "", apperrors.ErrInternalServer
+		return "", "", "", false, "", "", apperrors.ErrInternalServer
 	}
 
 	var otpID string
@@ -132,7 +134,7 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 		}
 	}
 
-	return accessToken, refreshToken, req.Phone, isVerified, otpID, nil
+	return accessToken, refreshToken, req.Phone, isVerified, otpID, profession, nil
 }
 
 func (s *AuthService) RefreshToken(ctx context.Context, oldRefreshToken string) (string, error) {
@@ -179,8 +181,11 @@ func (s *AuthService) CheckResendEligibility(ctx context.Context, otpID string) 
 	if err != nil {
 		return nil, nil, apperrors.ErrInternalServer
 	}
-
-	if attempt != nil && attempt.Count >= 1 {
+	maxResendLimit := 3
+	if oldOTP.Type == models.REGISTER {
+		maxResendLimit = 5
+	}
+	if attempt != nil && attempt.Count >= maxResendLimit {
 		return nil, nil, apperrors.NewCustomError(429, "Maximum resend limit reached, please contact support", "LIMIT_REACHED")
 	}
 
@@ -205,7 +210,7 @@ func (s *AuthService) PerformResend(ctx context.Context, oldOTP *models.OTP, att
 		log.Printf("Failed to delete old OTP before resend: %v", err)
 	}
 
-	return s.generateAndSaveOTP(ctx, oldOTP.EntityID, models.Role(oldOTP.Role))
+	return s.generateAndSaveOTP(ctx, oldOTP.EntityID, models.Role(oldOTP.Role), models.Type(oldOTP.Type))
 }
 
 func (s *AuthService) ResendOTP(ctx context.Context, oldOtpID string) (string, error) {
@@ -288,10 +293,10 @@ func (s *AuthService) ForgotPassword(ctx context.Context, phone string, role mod
 		return "", apperrors.ErrUserNotFound
 	}
 
-	return s.generateAndSaveOTP(ctx, entityID, role)
+	return s.generateAndSaveOTP(ctx, entityID, role, models.RESET_PASSWORD)
 }
 
-func (s *AuthService) VerifyOTP(ctx context.Context, otpID, code string) (string, error) {
+func (s *AuthService) VerifyPasswordResetOTP(ctx context.Context, otpID, code string) (string, error) {
 	otp, err := s.AuthRepo.GetOTPInfo(ctx, otpID)
 	if err != nil {
 		return "", apperrors.NewCustomError(400, "Invalid or expired OTP session", "INVALID_SESSION")
@@ -383,7 +388,7 @@ func (s *AuthService) GetProfessions(ctx context.Context) ([]models.Profession, 
 	return s.AuthRepo.GetAllProfessions(ctx)
 }
 
-func (s *AuthService) verifyOTP(ctx context.Context, otpID, code string, role models.Role) error {
+func (s *AuthService) VerifyPhoneNumber(ctx context.Context, otpID, code string, role models.Role) error {
 	otp, err := s.AuthRepo.GetOTPInfo(ctx, otpID)
 	if err != nil {
 		return apperrors.NewCustomError(400, "Invalid or expired OTP session", "INVALID_SESSION")
@@ -425,7 +430,7 @@ func (s *AuthService) verifyOTP(ctx context.Context, otpID, code string, role mo
 	return nil
 }
 
-func (s *AuthService) generateAndSaveOTP(ctx context.Context, entityID uuid.UUID, role models.Role) (string, error) {
+func (s *AuthService) generateAndSaveOTP(ctx context.Context, entityID uuid.UUID, role models.Role, otpType models.Type) (string, error) {
 	otpID, err := uuid.NewV7()
 	if err != nil {
 		return "", apperrors.ErrInternalServer
@@ -441,6 +446,7 @@ func (s *AuthService) generateAndSaveOTP(ctx context.Context, entityID uuid.UUID
 		ID:        otpID,
 		EntityID:  entityID,
 		Role:      role,
+		Type:      otpType,
 		OTPToken:  string(hashCode),
 		ExpiresAt: time.Now().UTC().Add(3 * time.Minute),
 	}

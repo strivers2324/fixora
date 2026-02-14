@@ -6,10 +6,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type Type string
+
+const (
+	REGISTER       Type = "register"
+	RESET_PASSWORD Type = "reset_password"
+)
+
 type OTP struct {
 	ID        uuid.UUID `json:"id" db:"id"`
 	EntityID  uuid.UUID `json:"entity_id" db:"entity_id"`
 	Role      Role      `json:"role" db:"role"`
+	Type      Type      `json:"purpose" db:"purpose"`
 	OTPToken  string    `json:"-" db:"otp_token"`
 	ExpiresAt time.Time `json:"expires_at" db:"expires_at"`
 }

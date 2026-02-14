@@ -90,12 +90,22 @@ func (r *AuthRepository) CreateServiceProvider(ctx context.Context, providerID, 
 }
 
 func (r *AuthRepository) GetServiceProviderLoginData(ctx context.Context, phone string) (*models.ServiceProviderLoginData, error) {
-	query := `SELECT provider_id, password_hash, is_phone_verified FROM service_providers WHERE phone = $1`
+	query := `
+        SELECT 
+            sp.provider_id, 
+            sp.password_hash, 
+            sp.is_phone_verified,
+            COALESCE(p.profession_name, '') as profession_name
+        FROM service_providers sp
+        LEFT JOIN professions p ON sp.profession_id = p.id
+        WHERE sp.phone = $1
+    `
 	var data models.ServiceProviderLoginData
 	err := r.db.QueryRowContext(ctx, query, phone).Scan(
 		&data.ProviderID,
 		&data.PasswordHash,
 		&data.IsPhoneVerified,
+		&data.ProfessionName,
 	)
 	if err != nil {
 		return nil, err
@@ -137,16 +147,16 @@ func (r *AuthRepository) UpdateServiceProviderPassword(ctx context.Context, prov
 
 func (r *AuthRepository) InsertOTPInfo(ctx context.Context, otp *models.OTP) error {
 	query := `
-        INSERT INTO otps (id, entity_id, role, otp_token, expires_at)
-        VALUES ($1, $2, $3, $4, $5)`
-	_, err := r.db.ExecContext(ctx, query, otp.ID, otp.EntityID, otp.Role, otp.OTPToken, otp.ExpiresAt)
+        INSERT INTO otps (id, entity_id, role, type, otp_token, expires_at)
+        VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.db.ExecContext(ctx, query, otp.ID, otp.EntityID, otp.Role, otp.Type, otp.OTPToken, otp.ExpiresAt)
 	return err
 }
 
 func (r *AuthRepository) GetOTPInfo(ctx context.Context, otpID string) (*models.OTP, error) {
 	otp := &models.OTP{}
-	query := `SELECT id, entity_id, role, otp_token, expires_at FROM otps WHERE id = $1`
-	err := r.db.QueryRowContext(ctx, query, otpID).Scan(&otp.ID, &otp.EntityID, &otp.Role, &otp.OTPToken, &otp.ExpiresAt)
+	query := `SELECT id, entity_id, role, type, otp_token, expires_at FROM otps WHERE id = $1`
+	err := r.db.QueryRowContext(ctx, query, otpID).Scan(&otp.ID, &otp.EntityID, &otp.Role, &otp.Type, &otp.OTPToken, &otp.ExpiresAt)
 	if err != nil {
 		return nil, err
 	}

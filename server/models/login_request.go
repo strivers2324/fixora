@@ -23,4 +23,5 @@ type ServiceProviderLoginData struct {
 	ProviderID      string `db:"provider_id"`
 	PasswordHash    string `db:"password_hash"`
 	IsPhoneVerified bool   `db:"is_phone_verified"`
+	ProfessionName  string `db:"profession_name"`
 }
