@@ -19,7 +19,7 @@ export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) =>
 
   const handleServiceProviderSignup = () => {
     setOpen(false);
-    navigate("/service_provider/registration");
+    navigate("/service-provider/registration");
   };
 
   return (
@@ -43,13 +43,13 @@ export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) =>
               className="flex-1 flex flex-col items-center bg-teal-600 text-white py-4 px-6 rounded-xl hover:bg-teal-700 transition min-w-[140px]"
               onClick={handleUserSignup}
             >
-              User?
+              User
             </Button>
             <Button
               className="flex-1 flex flex-col items-center bg-emerald-600 text-white py-4 px-6 rounded-xl hover:bg-emerald-700 transition min-w-[140px]"
               onClick={handleServiceProviderSignup}
             >
-              Service Provider?
+              Service Provider
             </Button>
           </div>
         </div>

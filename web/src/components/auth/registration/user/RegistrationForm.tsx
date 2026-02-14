@@ -11,7 +11,6 @@ import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/f
 export function UserRegistrationForm() {
   const navigate = useNavigate();
 
-  // State
   const [visible, setVisible] = useState(false);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
@@ -30,8 +29,8 @@ export function UserRegistrationForm() {
     if (!phone) {
       setPhoneError("Please enter your phone number.");
       isValid = false;
-    } else if (!/^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/.test(phone)) {
-      setPhoneError("Please enter a valid Bangladeshi phone number.");
+    } else if (!/^01[3-9]\d{8}$/.test(phone)) {
+      setPhoneError("Please enter a valid 11-digit phone number (e.g., 017XXXXXXXX).");
       isValid = false;
     } else {
       setPhoneError("");
@@ -60,12 +59,17 @@ export function UserRegistrationForm() {
     if (isValid) {
       setIsLoading(true);
       try {
-        await RegisterUser({ phone, password });
-        navigate("/user/number_verification", {
-          state: {
-            phone,
-          },
-        });
+        const formattedPhone = "+88" + phone;
+
+        const response = await RegisterUser({ phone: formattedPhone, password });
+        if (response && response.otp_id) {
+          navigate(`/user/verify/otp/${response.otp_id}`, {
+            state: {
+              phone: formattedPhone,
+              from: "registration",
+            },
+          });
+        }
       } catch (error: any) {
         setPhoneError(error.message);
       } finally {
@@ -87,15 +91,20 @@ export function UserRegistrationForm() {
 
                 <Field>
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
-                  <Input
-                    id="Phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    pattern="(\+8801[3-9]\d{8}|01[3-9]\d{8})"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                      +88
+                    </div>
+                    <Input
+                      id="Phone"
+                      type="tel"
+                      placeholder="017XXXXXXXX"
+                      maxLength={11}
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
                   <p className="text-sm text-gray-600 font-serif mt-0">We'll send you an OTP to confirm your number.</p>
                   {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
                 </Field>

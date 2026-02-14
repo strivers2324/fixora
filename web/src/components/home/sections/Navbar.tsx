@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import Fixoralogo from "@/assets/images/Logo.png";
 import { Button } from "../../ui/button";
@@ -8,10 +8,11 @@ import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
-  const closeMenu = () => {
+  useEffect(() => {
     setIsMenuOpen(false);
-  };
+  }, [location]);
 
   return (
     <div className="px-4 bg-teal-700 sticky top-0 z-50">
@@ -55,30 +56,15 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden pb-4">
           <nav className="flex flex-col items-center gap-y-4 pt-2">
-            <HashLink
-              smooth
-              to="/#"
-              className="transition-colors hover:text-black/80 text-white font-semibold"
-              onClick={closeMenu}
-            >
+            <HashLink smooth to="/#" className="transition-colors hover:text-black/80 text-white font-semibold">
               Home
             </HashLink>
 
-            <HashLink
-              smooth
-              to="/#services"
-              className="transition-colors hover:text-black/80 text-white"
-              onClick={closeMenu}
-            >
+            <HashLink smooth to="/#services" className="transition-colors hover:text-black/80 text-white">
               Services
             </HashLink>
 
-            <HashLink
-              smooth
-              to="/#about-section"
-              className="transition-colors hover:text-black/80 text-white"
-              onClick={closeMenu}
-            >
+            <HashLink smooth to="/#about-section" className="transition-colors hover:text-black/80 text-white">
               About
             </HashLink>
 
@@ -89,11 +75,9 @@ export default function Navbar() {
                 Login
               </Button>
             </Link>
+
             <SignUpRolePopup>
-              <Button
-                className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <Button className="text-white font-bold rounded-md bg-transparent hover:bg-teal-400 transition-colors">
                 SignUp
               </Button>
             </SignUpRolePopup>
