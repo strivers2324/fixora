@@ -20,6 +20,7 @@ type LoginResponseData = {
     phone: string;
     role: Role;
     is_phone_verified: boolean;
+    profession?: string;
   };
   otp_id: string;
 };
@@ -194,5 +195,14 @@ export async function ResetPassword(data: ResetPasswordData): Promise<void> {
   } catch (error: any) {
     handleApiError(error, "Failed to reset password");
     throw error;
+  }
+}
+
+export async function Logout() {
+  try {
+    const res = await api.post("/auth/logout");
+    return res.data;
+  } catch (error: any) {
+    handleApiError(error, "Failed to logout");
   }
 }

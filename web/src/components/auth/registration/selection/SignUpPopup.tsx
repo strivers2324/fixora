@@ -14,12 +14,12 @@ export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) =>
 
   const handleUserSignup = () => {
     setOpen(false);
-    navigate("/user/registration");
+    navigate("/registration/user");
   };
 
   const handleServiceProviderSignup = () => {
     setOpen(false);
-    navigate("/service-provider/registration");
+    navigate("/registration/service-provider");
   };
 
   return (

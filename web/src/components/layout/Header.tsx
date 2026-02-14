@@ -1,4 +1,4 @@
-import Navbar from "../home/sections/Navbar";
+import Navbar from "../home/sections/PublicNavbar";
 
 export default function Header() {
   return (
