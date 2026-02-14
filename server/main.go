@@ -21,11 +21,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:embed "dist"
 var embeddedFiles embed.FS
 
 func main() {
-	//environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -37,21 +35,19 @@ func main() {
 	db := database.InitDB()
 	defer database.CloseDB(db)
 
-	// Initialize repositories
 	authRepo := repository.NewAuthRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 
-	// Initialize services
 	authService := service.NewAuthService(authRepo)
+	orderService := service.NewOrderService(orderRepo)
 
-	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	orderHandler := handlers.NewOrderHandler(orderService)
 
-	// Set up routes
 	routes.SetAuthRoutes(router, authHandler)
+	routes.SetOrderRoutes(router, orderHandler)
 
-	//Serve frontend
 	router.NoRoute(func(c *gin.Context) {
-		// Only serve index.html
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") {
 			index, err := distFS.Open("index.html")
 			if err != nil {
