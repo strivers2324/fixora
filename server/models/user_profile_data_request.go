@@ -6,7 +6,6 @@ type UserProfileDataRequest struct {
 	District       string `json:"district" binding:"required"`
 	Area           string `json:"area" binding:"required"`
 	SubArea        string `json:"sub_area" binding:"required"`
-	Phone          string `json:"phone" binding:"required"`
 	ProfilePicture string `json:"profile_picture"`
 }
 

@@ -154,3 +154,97 @@ func (r *OrderRepository) GetServiceProviderProfileData(ctx context.Context, pro
 	}
 	return &profiledata, nil
 }
+
+func (r *OrderRepository) GetUserPassword(ctx context.Context, userID uuid.UUID) (string, error) {
+	var hash string
+	query := `SELECT password_hash FROM users WHERE user_id = $1`
+	err := r.db.QueryRowContext(ctx, query, userID).Scan(&hash)
+	if err != nil {
+		return "", err
+	}
+	return hash, nil
+}
+
+func (r *OrderRepository) GetServiceProviderPassword(ctx context.Context, providerID uuid.UUID) (string, error) {
+	var hash string
+	query := `SELECT password_hash FROM service_providers WHERE provider_id = $1`
+	err := r.db.QueryRowContext(ctx, query, providerID).Scan(&hash)
+	if err != nil {
+		return "", err
+	}
+	return hash, nil
+}
+
+func (r *OrderRepository) UpdateUserPassword(ctx context.Context, userID uuid.UUID, newHash string) error {
+	query := `UPDATE users SET password_hash = $1 WHERE user_id = $2`
+
+	result, err := r.db.ExecContext(ctx, query, newHash, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (r *OrderRepository) UpdateServiceProviderPassword(ctx context.Context, providerID uuid.UUID, newHash string) error {
+	query := `UPDATE service_providers SET password_hash = $1 WHERE provider_id = $2`
+
+	result, err := r.db.ExecContext(ctx, query, newHash, providerID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (r *OrderRepository) SaveNIDData(ctx context.Context, providerID uuid.UUID, req models.NIDSubmitRequest) error {
+	query := `
+		INSERT INTO service_provider_nids (provider_id, nid_number, storage_folder_id, nid_status)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (provider_id) 
+		DO UPDATE SET 
+			nid_number = EXCLUDED.nid_number,
+			storage_folder_id = EXCLUDED.storage_folder_id,
+			nid_status = 'pending'
+	`
+	_, err := r.db.ExecContext(ctx, query, providerID, req.NIDNumber, req.StorageFolderID, models.PENDING)
+	return err
+}
+
+func (r *OrderRepository) GetNIDStatus(ctx context.Context, providerID uuid.UUID) (*models.NIDStatusResponse, error) {
+	var response models.NIDStatusResponse
+
+	query := `
+		SELECT nid_status 
+		FROM service_provider_nids 
+		WHERE provider_id = $1
+	`
+
+	err := r.db.QueryRowContext(ctx, query, providerID).Scan(&response.Status)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &response, nil
+}

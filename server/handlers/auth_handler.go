@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 
 	"fixora-server/models"
 	"fixora-server/pkg/response"
@@ -178,8 +177,7 @@ func (h *AuthHandler) RefreshHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie("access_token", newAccessToken, int(15*time.Minute.Seconds()), "/", "", false, true)
+	utils.SetAuthCookies(c, newAccessToken, cookieToken)
 
 	response.SendSuccess(c.Writer, "", nil)
 }

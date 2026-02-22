@@ -46,7 +46,7 @@ func (s *AuthService) RegisterUser(ctx context.Context, req models.UserRegisterR
 		return "", apperrors.ErrInternalServer
 	}
 
-	if err := s.AuthRepo.CreateUser(ctx, userID.String(), req.Phone, string(hash)); err != nil {
+	if err := s.AuthRepo.CreateUser(ctx, userID, req.Phone, string(hash)); err != nil {
 		return "", apperrors.ErrInternalServer
 	}
 
@@ -72,7 +72,7 @@ func (s *AuthService) RegisterServiceProvider(ctx context.Context, req models.Se
 		return "", apperrors.ErrInternalServer
 	}
 
-	if err := s.AuthRepo.CreateServiceProvider(ctx, providerID.String(), req.Phone, req.ProfessionID, string(hash)); err != nil {
+	if err := s.AuthRepo.CreateServiceProvider(ctx, providerID, req.Phone, req.ProfessionID, string(hash)); err != nil {
 		return "", apperrors.ErrInternalServer
 	}
 
@@ -88,9 +88,10 @@ func (s *AuthService) VerifyServiceProviderPhone(ctx context.Context, otpID, cod
 }
 
 func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (string, string, string, bool, string, string, error) {
-	var savedHash, userID, profession string
+	var savedHash string
 	var isVerified bool
-	var err error
+	var profession string
+	var userID uuid.UUID
 
 	if req.Role == models.USER {
 		data, err := s.AuthRepo.GetUserLoginData(ctx, req.Phone)
@@ -100,9 +101,10 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 			}
 			return "", "", "", false, "", "", apperrors.ErrInternalServer
 		}
-		userID, savedHash, isVerified = data.UserID, data.PasswordHash, data.IsPhoneVerified
+		userID = data.UserID
+		savedHash = data.PasswordHash
+		isVerified = data.IsPhoneVerified
 		profession = ""
-
 	} else if req.Role == models.SERVICE_PROVIDER {
 		data, err := s.AuthRepo.GetServiceProviderLoginData(ctx, req.Phone)
 		if err != nil {
@@ -111,9 +113,10 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 			}
 			return "", "", "", false, "", "", apperrors.ErrInternalServer
 		}
-		userID, savedHash, isVerified = data.ProviderID, data.PasswordHash, data.IsPhoneVerified
+		userID = data.ProviderID
+		savedHash = data.PasswordHash
+		isVerified = data.IsPhoneVerified
 		profession = data.ProfessionName
-
 	} else {
 		return "", "", "", false, "", "", apperrors.NewCustomError(400, "Invalid role specified", "INVALID_ROLE")
 	}
@@ -130,7 +133,7 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 	var otpID string
 	if !isVerified {
 		if fetchedOtpID, err := s.AuthRepo.GetOTPID(ctx, userID); err == nil {
-			otpID = fetchedOtpID
+			otpID = fetchedOtpID.String()
 		}
 	}
 
@@ -138,7 +141,7 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (strin
 }
 
 func (s *AuthService) RefreshToken(ctx context.Context, oldRefreshToken string) (string, error) {
-	userID, roleStr, expiresAt, err := s.AuthRepo.FindRefreshToken(ctx, oldRefreshToken)
+	userID, expiresAt, err := s.AuthRepo.FindRefreshToken(ctx, oldRefreshToken)
 	if err != nil {
 		return "", apperrors.ErrInvalidToken
 	}
@@ -150,10 +153,25 @@ func (s *AuthService) RefreshToken(ctx context.Context, oldRefreshToken string) 
 		return "", apperrors.ErrTokenExpired
 	}
 
+	token, err := jwt.Parse(oldRefreshToken, func(token *jwt.Token) (interface{}, error) {
+		return s.getSecretKey(), nil
+	})
+
+	if err != nil || !token.Valid {
+		return "", apperrors.ErrInvalidToken
+	}
+
+	var userRole string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		userRole = claims["role"].(string)
+	} else {
+		return "", apperrors.ErrInternalServer
+	}
+
 	secretKey := s.getSecretKey()
 	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, models.AppClaims{
-		Role:   models.Role(roleStr),
-		UserID: userID,
+		Role:   models.Role(userRole),
+		UserID: userID.String(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(15 * time.Minute)),
 			Issuer:    "fixora",
@@ -243,9 +261,9 @@ func (s *AuthService) UpdatePhoneAndResendOTP(ctx context.Context, oldOtpID stri
 	}
 
 	if oldOTP.Role == models.USER {
-		err = s.AuthRepo.UpdateUserPhone(ctx, oldOTP.EntityID.String(), newPhone)
+		err = s.AuthRepo.UpdateUserPhone(ctx, oldOTP.EntityID, newPhone)
 	} else {
-		err = s.AuthRepo.UpdateServiceProviderPhone(ctx, oldOTP.EntityID.String(), newPhone)
+		err = s.AuthRepo.UpdateServiceProviderPhone(ctx, oldOTP.EntityID, newPhone)
 	}
 
 	if err != nil {
@@ -263,12 +281,12 @@ func (s *AuthService) OTPExpirationInfo(ctx context.Context, otpID string) (time
 
 	var phone string
 	if otp.Role == models.USER {
-		p, err := s.AuthRepo.GetUserPhone(ctx, otp.EntityID.String())
+		p, err := s.AuthRepo.GetUserPhone(ctx, otp.EntityID)
 		if err == nil {
 			phone = p
 		}
 	} else if otp.Role == models.SERVICE_PROVIDER {
-		p, err := s.AuthRepo.GetServiceProviderPhone(ctx, otp.EntityID.String())
+		p, err := s.AuthRepo.GetServiceProviderPhone(ctx, otp.EntityID)
 		if err == nil {
 			phone = p
 		}
@@ -360,9 +378,9 @@ func (s *AuthService) ResetPassword(ctx context.Context, resetToken, newPassword
 	}
 
 	if otp.Role == models.USER {
-		err = s.AuthRepo.UpdateUserPassword(ctx, otp.EntityID.String(), string(newHash))
+		err = s.AuthRepo.UpdateUserPassword(ctx, otp.EntityID, string(newHash))
 	} else {
-		err = s.AuthRepo.UpdateServiceProviderPassword(ctx, otp.EntityID.String(), string(newHash))
+		err = s.AuthRepo.UpdateServiceProviderPassword(ctx, otp.EntityID, string(newHash))
 	}
 
 	if err != nil {
@@ -455,17 +473,17 @@ func (s *AuthService) generateAndSaveOTP(ctx context.Context, entityID uuid.UUID
 		return "", apperrors.ErrInternalServer
 	}
 
-	fmt.Printf(">>> [DEBUG SMS] Raw Code: %s (Save as Hash) for Entity: %s\n", rawCode, entityID)
+	fmt.Printf(">>> [DEBUG SMS] Raw Code: %s (Save as Hash) for Entity: %s\n", rawCode, entityID.String())
 
 	return otpID.String(), nil
 }
 
-func (s *AuthService) generateAndSaveTokens(ctx context.Context, role models.Role, userID string) (string, string, error) {
+func (s *AuthService) generateAndSaveTokens(ctx context.Context, role models.Role, userID uuid.UUID) (string, string, error) {
 	secretKey := s.getSecretKey()
 
 	accessToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, models.AppClaims{
 		Role:   role,
-		UserID: userID,
+		UserID: userID.String(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(15 * time.Minute)),
 			Issuer:    "fixora",
@@ -473,7 +491,8 @@ func (s *AuthService) generateAndSaveTokens(ctx context.Context, role models.Rol
 	}).SignedString(secretKey)
 
 	refreshToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
+		"user_id": userID.String(),
+		"role":    string(role),
 		"exp":     time.Now().UTC().Add(15 * 24 * time.Hour).Unix(),
 	}).SignedString(secretKey)
 

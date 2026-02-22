@@ -24,9 +24,9 @@ func (r *AuthRepository) CheckUserExists(ctx context.Context, phone string) (boo
 	return exists, err
 }
 
-func (r *AuthRepository) CreateUser(ctx context.Context, userID, phone, passwordHash string) error {
+func (r *AuthRepository) CreateUser(ctx context.Context, userID uuid.UUID, phone, passwordHash string) error {
 	query := `INSERT INTO users (user_id, phone, password_hash, is_phone_verified) VALUES ($1, $2, $3, $4)`
-	_, err := r.db.ExecContext(ctx, query, userID, phone, passwordHash, false)
+	_, err := r.db.ExecContext(ctx, query, userID.String(), phone, passwordHash, false)
 	return err
 }
 
@@ -51,28 +51,28 @@ func (r *AuthRepository) GetUserID(ctx context.Context, phone string) (uuid.UUID
 	return userID, err
 }
 
-func (r *AuthRepository) GetUserPhone(ctx context.Context, userID string) (string, error) {
+func (r *AuthRepository) GetUserPhone(ctx context.Context, userID uuid.UUID) (string, error) {
 	var phone string
 	query := `SELECT phone FROM users WHERE user_id = $1`
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(&phone)
+	err := r.db.QueryRowContext(ctx, query, userID.String()).Scan(&phone)
 	return phone, err
 }
 
 func (r *AuthRepository) UpdateUserVerification(ctx context.Context, userID uuid.UUID) error {
 	query := `UPDATE users SET is_phone_verified = TRUE WHERE user_id = $1`
-	_, err := r.db.ExecContext(ctx, query, userID)
+	_, err := r.db.ExecContext(ctx, query, userID.String())
 	return err
 }
 
-func (r *AuthRepository) UpdateUserPhone(ctx context.Context, userID string, newPhone string) error {
+func (r *AuthRepository) UpdateUserPhone(ctx context.Context, userID uuid.UUID, newPhone string) error {
 	query := `UPDATE users SET phone = $1 WHERE user_id = $2`
-	_, err := r.db.ExecContext(ctx, query, newPhone, userID)
+	_, err := r.db.ExecContext(ctx, query, newPhone, userID.String())
 	return err
 }
 
-func (r *AuthRepository) UpdateUserPassword(ctx context.Context, userID string, newPasswordHash string) error {
+func (r *AuthRepository) UpdateUserPassword(ctx context.Context, userID uuid.UUID, newPasswordHash string) error {
 	query := `UPDATE users SET password_hash = $1 WHERE user_id = $2`
-	_, err := r.db.ExecContext(ctx, query, newPasswordHash, userID)
+	_, err := r.db.ExecContext(ctx, query, newPasswordHash, userID.String())
 	return err
 }
 
@@ -83,9 +83,9 @@ func (r *AuthRepository) CheckServiceProviderExists(ctx context.Context, phone s
 	return exists, err
 }
 
-func (r *AuthRepository) CreateServiceProvider(ctx context.Context, providerID, phone string, professionID int, passwordHash string) error {
+func (r *AuthRepository) CreateServiceProvider(ctx context.Context, providerID uuid.UUID, phone string, professionID int, passwordHash string) error {
 	query := `INSERT INTO service_providers (provider_id, phone, profession_id, password_hash, is_phone_verified) VALUES ($1, $2, $3, $4, $5)`
-	_, err := r.db.ExecContext(ctx, query, providerID, phone, professionID, passwordHash, false)
+	_, err := r.db.ExecContext(ctx, query, providerID.String(), phone, professionID, passwordHash, false)
 	return err
 }
 
@@ -120,28 +120,28 @@ func (r *AuthRepository) GetServiceProviderID(ctx context.Context, phone string)
 	return providerID, err
 }
 
-func (r *AuthRepository) GetServiceProviderPhone(ctx context.Context, providerID string) (string, error) {
+func (r *AuthRepository) GetServiceProviderPhone(ctx context.Context, providerID uuid.UUID) (string, error) {
 	var phone string
 	query := `SELECT phone FROM service_providers WHERE provider_id = $1`
-	err := r.db.QueryRowContext(ctx, query, providerID).Scan(&phone)
+	err := r.db.QueryRowContext(ctx, query, providerID.String()).Scan(&phone)
 	return phone, err
 }
 
 func (r *AuthRepository) UpdateServiceProviderVerification(ctx context.Context, providerID uuid.UUID) error {
 	query := `UPDATE service_providers SET is_phone_verified = TRUE WHERE provider_id = $1`
-	_, err := r.db.ExecContext(ctx, query, providerID)
+	_, err := r.db.ExecContext(ctx, query, providerID.String())
 	return err
 }
 
-func (r *AuthRepository) UpdateServiceProviderPhone(ctx context.Context, providerID string, newPhone string) error {
+func (r *AuthRepository) UpdateServiceProviderPhone(ctx context.Context, providerID uuid.UUID, newPhone string) error {
 	query := `UPDATE service_providers SET phone = $1 WHERE provider_id = $2`
-	_, err := r.db.ExecContext(ctx, query, newPhone, providerID)
+	_, err := r.db.ExecContext(ctx, query, newPhone, providerID.String())
 	return err
 }
 
-func (r *AuthRepository) UpdateServiceProviderPassword(ctx context.Context, providerID string, newPasswordHash string) error {
+func (r *AuthRepository) UpdateServiceProviderPassword(ctx context.Context, providerID uuid.UUID, newPasswordHash string) error {
 	query := `UPDATE service_providers SET password_hash = $1 WHERE provider_id = $2`
-	_, err := r.db.ExecContext(ctx, query, newPasswordHash, providerID)
+	_, err := r.db.ExecContext(ctx, query, newPasswordHash, providerID.String())
 	return err
 }
 
@@ -149,7 +149,7 @@ func (r *AuthRepository) InsertOTPInfo(ctx context.Context, otp *models.OTP) err
 	query := `
         INSERT INTO otps (id, entity_id, role, type, otp_token, expires_at)
         VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.ExecContext(ctx, query, otp.ID, otp.EntityID, otp.Role, otp.Type, otp.OTPToken, otp.ExpiresAt)
+	_, err := r.db.ExecContext(ctx, query, otp.ID.String(), otp.EntityID.String(), otp.Role, otp.Type, otp.OTPToken, otp.ExpiresAt)
 	return err
 }
 
@@ -163,12 +163,12 @@ func (r *AuthRepository) GetOTPInfo(ctx context.Context, otpID string) (*models.
 	return otp, nil
 }
 
-func (r *AuthRepository) GetOTPID(ctx context.Context, entityID string) (string, error) {
-	var otpID string
+func (r *AuthRepository) GetOTPID(ctx context.Context, entityID uuid.UUID) (uuid.UUID, error) {
+	var otpID uuid.UUID
 	query := `SELECT id FROM otps WHERE entity_id = $1`
-	err := r.db.QueryRowContext(ctx, query, entityID).Scan(&otpID)
+	err := r.db.QueryRowContext(ctx, query, entityID.String()).Scan(&otpID)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 	return otpID, nil
 }
@@ -182,7 +182,7 @@ func (r *AuthRepository) DeleteOTP(ctx context.Context, otpID string) error {
 func (r *AuthRepository) GetOTPAttemptInfo(ctx context.Context, entityID uuid.UUID) (*models.OTPAttempt, error) {
 	attempt := &models.OTPAttempt{}
 	query := `SELECT entity_id, count, last_attempt_at FROM otp_attempts WHERE entity_id = $1`
-	err := r.db.QueryRowContext(ctx, query, entityID).Scan(&attempt.EntityID, &attempt.Count, &attempt.LastAttemptAt)
+	err := r.db.QueryRowContext(ctx, query, entityID.String()).Scan(&attempt.EntityID, &attempt.Count, &attempt.LastAttemptAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -194,28 +194,28 @@ func (r *AuthRepository) UpdateOTPAttempt(ctx context.Context, attempt *models.O
         INSERT INTO otp_attempts (entity_id, count, last_attempt_at) 
         VALUES ($1, $2, $3)
         ON CONFLICT (entity_id) DO UPDATE SET count = $2, last_attempt_at = $3`
-	_, err := r.db.ExecContext(ctx, query, attempt.EntityID, attempt.Count, attempt.LastAttemptAt)
+	_, err := r.db.ExecContext(ctx, query, attempt.EntityID.String(), attempt.Count, attempt.LastAttemptAt)
 	return err
 }
 
-func (r *AuthRepository) SaveRefreshToken(ctx context.Context, userID, token string, expiresAt time.Time) error {
+func (r *AuthRepository) SaveRefreshToken(ctx context.Context, userID uuid.UUID, token string, expiresAt time.Time) error {
 	query := `
         INSERT INTO refresh_tokens (user_id, token, expires_at)
         VALUES ($1, $2, $3)
         ON CONFLICT (user_id) DO UPDATE SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`
-	_, err := r.db.ExecContext(ctx, query, userID, token, expiresAt)
+	_, err := r.db.ExecContext(ctx, query, userID.String(), token, expiresAt)
 	return err
 }
 
-func (r *AuthRepository) FindRefreshToken(ctx context.Context, token string) (string, string, time.Time, error) {
-	var userID, role string
+func (r *AuthRepository) FindRefreshToken(ctx context.Context, token string) (uuid.UUID, time.Time, error) {
+	var userID uuid.UUID
 	var expiresAt time.Time
-	query := `SELECT user_id, role, expires_at FROM refresh_tokens WHERE token = $1`
-	err := r.db.QueryRowContext(ctx, query, token).Scan(&userID, &role, &expiresAt)
+	query := `SELECT user_id, expires_at FROM refresh_tokens WHERE token = $1`
+	err := r.db.QueryRowContext(ctx, query, token).Scan(&userID, &expiresAt)
 	if err != nil {
-		return "", "", time.Time{}, err
+		return uuid.Nil, time.Time{}, err
 	}
-	return userID, role, expiresAt, nil
+	return userID, expiresAt, nil
 }
 
 func (r *AuthRepository) DeleteRefreshToken(ctx context.Context, token string) error {
