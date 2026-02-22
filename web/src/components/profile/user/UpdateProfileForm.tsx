@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountStore } from "@/store/AccountStore";
-import { UpdateUserProfile, UserProfileRequest } from "@/api/OrderApi";
+import { UpdateUserProfile, UserProfileRequest, ChangePassword } from "@/api/OrderApi";
 import { Logout } from "@/api/AuthApi";
 import {
   LayoutDashboard,
@@ -173,7 +173,6 @@ export default function UserUpdateProfile() {
       const requestData: UserProfileRequest = {
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
         district: formData.district,
         area: formData.area,
         sub_area: formData.subArea,
@@ -193,13 +192,37 @@ export default function UserUpdateProfile() {
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+
     setIsPasswordSaving(true);
-    setTimeout(() => {
-      setIsPasswordSaving(false);
-      showSuccessToast("Password updated!");
+    setPasswordError("");
+
+    try {
+      await ChangePassword({
+        old_password: passwordData.oldPassword,
+        new_password: passwordData.newPassword,
+      });
+
+      showSuccessToast("Password updated successfully!");
       setShowPasswordFields(false);
       setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-    }, 1000);
+    } catch (error: any) {
+      console.error("Password update failed:", error);
+      const errorMsg = error.message || "Failed to update password. Please check your old password.";
+      setPasswordError(errorMsg);
+      //showErrorToast(errorMsg);
+    } finally {
+      setIsPasswordSaving(false);
+    }
   };
 
   const handlePhoneChangeClick = () => {
@@ -564,7 +587,7 @@ export default function UserUpdateProfile() {
                                 value={passwordData.oldPassword}
                                 onChange={handlePasswordChange}
                                 placeholder="Enter current password"
-                                className="bg-white pr-10"
+                                className={`bg-white pr-10 ${passwordError && !passwordError.includes("characters") && !passwordError.includes("match") ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                                 required
                               />
                               <button
@@ -575,7 +598,13 @@ export default function UserUpdateProfile() {
                                 {showOldPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </button>
                             </div>
+                            {passwordError &&
+                              !passwordError.includes("characters") &&
+                              !passwordError.includes("match") && (
+                                <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                              )}
                           </div>
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label className="text-sm font-medium">
@@ -599,7 +628,11 @@ export default function UserUpdateProfile() {
                                   {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                               </div>
+                              {passwordError.includes("characters") && (
+                                <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                              )}
                             </div>
+
                             <div className="space-y-2">
                               <Label className="text-sm font-medium">
                                 Confirm Password <span className="text-red-500">*</span>
@@ -622,16 +655,26 @@ export default function UserUpdateProfile() {
                                   {showConfirmPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                               </div>
+                              {passwordError.includes("match") && (
+                                <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                              )}
                             </div>
                           </div>
-                          {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
+
                           <div className="flex items-center justify-end mt-4">
                             <Button
                               type="submit"
                               disabled={isPasswordSaving}
                               className="bg-amber-600 hover:bg-amber-700 text-white"
                             >
-                              {isPasswordSaving ? "Updating..." : "Update Password"}
+                              {isPasswordSaving ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Updating...
+                                </>
+                              ) : (
+                                "Update Password"
+                              )}
                             </Button>
                           </div>
                         </form>

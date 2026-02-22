@@ -171,7 +171,7 @@ export default function UserNavbar() {
                           variant="secondary"
                           className="text-[10px] px-1.5 h-5 bg-teal-100 text-teal-800 hover:bg-teal-100"
                         >
-                          Provider
+                          Service-Provider
                         </Badge>
                       )}
                       {!isProfileComplete && (

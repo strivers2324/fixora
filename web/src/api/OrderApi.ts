@@ -15,7 +15,6 @@ export type UserProfileRequest = {
   district: string;
   area: string;
   sub_area: string;
-  phone: string;
   profile_picture: string;
 };
 
@@ -34,26 +33,21 @@ export type ServiceProviderProfileRequest = {
   district: string;
   area: string;
   sub_area: string;
-  phone: string;
   profile_picture: string;
 };
 
 export type NIDSubmissionRequest = {
   nid_number: string;
-  front_image: string;
-  back_image: string;
+  storage_folder_id: string;
 };
 
 export type NIDStatusResponse = {
-  is_verified: boolean;
-  status?: "pending" | "verified" | "rejected" | "none";
+  status: "pending" | "accepted" | "rejected";
 };
 
-type CloudinarySignature = {
-  signature: string;
-  timestamp: number;
-  cloudName: string;
-  apiKey: string;
+export type ChangePasswordRequest = {
+  old_password: string;
+  new_password: string;
 };
 
 const handleApiError = (error: any, defaultMessage: string): never => {
@@ -75,17 +69,16 @@ export async function UpdateUserProfile(data: UserProfileRequest): Promise<UserP
   }
 }
 
-export async function GetUserProfile(phone: string): Promise<UserProfileData> {
+export async function GetUserProfile(): Promise<UserProfileData> {
   try {
-    const res = await api.get<UserProfileData>("/order/user/profile", {
-      params: { phone },
-    });
+    const res = await api.get<UserProfileData>("/order/user/profile");
     return res.data;
   } catch (error: any) {
     handleApiError(error, "Failed to fetch profile");
     throw error;
   }
 }
+
 export async function UpdateServiceProviderProfile(data: UserProfileRequest): Promise<ServiceProviderProfileData> {
   try {
     const res = await api.post<ServiceProviderProfileData>("/order/service-provider/update-profile", data);
@@ -96,11 +89,9 @@ export async function UpdateServiceProviderProfile(data: UserProfileRequest): Pr
   }
 }
 
-export async function GetServiceProviderProfile(phone: string): Promise<ServiceProviderProfileData> {
+export async function GetServiceProviderProfile(): Promise<ServiceProviderProfileData> {
   try {
-    const res = await api.get<ServiceProviderProfileData>("/order/service-provider/profile", {
-      params: { phone },
-    });
+    const res = await api.get<ServiceProviderProfileData>("/order/service-provider/profile");
     return res.data;
   } catch (error: any) {
     handleApiError(error, "Failed to fetch profile");
@@ -120,11 +111,9 @@ export async function SubmitNIDVerification(
   }
 }
 
-export async function GetNIDStatus(phone: string): Promise<NIDStatusResponse> {
+export async function GetNIDStatus(): Promise<NIDStatusResponse> {
   try {
-    const res = await api.get<NIDStatusResponse>("/order/service-provider/nid-status", {
-      params: { phone },
-    });
+    const res = await api.get<NIDStatusResponse>("/order/service-provider/nid-status");
     return res.data;
   } catch (error: any) {
     handleApiError(error, "Failed to fetch NID status");
@@ -132,12 +121,12 @@ export async function GetNIDStatus(phone: string): Promise<NIDStatusResponse> {
   }
 }
 
-export async function GetCloudinarySignature(): Promise<CloudinarySignature> {
+export async function ChangePassword(data: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
   try {
-    const res = await api.get<CloudinarySignature>("/utils/cloudinary-sign");
+    const res = await api.post<{ success: boolean; message: string }>("/order/change-password", data);
     return res.data;
   } catch (error: any) {
-    handleApiError(error, "Failed to get upload signature");
+    handleApiError(error, "Failed to change password");
     throw error;
   }
 }

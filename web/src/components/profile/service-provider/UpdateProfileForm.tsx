@@ -1,20 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountStore } from "@/store/AccountStore";
+import { supabase } from "@/lib/supabase";
 import {
   UpdateServiceProviderProfile,
   ServiceProviderProfileRequest,
-  GetCloudinarySignature,
   SubmitNIDVerification,
   GetNIDStatus,
+  ChangePassword,
 } from "@/api/OrderApi";
 import { Logout } from "@/api/AuthApi";
 
 import {
   LayoutDashboard,
-  Briefcase,
-  Bell,
-  Wallet,
   User,
   LogOut,
   MapPin,
@@ -33,6 +31,7 @@ import {
   XCircle,
   CheckCircle,
   Loader2,
+  Clock,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,6 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { LOCATION_DATA } from "@/data/locationData";
-import axios from "axios";
 
 const CLOUDINARY_UPLOAD_PRESET = "fixora_profile_upload";
 const CLOUDINARY_CLOUD_NAME = "dkskg6fv9";
@@ -65,7 +63,7 @@ export default function ServiceProviderProfile() {
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
 
   const [isNidSubmitting, setIsNidSubmitting] = useState(false);
-  const [isNidSubmitted, setIsNidSubmitted] = useState(false);
+  const [nidStatus, setNidStatus] = useState<"pending" | "accepted" | "rejected" | null>(null);
   const [formError, setFormError] = useState("");
 
   const [passwordError, setPasswordError] = useState("");
@@ -110,8 +108,18 @@ export default function ServiceProviderProfile() {
   useEffect(() => {
     if (account?.phone) {
       fetchProfile();
-      GetNIDStatus(account.phone)
-        .then((status) => setIsNidSubmitted(status.is_verified))
+      GetNIDStatus()
+        .then((res: any) => {
+          console.log("NID Status API Response:", res);
+
+          if (res) {
+            const currentStatus = res?.data?.status || res?.status;
+
+            if (currentStatus) {
+              setNidStatus(currentStatus.toLowerCase());
+            }
+          }
+        })
         .catch((err) => console.error("Error fetching NID status", err));
     }
   }, [account]);
@@ -152,26 +160,6 @@ export default function ServiceProviderProfile() {
     } catch (error) {
       console.error(error);
       return null;
-    }
-  };
-
-  const uploadNIDImageSigned = async (file: File): Promise<string> => {
-    try {
-      const sigData = await GetCloudinarySignature();
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", sigData.apiKey);
-      formData.append("timestamp", sigData.timestamp.toString());
-      formData.append("signature", sigData.signature);
-
-      const dynamicUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`;
-
-      const response = await axios.post(dynamicUrl, formData);
-      return (response.data as { secure_url: string }).secure_url;
-    } catch (error) {
-      console.error("NID Upload Error:", error);
-      throw new Error("Failed to upload NID image.");
     }
   };
 
@@ -240,7 +228,6 @@ export default function ServiceProviderProfile() {
       const requestData: ServiceProviderProfileRequest = {
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
         district: formData.district,
         area: formData.area,
         sub_area: formData.subArea,
@@ -266,13 +253,36 @@ export default function ServiceProviderProfile() {
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+
     setIsPasswordSaving(true);
-    setTimeout(() => {
-      setIsPasswordSaving(false);
-      showSuccessToast("Password updated!");
+    setPasswordError("");
+
+    try {
+      await ChangePassword({
+        old_password: passwordData.oldPassword,
+        new_password: passwordData.newPassword,
+      });
+
+      showSuccessToast("Password updated successfully!");
       setShowPasswordFields(false);
       setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-    }, 1000);
+    } catch (error: any) {
+      console.error("Password update failed:", error);
+      const errorMsg = error.message || "Failed to update password. Please check your old password.";
+      setPasswordError(errorMsg);
+    } finally {
+      setIsPasswordSaving(false);
+    }
   };
 
   const handlePhoneChangeClick = () => {
@@ -335,18 +345,28 @@ export default function ServiceProviderProfile() {
     setIsNidSubmitting(true);
 
     try {
-      const frontUrl = await uploadNIDImageSigned(nidData.frontFile);
-      const backUrl = await uploadNIDImageSigned(nidData.backFile);
+      const folderId = Date.now().toString();
+
+      const frontExt = nidData.frontFile.name.split(".").pop();
+      const backExt = nidData.backFile.name.split(".").pop();
+
+      const { error: frontError } = await supabase.storage
+        .from("service-provider-nids")
+        .upload(`${folderId}/front.${frontExt}`, nidData.frontFile);
+      if (frontError) throw new Error("Failed to upload front image");
+
+      const { error: backError } = await supabase.storage
+        .from("service-provider-nids")
+        .upload(`${folderId}/back.${backExt}`, nidData.backFile);
+      if (backError) throw new Error("Failed to upload back image");
 
       await SubmitNIDVerification({
         nid_number: nidData.number,
-        front_image: frontUrl,
-        back_image: backUrl,
+        storage_folder_id: folderId,
       });
 
-      setIsNidSubmitted(true);
+      setNidStatus("pending");
       showSuccessToast("NID submitted for verification!");
-
       setNidData({ number: "", frontFile: null, backFile: null, frontPreview: null, backPreview: null });
     } catch (error: any) {
       console.error("NID Submit Failed:", error);
@@ -366,9 +386,7 @@ export default function ServiceProviderProfile() {
   const [activeMenu, setActiveMenu] = useState("profile settings");
   const sidebarItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-    { name: "My Jobs", icon: Briefcase, path: "/jobs" },
-    { name: "New Requests", icon: Bell, path: "/requests" },
-    { name: "Earnings / Wallet", icon: Wallet, path: "/earnings" },
+
     { name: "Profile Settings", icon: User, path: "/profile" },
   ];
 
@@ -413,7 +431,6 @@ export default function ServiceProviderProfile() {
             <Card className="border-0 shadow-lg rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm h-auto flex flex-col">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center text-center mb-8">
-                  {/* Profile Picture Section */}
                   <div className="relative mb-4 group">
                     <Avatar className="h-24 w-24 border-4 border-white shadow-xl cursor-pointer group-hover:opacity-90 transition-opacity">
                       <AvatarImage src={profileImage || ""} />
@@ -513,7 +530,6 @@ export default function ServiceProviderProfile() {
                     <CardContent className="p-6 space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                          {/* 1. Added Required Star */}
                           <Label htmlFor="name" className="text-sm font-medium">
                             Full Name <span className="text-red-500">*</span>
                           </Label>
@@ -525,13 +541,12 @@ export default function ServiceProviderProfile() {
                               onChange={handleChange}
                               className="pl-10 h-11 rounded-lg bg-white/50"
                               placeholder="e.g. Rahim Ullah"
-                              required // 2. Added HTML required attribute
+                              required
                             />
                           </div>
                         </div>
 
                         <div className="space-y-3">
-                          {/* 1. Added Required Star */}
                           <Label htmlFor="email" className="text-sm font-medium">
                             Email Address <span className="text-red-500">*</span>
                           </Label>
@@ -543,7 +558,7 @@ export default function ServiceProviderProfile() {
                               onChange={handleChange}
                               className="pl-10 h-11 rounded-lg bg-white/50"
                               placeholder="e.g. rahim@service.com"
-                              required // 2. Added HTML required attribute
+                              required
                             />
                           </div>
                         </div>
@@ -585,11 +600,9 @@ export default function ServiceProviderProfile() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="space-y-3">
-                            {/* 1. Added Required Star */}
                             <Label className="text-sm font-medium">
                               District <span className="text-red-500">*</span>
                             </Label>
-                            {/* 2. Added required to Select (handled via validation check in handleSubmit usually for custom components, but visually marked) */}
                             <Select
                               value={formData.district}
                               onValueChange={(value) => handleSelectChange("district", value)}
@@ -609,7 +622,6 @@ export default function ServiceProviderProfile() {
                           </div>
 
                           <div className="space-y-3">
-                            {/* 1. Added Required Star */}
                             <Label className="text-sm font-medium">
                               Area <span className="text-red-500">*</span>
                             </Label>
@@ -634,7 +646,6 @@ export default function ServiceProviderProfile() {
                           </div>
 
                           <div className="space-y-3">
-                            {/* 1. Added Required Star */}
                             <Label className="text-sm font-medium">
                               Sub-Area <span className="text-red-500">*</span>
                             </Label>
@@ -729,7 +740,6 @@ export default function ServiceProviderProfile() {
                           onSubmit={handlePasswordSubmit}
                           className="grid gap-4 mt-6 animate-in slide-in-from-top-2 fade-in duration-300"
                         >
-                          {/* ... Password fields ... */}
                           <Separator className="mb-2" />
                           <div className="space-y-2">
                             <Label className="text-sm font-medium">
@@ -742,7 +752,7 @@ export default function ServiceProviderProfile() {
                                 value={passwordData.oldPassword}
                                 onChange={handlePasswordChange}
                                 placeholder="Enter current password"
-                                className="bg-white pr-10"
+                                className={`bg-white pr-10 ${passwordError && !passwordError.includes("characters") && !passwordError.includes("match") ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                                 required
                               />
                               <button
@@ -753,6 +763,11 @@ export default function ServiceProviderProfile() {
                                 {showOldPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </button>
                             </div>
+                            {passwordError &&
+                              !passwordError.includes("characters") &&
+                              !passwordError.includes("match") && (
+                                <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                              )}
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -846,26 +861,51 @@ export default function ServiceProviderProfile() {
                   </CardHeader>
 
                   <CardContent className="p-6 space-y-6">
-                    {isNidSubmitted ? (
+                    {nidStatus === "pending" ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 animate-in fade-in zoom-in duration-500">
+                        <div className="bg-amber-100 p-4 rounded-full">
+                          <Clock className="h-12 w-12 text-amber-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">Verification Pending</h3>
+                          <p className="text-gray-500 max-w-sm mt-2 mx-auto">
+                            Thank you. We have received your NID information and it is under review by our team.
+                          </p>
+                        </div>
+                      </div>
+                    ) : nidStatus === "accepted" ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 animate-in fade-in zoom-in duration-500">
                         <div className="bg-green-100 p-4 rounded-full">
                           <CheckCircle className="h-12 w-12 text-green-600" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">Your NID is submitted</h3>
+                          <h3 className="text-xl font-bold text-gray-900">NID Verified</h3>
                           <p className="text-gray-500 max-w-sm mt-2 mx-auto">
-                            Thank you. We have received your NID information and it is under verification.
+                            Congratulations! Your identity has been successfully verified.
                           </p>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <Alert className="bg-blue-50 border-blue-200">
+                        <Alert className="bg-blue-50 border-blue-200 mb-4">
                           <ShieldCheck className="h-4 w-4 text-blue-600" />
                           <AlertDescription className="text-blue-700 text-sm">
                             Your NID information is encrypted and only used for identity verification.
                           </AlertDescription>
                         </Alert>
+
+                        {nidStatus === "rejected" && (
+                          <Alert
+                            variant="destructive"
+                            className="bg-red-50 border-red-200 text-red-800 mb-6 animate-in fade-in"
+                          >
+                            <XCircle className="h-4 w-4" />
+                            <AlertTitle>Verification Rejected</AlertTitle>
+                            <AlertDescription>
+                              Your previous NID submission was rejected. Please upload clear and valid documents again.
+                            </AlertDescription>
+                          </Alert>
+                        )}
 
                         {formError && (
                           <Alert

@@ -59,7 +59,7 @@ export default function ProviderDashboard() {
               </div>
             </div>
             <Button
-              onClick={() => navigate("/provider-profile")}
+              onClick={() => navigate("/profile")}
               className="bg-amber-600 hover:bg-amber-700 text-white w-full sm:w-auto px-6 whitespace-nowrap"
             >
               Update Profile

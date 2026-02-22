@@ -77,11 +77,9 @@ export default function UserDashboard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showAllServices, setShowAllServices] = useState(false);
 
-  // স্টোর থেকে ডাটা আনা
   const { profile, fetchProfile } = useAccountStore();
   const navigate = useNavigate();
 
-  // ডাটা সোর্স (আপাতত খালি রাখা হলো)
   const activeBooking = null;
   const recentServices: any[] = [];
 
@@ -107,7 +105,6 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-20">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {/* 1. Profile Completion Warning */}
         {!isProfileComplete && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-pulse-slow">
             <div className="flex items-center gap-4 text-center sm:text-left">
@@ -130,7 +127,6 @@ export default function UserDashboard() {
           </div>
         )}
 
-        {/* 2. Active Booking Section */}
         {activeBooking ? (
           <Card className="border-l-4 border-l-teal-500 shadow-sm bg-white overflow-hidden">
             <div className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -166,7 +162,6 @@ export default function UserDashboard() {
           </div>
         )}
 
-        {/* 3. Hero Section (Welcome + Slider) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-gradient-to-r from-teal-800 to-teal-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-center min-h-[220px]">
             <div className="relative z-10">
@@ -199,7 +194,6 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* 4. Service Categories */}
         <section id="popular-services" className="scroll-mt-30">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-800">Service Categories</h2>
@@ -230,7 +224,6 @@ export default function UserDashboard() {
           </div>
         </section>
 
-        {/* 5. Recent Services Section */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-800">Recent Services</h2>
