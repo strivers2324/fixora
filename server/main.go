@@ -44,13 +44,13 @@ func main() {
 	profileRepo := repository.NewProfileRepository(db)
 	jobRepo := repository.NewJobRepository(db)
 
-	otpService := service.NewOTPService(otpRepo)
+	smsService := service.NewSmsService(smsSercrets)
+	otpService := service.NewOTPService(otpRepo, smsService)
 	profileService := service.NewProfileService(profileRepo)
 	accountService := service.NewAccountService(accountRepo, otpService, nil)
 	authService := service.NewAuthService(authRepo, otpService, accountService)
 	accountService.AuthService = authService
 	jobService := service.NewJobService(jobRepo)
-	smsService := service.NewSmsService(smsSercrets)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	otpHandler := handlers.NewOTPHandler(otpService)

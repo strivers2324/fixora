@@ -10,7 +10,6 @@ import (
 
 	"fixora-server/models"
 	"fixora-server/pkg/apperrors"
-	"fixora-server/pkg/utils"
 	"fixora-server/repository"
 
 	"github.com/google/uuid"
@@ -18,11 +17,12 @@ import (
 )
 
 type OTPService struct {
-	OTPRepo *repository.OTPRepository
+	OTPRepo    *repository.OTPRepository
+	smsService *SmsService
 }
 
-func NewOTPService(otpRepo *repository.OTPRepository) *OTPService {
-	return &OTPService{OTPRepo: otpRepo}
+func NewOTPService(otpRepo *repository.OTPRepository, smsService *SmsService) *OTPService {
+	return &OTPService{OTPRepo: otpRepo, smsService: smsService}
 }
 
 func (s *OTPService) generateOTP(n int) string {
@@ -107,7 +107,7 @@ func (s *OTPService) GenerateAndSaveOTP(ctx context.Context, entityID uuid.UUID,
 
 	if phone != "" {
 		go func(targetPhone, otpCode string) {
-			err := utils.SendSMS(targetPhone, otpCode)
+			err := s.smsService.SendSMS(targetPhone, otpCode)
 			if err != nil {
 				log.Printf("Failed to send OTP SMS to %s: %v", targetPhone, err)
 			} else {
