@@ -1,27 +1,33 @@
-package utils
+package service
 
 import (
 	"bytes"
 	"encoding/json"
 	"fixora-server/models"
+	"fixora-server/pkg/utils"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
 
-func SendSMS(phone, otp string) error {
-	apiUrl := os.Getenv("SMS_API_URL")
-	apiKey := os.Getenv("SMS_API_KEY")
-	senderID := os.Getenv("SMS_SENDER_ID")
+type SmsService struct {
+	smsSecret utils.SmsSecrets
+}
 
+func NewSmsService(smsSecrets utils.SmsSecrets) *SmsService {
+	return &SmsService{
+		smsSecret: smsSecrets,
+	}
+}
+
+func (s *SmsService) SendSMS(phone, otp string) error {
 	formattedPhone := strings.TrimPrefix(phone, "+")
 
 	payload := models.SMSPayload{
-		APIKey:   apiKey,
-		SenderID: senderID,
+		APIKey:   s.smsSecret.ApiKey,
+		SenderID: s.smsSecret.SenderID,
 		Number:   formattedPhone,
 		Message:  fmt.Sprintf("Your Fixora OTP code is: %s. This code is valid for 3 minutes.", otp),
 	}
@@ -31,7 +37,7 @@ func SendSMS(phone, otp string) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", apiUrl, bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest("POST", s.smsSecret.ApiUrl, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return err
 	}

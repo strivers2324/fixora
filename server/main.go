@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fixora-server/database"
 	"fixora-server/handlers"
+	"fixora-server/pkg/utils"
 	"fixora-server/repository"
 	"fixora-server/routes"
 	"fixora-server/service"
@@ -29,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	smsSercrets := utils.GetSmsSercrets()
 	router := gin.Default()
 	distFS := getFileSystem("dist")
 	router.Use(static.Serve("/", distFS))
@@ -48,6 +50,7 @@ func main() {
 	authService := service.NewAuthService(authRepo, otpService, accountService)
 	accountService.AuthService = authService
 	jobService := service.NewJobService(jobRepo)
+	smsService := service.NewSmsService(smsSercrets)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	otpHandler := handlers.NewOTPHandler(otpService)
