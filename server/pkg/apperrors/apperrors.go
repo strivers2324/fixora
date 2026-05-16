@@ -9,6 +9,7 @@ var (
 	ErrPhoneExists = NewCustomError(http.StatusConflict, "Phone number already registered. Please login.", "PHONE_EXISTS")
 
 	ErrInvalidCredentials = NewCustomError(http.StatusUnauthorized, "Invalid phone or password.", "INVALID_CREDENTIALS")
+	ErrInvalidOldPassword = NewCustomError(http.StatusBadRequest, "Incorrect old password", "INVALID_PASSWORD")
 	ErrUserNotFound       = NewCustomError(http.StatusNotFound, "Account not found. Please register first.", "USER_NOT_FOUND")
 	ErrNotVerified        = NewCustomError(http.StatusForbidden, "Account not verified. Please verify OTP.", "NOT_VERIFIED")
 
@@ -16,7 +17,7 @@ var (
 	ErrTokenExpired = NewCustomError(http.StatusUnauthorized, "Session expired. Please login again.", "TOKEN_EXPIRED")
 	ErrInvalidToken = NewCustomError(http.StatusUnauthorized, "Invalid session. Please login again.", "INVALID_TOKEN")
 
-	ErrInvalidOTP = NewCustomError(http.StatusBadRequest, "Invalid OTP. Please resend a new code.", "INVALID_OTP")
+	ErrInvalidOTP = NewCustomError(http.StatusBadRequest, "Invalid or Expired OTP.", "INVALID_OTP")
 
 	ErrInternalServer = NewCustomError(http.StatusInternalServerError, "Something went wrong. Please contact support.", "INTERNAL_ERROR")
 
