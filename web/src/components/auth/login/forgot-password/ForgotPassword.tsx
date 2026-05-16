@@ -52,8 +52,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
-      <Card className="w-full max-w-md mx-auto rounded-xl shadow-2xl bg-white animate-in zoom-in duration-300">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200 dark:bg-zinc-950 transition-colors duration-300">
+      <Card className="w-full max-w-md mx-auto rounded-xl shadow-2xl bg-white dark:bg-zinc-900 border-none animate-in zoom-in duration-300 transition-colors">
         <CardContent className="w-full px-6 md:px-10 py-10 flex flex-col justify-center">
           <div className="mb-4">
             {generalError && (
@@ -65,23 +65,27 @@ export default function ForgotPasswordPage() {
 
           <div className="flex flex-col items-center gap-2 text-center mb-6">
             <div className="flex items-center justify-center mt-2 mb-2">
-              <img src={logo1} alt="Fixora Logo" className="h-16 w-auto" />
+              <img
+                src={logo1}
+                alt="Fixora Logo"
+                className="h-16 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
+              />
             </div>
-            <h2 className="text-xl font-serif text-teal-900">Reset Password</h2>
+            <h2 className="text-xl font-serif text-teal-900 dark:text-slate-300 transition-colors">Reset Password</h2>
             <p className="text-muted-foreground text-sm font-serif">Select account type and enter your phone number.</p>
           </div>
 
           <Form {...phoneForm}>
             <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="w-full">
               <div className="mb-4">
-                <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg">
+                <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-zinc-800 rounded-lg transition-colors">
                   <button
                     type="button"
                     onClick={() => setRole(Role.USER)}
                     className={`flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                       role === Role.USER
-                        ? "bg-white text-teal-900 shadow-sm ring-1 ring-gray-200"
-                        : "text-gray-500 hover:text-gray-900"
+                        ? "bg-white dark:bg-zinc-950 text-teal-900 dark:text-teal-400 shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
                     <User size={18} /> User
@@ -91,8 +95,8 @@ export default function ForgotPasswordPage() {
                     onClick={() => setRole(Role.SERVICE_PROVIDER)}
                     className={`flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                       role === Role.SERVICE_PROVIDER
-                        ? "bg-white text-teal-900 shadow-sm ring-1 ring-gray-200"
-                        : "text-gray-500 hover:text-gray-900"
+                        ? "bg-white dark:bg-zinc-950 text-teal-900 dark:text-teal-400 shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
                     <Briefcase size={18} /> Service Provider
@@ -107,7 +111,7 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                      <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 dark:bg-zinc-800 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-medium h-10 text-sm transition-colors">
                         +88
                       </div>
                       <FormControl>
@@ -117,6 +121,7 @@ export default function ForgotPasswordPage() {
                           maxLength={11}
                           disabled={loading}
                           autoFocus
+                          className="dark:bg-zinc-950 dark:border-zinc-800 transition-colors"
                           {...field}
                         />
                       </FormControl>
@@ -128,7 +133,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-teal-900 text-white hover:bg-teal-700 font-serif text-md mt-4"
+                className="w-full bg-teal-900 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 font-serif text-md mt-6 transition-colors"
                 disabled={loading}
               >
                 {loading ? "Sending..." : "Send OTP"}
@@ -138,7 +143,7 @@ export default function ForgotPasswordPage() {
                 <Button
                   type="button"
                   variant="link"
-                  className="text-gray-500 hover:text-gray-700 text-sm font-serif p-0"
+                  className="text-teal-900 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 text-sm font-serif p-0 transition-colors"
                   onClick={() => navigate("/login")}
                 >
                   Back to Login

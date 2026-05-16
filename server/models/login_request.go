@@ -3,8 +3,8 @@ package models
 type Role string
 
 const (
-	USER             Role = "user"
-	SERVICE_PROVIDER Role = "service_provider"
+	USER             Role = "USER"
+	SERVICE_PROVIDER Role = "SERVICE_PROVIDER"
 )
 
 type LoginRequest struct {

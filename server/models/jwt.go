@@ -10,6 +10,6 @@ type AppClaims struct {
 
 type ResetPasswordClaims struct {
 	OtpID string `json:"otp_id"`
-	Type  string `json:"type"`
+	Type  Type   `json:"type"`
 	jwt.RegisteredClaims
 }

@@ -126,16 +126,15 @@ export function SpRegistrationForm() {
     }
   }
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center md:items-center px-4 bg-gray-200 gap-y-6 md:gap-x-8">
-      {/* Left Side (Info) */}
+    <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center md:items-center px-4 bg-gray-200 dark:bg-zinc-950 transition-colors duration-300 gap-y-6 md:gap-x-8">
       <div className="flex-1 w-full max-w-xs md:max-w-none flex flex-col items-center justify-start">
-        <h2 className="text-lg md:text-2xl font-bold font-serif text-teal-700 mb-3 md:max-h-80 md:h-auto text-center md:text-left">
+        <h2 className="text-lg md:text-2xl font-bold font-serif text-teal-700 dark:text-teal-400 mb-3 md:max-h-80 md:h-auto text-center md:text-left transition-colors">
           Want to join Fixora as a Service Provider?
         </h2>
-        <p className="text-gray-700 font-serif text-sm md:text-base mb-4 text-center md:text-left">
+        <p className="text-gray-700 dark:text-gray-300 font-serif text-sm md:text-base mb-4 text-center md:text-left transition-colors">
           Here's what you'll need to get started:
         </p>
-        <ul className="inline-flex flex-col items-center gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg">
+        <ul className="inline-flex flex-col items-center gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg dark:text-white transition-colors">
           <li className="flex items-center gap-x-3">
             <img src={Toolbox} alt="Toolbox" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
             <span>Own toolbox</span>
@@ -151,17 +150,20 @@ export function SpRegistrationForm() {
         </ul>
       </div>
 
-      {/* Right Side (Form) */}
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
-        <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white">
+        <Card className="w-full max-w-xl mx-auto rounded-xl shadow-2xl bg-white dark:bg-zinc-900 border-none transition-colors duration-300">
           <CardContent className="w-full px-6 md:px-10 py-10 md:py-12 flex flex-col justify-center">
             <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
-                    <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
+                    <img
+                      src={logo1}
+                      alt="Fixora Logo"
+                      className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
+                    />
                   </div>
-                  <p className="text-balance font-serif text-lg color-teal-900">
+                  <p className="text-balance font-serif text-lg text-teal-900 dark:text-teal-400 transition-colors">
                     Start earning today—join Fixora as a Service Provider and grow your income with your skills!
                   </p>
                 </div>
@@ -170,7 +172,7 @@ export function SpRegistrationForm() {
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
 
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 dark:bg-zinc-800 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-medium h-10 text-sm transition-colors">
                       +88
                     </div>
                     <Input
@@ -289,9 +291,15 @@ export function SpRegistrationForm() {
                       checked={agree}
                       onChange={(e) => setAgree(e.target.checked)}
                     />
-                    <label htmlFor="terms" className="text-sm font-serif">
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-serif text-gray-900 dark:text-gray-300 transition-colors"
+                    >
                       I agree to all the{" "}
-                      <Link to="/terms" className="text-teal-900 hover:text-teal-700 hover:underline font-serif">
+                      <Link
+                        to="/terms"
+                        className="text-teal-900 hover:text-teal-700 hover:underline font-serif dark:text-teal-400 dark:hover:text-teal-300 cursor-pointer transition-colors"
+                      >
                         Terms & Conditions
                       </Link>
                     </label>
@@ -302,18 +310,18 @@ export function SpRegistrationForm() {
                 <Field>
                   <Button
                     type="submit"
-                    className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md w-full"
+                    className="bg-teal-900 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 font-serif text-md w-full transition-colors"
                     disabled={isLoading}
                   >
                     {isLoading ? "Processing..." : "Continue"}
                   </Button>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
-                <div className="text-center font-serif text-md">
+                <div className="text-center font-serif text-md text-gray-700 dark:text-gray-300 transition-colors">
                   {"Already have an account? "}
                   <Link
                     to="/login"
-                    className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
+                    className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline dark:text-teal-400 dark:hover:text-teal-300 cursor-pointer transition-colors"
                   >
                     Log In
                   </Link>

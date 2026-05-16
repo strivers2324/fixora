@@ -19,6 +19,18 @@ var (
 	ErrInvalidOTP = NewCustomError(http.StatusBadRequest, "Invalid OTP. Please resend a new code.", "INVALID_OTP")
 
 	ErrInternalServer = NewCustomError(http.StatusInternalServerError, "Something went wrong. Please contact support.", "INTERNAL_ERROR")
+
+	ErrFileTooLarge = NewCustomError(http.StatusBadRequest, "File too large (Max 500KB).", "FILE_TOO_LARGE")
+	ErrUploadFailed = NewCustomError(http.StatusInternalServerError, "File upload failed. Try again.", "UPLOAD_FAILED")
+
+	ErrUserExists     = NewCustomError(http.StatusConflict, "Phone number is already in use by another user", "USER_ALREADY_EXISTS")
+	ErrProviderExists = NewCustomError(http.StatusConflict, "Phone number is already in use by another provider", "PROVIDER_ALREADY_EXISTS")
+
+	ErrProfileMissing    = NewCustomError(http.StatusBadRequest, "Please complete your profile first before updating the service catalog.", "PROFILE_INCOMPLETE")
+	ErrProfileIncomplete = NewCustomError(http.StatusBadRequest, "Your profile is incomplete. Please fill out all, before updating your service catalog.", "PROFILE_INCOMPLETE")
+
+	ErrAlreadyRequested = NewCustomError(http.StatusConflict, "Request already sent to this provider for this job.", "ALREADY_REQUESTED")
+	ErrOfferPriceTooLow = NewCustomError(http.StatusBadRequest, "Offering price cannot be less than provider's minimum charge.", "OFFER_PRICE_TOO_LOW")
 )
 
 type AppError struct {

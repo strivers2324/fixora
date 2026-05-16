@@ -1,0 +1,5 @@
+export enum NIDStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+}

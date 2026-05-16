@@ -9,8 +9,9 @@ import (
 type Type string
 
 const (
-	REGISTER       Type = "register"
-	RESET_PASSWORD Type = "reset_password"
+	REGISTER       Type = "REGISTER"
+	RESET_PASSWORD Type = "RESET_PASSWORD"
+	CHANGE_PHONE   Type = "CHANGE_PHONE"
 )
 
 type OTP struct {
@@ -40,4 +41,11 @@ type ResendOTPRequest struct {
 type UpdatePhoneRequest struct {
 	OtpID    string `json:"otp_id" binding:"required"`
 	NewPhone string `json:"new_phone" binding:"required,min=11,max=14"`
+}
+
+type SMSPayload struct {
+	APIKey   string `json:"api_key"`
+	SenderID string `json:"senderid"`
+	Number   string `json:"number"`
+	Message  string `json:"message"`
 }

@@ -21,11 +21,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:embed "dist"
+//go:embed dist
 var embeddedFiles embed.FS
 
 func main() {
-	//environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -37,21 +36,28 @@ func main() {
 	db := database.InitDB()
 	defer database.CloseDB(db)
 
-	// Initialize repositories
 	authRepo := repository.NewAuthRepository(db)
+	otpRepo := repository.NewOTPRepository(db)
+	accountRepo := repository.NewAccountRepository(db)
+	profileRepo := repository.NewProfileRepository(db)
+	jobRepo := repository.NewJobRepository(db)
 
-	// Initialize services
-	authService := service.NewAuthService(authRepo)
+	otpService := service.NewOTPService(otpRepo)
+	profileService := service.NewProfileService(profileRepo)
+	accountService := service.NewAccountService(accountRepo, otpService, nil)
+	authService := service.NewAuthService(authRepo, otpService, accountService)
+	accountService.AuthService = authService
+	jobService := service.NewJobService(jobRepo)
 
-	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	otpHandler := handlers.NewOTPHandler(otpService)
+	accountHandler := handlers.NewAccountHandler(accountService)
+	profileHandler := handlers.NewProfileHandler(profileService)
+	jobHandler := handlers.NewJobHandler(jobService)
 
-	// Set up routes
-	routes.SetAuthRoutes(router, authHandler)
+	routes.SetupRoutes(router, authHandler, otpHandler, accountHandler, profileHandler, jobHandler)
 
-	//Serve frontend
 	router.NoRoute(func(c *gin.Context) {
-		// Only serve index.html
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") {
 			index, err := distFS.Open("index.html")
 			if err != nil {
