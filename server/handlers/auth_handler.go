@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 
 	"fixora-server/models"
 	"fixora-server/pkg/response"
@@ -10,6 +9,7 @@ import (
 	"fixora-server/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type AuthHandler struct {
@@ -52,38 +52,6 @@ func (h *AuthHandler) ServiceProviderRegisterHandler(c *gin.Context) {
 	response.SendSuccess(c.Writer, "", gin.H{"otp_id": otpID})
 }
 
-func (h *AuthHandler) ResendOTPHandler(c *gin.Context) {
-	var req models.ResendOTPRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.SendError(c.Writer, http.StatusBadRequest, "otp_id is required", "BAD_REQUEST")
-		return
-	}
-
-	newOtpID, err := h.AuthService.ResendOTP(c.Request.Context(), req.OtpID)
-	if err != nil {
-		response.HandleError(c.Writer, err)
-		return
-	}
-
-	response.SendSuccess(c.Writer, "", gin.H{"otp_id": newOtpID})
-}
-
-func (h *AuthHandler) UpdatePhoneHandler(c *gin.Context) {
-	var req models.UpdatePhoneRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.SendError(c.Writer, http.StatusBadRequest, "Invalid phone number or otp_id", "BAD_REQUEST")
-		return
-	}
-
-	newOtpID, err := h.AuthService.UpdatePhoneAndResendOTP(c.Request.Context(), req.OtpID, req.NewPhone)
-	if err != nil {
-		response.HandleError(c.Writer, err)
-		return
-	}
-
-	response.SendSuccess(c.Writer, "", gin.H{"otp_id": newOtpID})
-}
-
 func (h *AuthHandler) VerifyUserPhoneHandler(c *gin.Context) {
 	var req models.OTPVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -112,25 +80,6 @@ func (h *AuthHandler) VerifyServiceProviderPhoneHandler(c *gin.Context) {
 	}
 
 	response.SendSuccess(c.Writer, "", nil)
-}
-
-func (h *AuthHandler) GetOTPInfoHandler(c *gin.Context) {
-	otpID := c.Param("otp_id")
-	if otpID == "" {
-		response.SendError(c.Writer, http.StatusBadRequest, "otp_id is required", "BAD_REQUEST")
-		return
-	}
-	expiry, phone, err := h.AuthService.OTPExpirationInfo(c.Request.Context(), otpID)
-	if err != nil {
-		response.HandleError(c.Writer, err)
-		return
-	}
-
-	response.SendSuccess(c.Writer, "", gin.H{
-		"otp_id":     otpID,
-		"expires_at": expiry.UTC(),
-		"phone":      phone,
-	})
 }
 
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
@@ -164,6 +113,30 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	})
 }
 
+func (h *AuthHandler) VerifySessionHandler(c *gin.Context) {
+	userID, ok := utils.GetUserID(c)
+	if !ok || userID == uuid.Nil {
+		response.SendError(c.Writer, http.StatusUnauthorized, "User ID not found in token", "UNAUTHORIZED")
+		return
+	}
+
+	userRoleModelsRole, ok := utils.GetUserRole(c)
+	if !ok {
+		response.SendError(c.Writer, http.StatusUnauthorized, "User role not found in token", "UNAUTHORIZED")
+		return
+	}
+
+	userRole := string(userRoleModelsRole)
+
+	sessionData, err := h.AuthService.GetSessionData(c.Request.Context(), userID, userRole)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", sessionData)
+}
+
 func (h *AuthHandler) RefreshHandler(c *gin.Context) {
 	cookieToken, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -178,9 +151,7 @@ func (h *AuthHandler) RefreshHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie("access_token", newAccessToken, int(15*time.Minute.Seconds()), "/", "", false, true)
-
+	utils.SetAuthCookies(c, newAccessToken, cookieToken)
 	response.SendSuccess(c.Writer, "", nil)
 }
 
@@ -251,4 +222,20 @@ func (h *AuthHandler) GetProfessionsHandler(c *gin.Context) {
 		return
 	}
 	response.SendSuccess(c.Writer, "", professions)
+}
+
+func (h *AuthHandler) UpdatePhoneAndResendOTPHandler(c *gin.Context) {
+	var req models.UpdatePhoneRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.SendError(c.Writer, http.StatusBadRequest, "Invalid phone number or otp_id", "BAD_REQUEST")
+		return
+	}
+
+	newOtpID, err := h.AuthService.UpdatePhoneAndResendOTP(c.Request.Context(), req.OtpID, req.NewPhone)
+	if err != nil {
+		response.HandleError(c.Writer, err)
+		return
+	}
+
+	response.SendSuccess(c.Writer, "", gin.H{"otp_id": newOtpID})
 }

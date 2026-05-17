@@ -1,0 +1,13 @@
+export enum JobStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum BroadcastStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  MISSED = "MISSED",
+  CANCELLED = "CANCELLED",
+}

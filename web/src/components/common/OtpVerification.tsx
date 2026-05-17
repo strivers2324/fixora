@@ -12,14 +12,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Role } from "@/enums/UserRole";
 import { toast } from "sonner";
 import logo1 from "@/assets/images/LogoLogin.png";
-import {
-  VerifyServiceProviderPhone,
-  VerifyUserPhone,
-  GetOTPInfo,
-  ResendOTP,
-  UpdatePhoneAndResend,
-  VerifyOTP,
-} from "@/api/AuthApi";
+
+import { VerifyServiceProviderPhone, VerifyUserPhone, UpdatePhoneAndResend, VerifyOTP } from "@/api/AuthApi";
+import { GetOTPInfo, ResendOTP } from "@/api/OTPApi";
 import { useAccountStore } from "@/store/AccountStore";
 
 const OtpSchema = z.object({
@@ -240,10 +235,10 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
 
   if (!currentOtpId) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-          <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-2" />
-          <p className="text-gray-700">Invalid Session. Redirecting...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-950 transition-colors">
+        <div className="text-center p-6 bg-white dark:bg-zinc-900 rounded-lg shadow-md border dark:border-zinc-800">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500 dark:text-red-400 mb-2" />
+          <p className="text-gray-700 dark:text-gray-300">Invalid Session. Redirecting...</p>
         </div>
       </div>
     );
@@ -253,18 +248,18 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
 
   if (isEditing) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 animate-in slide-in-from-right duration-300">
+      <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200 dark:bg-zinc-950 transition-colors duration-300">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl p-8 animate-in slide-in-from-right duration-300 transition-colors">
           <div className="flex items-center mb-8">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsEditing(false)}
-              className="mr-2 -ml-3 text-gray-500 hover:text-teal-700"
+              className="mr-2 -ml-3 text-gray-500 hover:text-teal-700 dark:text-gray-400 dark:hover:text-teal-400 transition-colors"
             >
               <ChevronLeft size={24} />
             </Button>
-            <h2 className="text-xl font-bold text-gray-800">Edit phone number</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 transition-colors">Edit phone number</h2>
           </div>
           <Form {...phoneForm}>
             <form onSubmit={phoneForm.handleSubmit(handleUpdatePhone)} className="space-y-6">
@@ -274,25 +269,25 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-3">
-                      <div className="flex items-center justify-center px-4 border rounded-md bg-gray-50 text-gray-600 font-medium select-none">
+                      <div className="flex items-center justify-center px-4 border rounded-md bg-gray-50 dark:bg-zinc-800 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-medium select-none transition-colors">
                         +880
                       </div>
                       <FormControl>
                         <Input
                           placeholder="1700000000"
-                          className="flex-1 h-11 text-base focus-visible:ring-teal-600"
+                          className="flex-1 h-11 text-base focus-visible:ring-teal-600 dark:bg-zinc-950 dark:border-zinc-800 transition-colors"
                           disabled={isTimerLoading}
                           {...field}
                         />
                       </FormControl>
                     </div>
-                    <FormMessage />
+                    <FormMessage className="dark:text-red-400" />
                   </FormItem>
                 )}
               />
               <Button
                 type="submit"
-                className="w-full bg-teal-900 text-white hover:bg-teal-700 h-11 text-md font-medium transition-all"
+                className="w-full bg-teal-900 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 h-11 text-md font-medium transition-colors"
                 disabled={isTimerLoading}
               >
                 {isTimerLoading ? "Sending..." : "Receive code"}
@@ -305,24 +300,26 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200 dark:bg-zinc-950 transition-colors duration-300">
       <div className="w-full md:w-1/2 flex items-center justify-center py-8">
         <Form {...otpForm}>
           <form
             onSubmit={otpForm.handleSubmit(handleVerify)}
-            className="w-full max-w-md mx-auto space-y-6 bg-white rounded-xl shadow-2xl p-8 animate-in zoom-in duration-300"
+            className="w-full max-w-md mx-auto space-y-6 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl p-8 animate-in zoom-in duration-300 transition-colors"
           >
             {successMessage && !limitError && (
-              <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800 flex items-center animate-in fade-in slide-in-from-top-2">
-                <CheckCircle2 className="h-5 w-5 mr-2 text-emerald-600" />
+              <Alert className="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-900 text-emerald-800 flex items-center animate-in fade-in slide-in-from-top-2 transition-colors">
+                <CheckCircle2 className="h-5 w-5 mr-2 text-emerald-600 dark:text-emerald-400" />
                 <div>
-                  <AlertTitle className="font-semibold text-emerald-900">Success</AlertTitle>
-                  <AlertDescription className="text-emerald-800">{successMessage}</AlertDescription>
+                  <AlertTitle className="font-semibold text-emerald-900 dark:text-emerald-300">Success</AlertTitle>
+                  <AlertDescription className="text-emerald-800 dark:text-emerald-400">
+                    {successMessage}
+                  </AlertDescription>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSuccessMessage(null)}
-                  className="ml-auto text-emerald-500 hover:text-emerald-700"
+                  className="ml-auto text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
                 >
                   <X size={16} />
                 </button>
@@ -330,24 +327,31 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
             )}
 
             {limitError && (
-              <Alert className="bg-red-50 border-red-200 text-red-800 flex items-center animate-in fade-in slide-in-from-top-2">
-                <Ban className="h-5 w-5 mr-2 text-red-600" />
+              <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900 text-red-800 flex items-center animate-in fade-in slide-in-from-top-2 transition-colors">
+                <Ban className="h-5 w-5 mr-2 text-red-600 dark:text-red-400" />
                 <div>
-                  <AlertTitle className="font-semibold text-red-900">Limit Reached</AlertTitle>
-                  <AlertDescription className="text-red-800 text-sm">{limitError}</AlertDescription>
+                  <AlertTitle className="font-semibold text-red-900 dark:text-red-300">Limit Reached</AlertTitle>
+                  <AlertDescription className="text-red-800 dark:text-red-400 text-sm">{limitError}</AlertDescription>
                 </div>
               </Alert>
             )}
 
             <div className="text-center mb-6">
               <div className="flex items-center justify-center mt-2 mb-4">
-                <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
+                <img
+                  src={logo1}
+                  alt="Fixora Logo"
+                  className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
+                />
               </div>
-              <h2 className="text-2xl font-bold font-serif text-teal-700">Verify your phone number</h2>
+              <h2 className="text-2xl font-bold font-serif text-teal-700 dark:text-slate-300 transition-colors">
+                Verify your phone number
+              </h2>
               <div className="mt-4 flex flex-col items-center justify-center">
-                <div className="flex items-center justify-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
-                  <p className="text-sm text-gray-600">
-                    Code sent to <span className="font-semibold text-teal-900">{displayPhone || "..."}</span>
+                <div className="flex items-center justify-center gap-2 bg-gray-50 dark:bg-zinc-800 px-4 py-2 rounded-full border border-gray-100 dark:border-zinc-700 transition-colors">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Code sent to{" "}
+                    <span className="font-semibold text-teal-900 dark:text-teal-400">{displayPhone || "..."}</span>
                   </p>
                 </div>
               </div>
@@ -366,7 +370,7 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
                           <InputOTPSlot
                             key={index}
                             index={index}
-                            className="h-12 w-12 border-gray-300 focus:border-teal-600 focus:ring-teal-600 text-lg"
+                            className="h-12 w-12 border-gray-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white focus:border-teal-600 dark:focus:border-teal-500 focus:ring-teal-600 text-lg transition-colors"
                           />
                         ))}
                       </InputOTPGroup>
@@ -376,16 +380,16 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
                   <div className="flex flex-col items-center mt-6 space-y-3 w-full">
                     {!limitError &&
                       (!isTimerLoading && timeLeft > 0 ? (
-                        <div className="flex items-center text-sm text-teal-700 font-medium bg-teal-50 px-4 py-1.5 rounded-full">
+                        <div className="flex items-center text-sm text-teal-700 dark:text-teal-400 font-medium bg-teal-50 dark:bg-teal-900/30 px-4 py-1.5 rounded-full transition-colors">
                           <Clock size={14} className="mr-2" />
                           Expires in: <span className="ml-1 font-bold">{formatTime(timeLeft)}</span>
                         </div>
                       ) : (
-                        <div className="text-sm text-red-500 font-medium bg-red-50 px-4 py-1.5 rounded-full border border-red-100">
+                        <div className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 px-4 py-1.5 rounded-full border border-red-100 dark:border-red-900 transition-colors">
                           Code Expired
                         </div>
                       ))}
-                    <FormDescription className="text-center w-full pt-2">
+                    <FormDescription className="text-center w-full pt-2 dark:text-gray-400">
                       Didn't get your code?{" "}
                       <button
                         type="button"
@@ -393,15 +397,15 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
                         disabled={timeLeft > 0 || !!limitError}
                         className={`font-semibold ml-1 transition-colors ${
                           timeLeft > 0 || !!limitError
-                            ? "text-gray-400 cursor-not-allowed"
-                            : "text-teal-700 hover:text-teal-900 hover:underline cursor-pointer"
+                            ? "text-gray-400 dark:text-zinc-600 cursor-not-allowed"
+                            : "text-teal-700 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300 cursor-pointer"
                         }`}
                       >
                         Resend
                       </button>
                     </FormDescription>
                   </div>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -419,8 +423,8 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
                   disabled={!!limitError}
                   className={`text-sm transition-all ${
                     limitError
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-teal-600 hover:text-teal-800 hover:underline"
+                      ? "text-gray-400 dark:text-zinc-600 cursor-not-allowed"
+                      : "text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300 hover:underline"
                   }`}
                 >
                   Wrong number? Change phone number
@@ -430,7 +434,7 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
 
             <Button
               type="submit"
-              className="w-full bg-teal-900 text-white hover:bg-teal-700 font-serif text-lg h-12 mt-2"
+              className="w-full bg-teal-900 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 font-serif text-lg h-12 mt-2 transition-colors"
               disabled={submitting || timeLeft === 0 || !!limitError}
             >
               {submitting ? "Verifying..." : "Verify & Proceed"}

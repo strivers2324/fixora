@@ -3,100 +3,65 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import ACTechnician from "@/assets/images/AC.jpg";
+import Refrigerator from "@/assets/images/Refrigerator.webp";
+import WashingMachine from "@/assets/images/Washing machine.png";
+import TV from "@/assets/images/TV.jpg";
+import IPSInverter from "@/assets/images/IPS.webp";
+import HomeAppliance from "@/assets/images/Home Appliance.jpg";
+import Electrician from "@/assets/images/Electrician.jpg";
+import Plumber from "@/assets/images/Plumber.webp";
+import Carpenter from "@/assets/images/Carpenter.jpg";
+import WaterPump from "@/assets/images/WaterPump.jpg";
+import Lift from "@/assets/images/Lift.webp";
+import Automobile from "@/assets/images/Auto Mobile.jpg";
+import CCTV from "@/assets/images/CCTV.webp";
+import Broadband from "@/assets/images/Broadband Internet.jpg";
+import Computer from "@/assets/images/Computer Technitian.jpg";
 
-const servicesData = [
+const serviceCategories = [
   {
-    to: "/services/electrician",
-    title: "Electrician",
-    desc: "Electrical solutions",
+    categoryName: "Appliance Repair",
+    services: [
+      { title: "AC Technician", img: ACTechnician },
+      { title: "Refrigerator Mechanic", img: Refrigerator },
+      { title: "Washing Machine Technician", img: WashingMachine },
+      { title: "TV Technician", img: TV },
+      { title: "IPS/Inverter Technician", img: IPSInverter },
+      { title: "Home Appliance Technician", img: HomeAppliance },
+    ],
   },
   {
-    to: "/services/ac-technician",
-    title: "AC Technician",
-    desc: "AC repair & service",
+    categoryName: "Home Maintenance",
+    services: [
+      { title: "Electrician", img: Electrician },
+      { title: "Plumber", img: Plumber },
+      { title: "Carpenter", img: Carpenter },
+      { title: "Water Pump Technician", img: WaterPump },
+      { title: "Lift Technician", img: Lift },
+      { title: "Automobile Mechanic", img: Automobile },
+    ],
   },
   {
-    to: "/services/refrigerator-mechanic",
-    title: "Refrigerator Mechanic",
-    desc: "Fridge repair",
-  },
-  {
-    to: "/services/plumber",
-    title: "Plumber",
-    desc: "Plumbing solutions",
-  },
-  {
-    to: "/services/carpenter",
-    title: "Carpenter",
-    desc: "Wooden furniture & repair",
-  },
-  {
-    to: "/services/cctv-installer",
-    title: "CCTV Installer",
-    desc: "Security camera installation",
-  },
-  {
-    to: "/services/broadband-provider",
-    title: "Broadband Provider",
-    desc: "High-speed internet",
-  },
-  {
-    to: "/services/ips-inverter-technician",
-    title: "IPS/Inverter Technician",
-    desc: "Power backup solutions",
-  },
-  {
-    to: "/services/washing-machine-technician",
-    title: "Washing Machine Technician",
-    desc: "Washing machine repair",
-  },
-  {
-    to: "/services/computer-technician",
-    title: "Computer Technician",
-    desc: "PC & laptop repair",
-  },
-  {
-    to: "/services/tv-technician",
-    title: "TV Technician",
-    desc: "Television repair",
-  },
-  {
-    to: "/services/automobile-mechanic",
-    title: "Automobile Mechanic",
-    desc: "Car & bike service",
-  },
-  {
-    to: "/services/lift-technician",
-    title: "Lift Technician",
-    desc: "Elevator repair & service",
-  },
-  {
-    to: "/services/water-pump-technician",
-    title: "Water Pump Technician",
-    desc: "Water pump repair",
+    categoryName: "IT & Security",
+    services: [
+      { title: "CCTV Installer", img: CCTV },
+      { title: "Broadband Internet Provider", img: Broadband },
+      { title: "Computer Technician", img: Computer },
+    ],
   },
 ];
 
 function SampleNextArrow(props: any) {
   const { className, onClick } = props;
-
-  if (className?.includes("slick-disabled")) {
-    return null;
-  }
+  if (className?.includes("slick-disabled")) return null;
 
   return (
     <button
-      className="absolute top-1/2 -translate-y-1/2 right-4 z-20
-                w-12 h-12 flex items-center justify-center
-                rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20
-                transition-all duration-300 ease-in-out
-                hover:bg-white hover:text-[#1d4b4a] hover:scale-110 
-                hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]
-                hidden lg:flex group cursor-pointer"
+      className="absolute top-1/2 -translate-y-1/2 right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/20 transition-all hover:bg-teal-600 hover:scale-110 hidden lg:flex shadow-lg"
       onClick={onClick}
-      aria-label="Next services"
     >
-      <BsChevronRight size={22} className="group-hover:translate-x-0.5 transition-transform duration-300" />
+      <BsChevronRight size={20} />
     </button>
   );
 }
@@ -104,167 +69,75 @@ function SampleNextArrow(props: any) {
 function SamplePrevArrow(props: any) {
   const { className, onClick } = props;
 
-  if (className?.includes("slick-disabled")) {
-    return null;
-  }
+  if (className?.includes("slick-disabled")) return null;
 
   return (
     <button
-      className="absolute top-1/2 -translate-y-1/2 left-4 z-20
-                w-12 h-12 flex items-center justify-center
-                rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20
-                transition-all duration-300 ease-in-out
-                hover:bg-white hover:text-[#1d4b4a] hover:scale-110 
-                hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]
-                hidden lg:flex group cursor-pointer"
+      className="absolute top-1/2 -translate-y-1/2 left-0 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/20 transition-all hover:bg-teal-600 hover:scale-110 hidden lg:flex shadow-lg"
       onClick={onClick}
-      aria-label="Previous services"
     >
-      <BsChevronLeft size={22} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
+      <BsChevronLeft size={20} />
     </button>
   );
 }
 
 export default function ServiceSection() {
   const settings = {
-    dots: true,
+    dots: false,
     infinite: false,
-    speed: 600,
-    slidesToShow: 5,
-    slidesToScroll: 5,
-    initialSlide: 0,
-    arrows: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     responsive: [
-      {
-        breakpoint: 1536,
-        settings: {
-          slidesToShow: 5,
-          slidesToScroll: 5,
-        },
-      },
-      {
-        breakpoint: 1280,
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 4,
-        },
-      },
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-        },
-      },
-      {
-        breakpoint: 640,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          arrows: false,
-          dots: true,
-          centerMode: true,
-          centerPadding: "40px",
-        },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1.2, arrows: false } },
     ],
   };
 
   return (
-    <div id="services" className="py-12 bg-[#1d4b4a] text-white border-b border-white/30 overflow-hidden relative">
-      <style>
-        {`
-          .slick-dots {
-            bottom: -40px !important;
-          }
-          .slick-dots li {
-            margin: 0 2px !important;
-          }
-          .slick-dots li button:before {
-            font-size: 8px !important;
-            color: white !important;
-            opacity: 0.4 !important;
-          }
-          .slick-dots li.slick-active button:before {
-            opacity: 1 !important;
-            color: white !important;
-            font-size: 10px !important;
-          }
-          
-          .slick-track {
-            display: flex !important;
-            gap: 0;
-          }
-          
-          .slick-slide {
-            height: auto;
-            display: flex;
-            flex-direction: column; 
-          }
-
-          .slick-slide > div {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-          }
-
-          .slick-list {
-            overflow: visible;
-            margin: 0 -10px;
-            padding: 10px 0;
-          }
-          
-          @media (min-width: 768px) {
-             .slick-list {
-                overflow: hidden;
-             }
-          }
-        `}
-      </style>
-
-      <div className="container mx-auto px-4 sm:px-6 text-center mb-10 relative z-10">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">Our Services</h2>
-        <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
-          Professional services for all your home and business needs
-        </p>
-      </div>
-
-      <div className="relative w-full">
-        <Slider {...settings}>
-          {servicesData.map((service, index) => (
-            <div key={index} className="h-full px-2 md:px-3 xl:px-4 pb-4 pt-2">
-              <Link
-                to={service.to}
-                className="flex flex-col justify-center items-center h-full min-h-[150px] sm:min-h-[160px]
-                             bg-[#2a9d8f] rounded-xl shadow-md text-center p-6
-                             transition-all duration-300 
-                             hover:shadow-2xl hover:bg-[#24867a] hover:-translate-y-2
-                             border border-white/10 group outline-none"
-              >
-                <h3 className="text-lg sm:text-xl font-bold mb-2 text-white leading-tight group-hover:text-white">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-100 leading-tight opacity-90">{service.desc}</p>
-              </Link>
+    <div
+      id="services"
+      className="scroll-mt-24 py-16 bg-[#0E2629] text-white border-b border-white/10 w-full overflow-hidden"
+    >
+      <div className="container mx-auto px-4 sm:px-6 md:px-12">
+        {serviceCategories.map((cat, index) => (
+          <div key={index} className="mb-14 last:mb-0 relative">
+            <div className="flex justify-between items-end mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide">{cat.categoryName}</h2>
             </div>
-          ))}
-        </Slider>
-      </div>
 
-      <div className="mt-12 text-center lg:hidden container mx-auto">
-        <p className="text-gray-400 text-xs animate-pulse flex justify-center items-center gap-2">
-          <span>Swipe for more</span>
-          <BsChevronRight size={12} />
-        </p>
+            <div className="relative -mx-2">
+              <Slider {...settings}>
+                {cat.services.map((service, idx) => (
+                  <div key={idx} className="px-2 pb-4">
+                    <Link
+                      to="/login"
+                      className="block bg-teal-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-white/5 group"
+                    >
+                      <div className="w-full h-40 overflow-hidden relative bg-white">
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10" />
+                        <img
+                          src={service.img}
+                          alt={service.title}
+                          className="w-50px h-80px object-contain transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </div>
+
+                      <div className="p-4 text-center bg-teal-950">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-100 group-hover:text-white transition-colors">
+                          {service.title}
+                        </h3>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

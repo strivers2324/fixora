@@ -79,20 +79,24 @@ export function UserRegistrationForm() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-200 dark:bg-zinc-950 transition-colors duration-300">
       <div className="w-full max-w-xl py-8">
-        <Card className="rounded-xl shadow-2xl bg-white">
+        <Card className="rounded-xl shadow-2xl bg-white dark:bg-zinc-900 border-none transition-colors duration-300">
           <CardContent className="px-6 py-10 flex flex-col justify-center">
             <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit} noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center mb-6">
-                  <img src={logo1} alt="Fixora Logo" className="h-20 w-auto" />
+                  <img
+                    src={logo1}
+                    alt="Fixora Logo"
+                    className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
+                  />
                 </div>
 
                 <Field>
                   <FieldLabel htmlFor="Phone">Phone Number</FieldLabel>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 text-gray-600 font-medium h-10 text-sm">
+                    <div className="flex items-center justify-center px-3 border rounded-md bg-gray-50 dark:bg-zinc-800 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-medium h-10 text-sm transition-colors">
                       +88
                     </div>
                     <Input
@@ -105,7 +109,9 @@ export function UserRegistrationForm() {
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
-                  <p className="text-sm text-gray-600 font-serif mt-0">We'll send you an OTP to confirm your number.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 font-serif mt-0 transition-colors">
+                    We'll send you an OTP to confirm your number.
+                  </p>
                   {phoneError && <span className="text-sm text-red-600">{phoneError}</span>}
                 </Field>
 
@@ -172,18 +178,18 @@ export function UserRegistrationForm() {
                 <Field>
                   <Button
                     type="submit"
-                    className="bg-teal-900 text-white hover:bg-teal-700 font-serif text-md w-full"
+                    className="bg-teal-900 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 font-serif text-md w-full transition-colors"
                     disabled={isLoading}
                   >
                     {isLoading ? "Loading..." : "Continue"}
                   </Button>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or</FieldSeparator>
-                <div className="text-center font-serif text-md">
+                <div className="text-center font-serif text-md text-gray-700 dark:text-gray-300 transition-colors">
                   {"Already have an account? "}
                   <Link
                     to="/login"
-                    className="text-teal-900 hover:text-teal-700 hover:underline text-md font-serif no-underline"
+                    className="text-teal-900 dark:text-teal-400 dark:hover:text-teal-300 hover:text-teal-700 hover:underline text-md font-serif no-underline cursor-pointer transition-colors"
                   >
                     Log In
                   </Link>
