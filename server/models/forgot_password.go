@@ -2,7 +2,7 @@ package models
 
 type ForgotPasswordRequest struct {
 	Phone string `json:"phone" binding:"required"`
-	Role  Role   `json:"role" binding:"required,oneof=user service_provider"`
+	Role  Role   `json:"role" binding:"required"`
 }
 
 type ResetPasswordRequest struct {

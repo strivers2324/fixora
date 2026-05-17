@@ -1,16 +1,18 @@
 package models
 
+import "mime/multipart"
+
 type NIDStatus string
 
 const (
-	ACCEPTED NIDStatus = "accepted"
-	PENDING  NIDStatus = "pending"
-	REJECTED NIDStatus = "rejected"
+	PENDING  NIDStatus = "PENDING"
+	ACCEPTED NIDStatus = "ACCEPTED"
+	REJECTED NIDStatus = "REJECTED"
 )
 
 type NIDSubmitRequest struct {
-	NIDNumber       string `json:"nid_number" binding:"required"`
-	StorageFolderID string `json:"storage_folder_id" binding:"required"`
+	NIDFront *multipart.FileHeader `form:"nid_front" binding:"required"`
+	NIDBack  *multipart.FileHeader `form:"nid_back" binding:"required"`
 }
 
 type NIDStatusResponse struct {

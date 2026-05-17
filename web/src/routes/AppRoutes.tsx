@@ -2,8 +2,8 @@ import { Navigate } from "react-router-dom";
 import { useAccountStore } from "../store/AccountStore";
 import { Role } from "../enums/UserRole";
 import HomePage from "../components/home/HomePage";
-import UserDashboard from "../components/order/Dashboard/user/UserDashboard";
-import ServiceProviderDashboard from "../components/order/Dashboard/service-provider/ServiceProviderDashboard";
+import UserDashboard from "../components/Dashboard/user/UserDashboard";
+import ServiceProviderDashboard from "../components/Dashboard/service-provider/ServiceProviderDashboard";
 import UserUpdateProfile from "../components/profile/user/UpdateProfileForm";
 import ServiceProviderUpdateProfile from "../components/profile/service-provider/UpdateProfileForm";
 

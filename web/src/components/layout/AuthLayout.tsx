@@ -15,9 +15,16 @@ const AuthLayout = () => {
       const isServiceProvider = account.role === Role.SERVICE_PROVIDER;
       const verifyUrl = isServiceProvider ? `/service-provider/verify/otp/${otpId}` : `/user/verify/otp/${otpId}`;
 
-      return <Navigate to={verifyUrl} replace />;
+      if (!location.pathname.includes(verifyUrl)) {
+        return <Navigate to={verifyUrl} replace />;
+      }
     } else {
-      return <Navigate to="/login" replace />;
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
+          <h2 className="text-xl font-bold text-red-500 mb-2">Verification ID Missing!</h2>
+          <p className="mb-4">Something went wrong. Please log out and log in again to verify your account.</p>
+        </div>
+      );
     }
   }
 

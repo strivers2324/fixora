@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fixora-server/database"
 	"fixora-server/handlers"
+	"fixora-server/pkg/utils"
 	"fixora-server/repository"
 	"fixora-server/routes"
 	"fixora-server/service"
@@ -21,6 +22,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+//go:embed dist
 var embeddedFiles embed.FS
 
 func main() {
@@ -28,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	smsSercrets := utils.GetSmsSercrets()
 	router := gin.Default()
 	distFS := getFileSystem("dist")
 	router.Use(static.Serve("/", distFS))
@@ -36,16 +39,26 @@ func main() {
 	defer database.CloseDB(db)
 
 	authRepo := repository.NewAuthRepository(db)
-	orderRepo := repository.NewOrderRepository(db)
+	otpRepo := repository.NewOTPRepository(db)
+	accountRepo := repository.NewAccountRepository(db)
+	profileRepo := repository.NewProfileRepository(db)
+	jobRepo := repository.NewJobRepository(db)
 
-	authService := service.NewAuthService(authRepo)
-	orderService := service.NewOrderService(orderRepo)
+	smsService := service.NewSmsService(smsSercrets)
+	otpService := service.NewOTPService(otpRepo, smsService)
+	profileService := service.NewProfileService(profileRepo)
+	accountService := service.NewAccountService(accountRepo, otpService, nil)
+	authService := service.NewAuthService(authRepo, otpService, accountService)
+	accountService.AuthService = authService
+	jobService := service.NewJobService(jobRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
-	orderHandler := handlers.NewOrderHandler(orderService)
+	otpHandler := handlers.NewOTPHandler(otpService)
+	accountHandler := handlers.NewAccountHandler(accountService)
+	profileHandler := handlers.NewProfileHandler(profileService)
+	jobHandler := handlers.NewJobHandler(jobService)
 
-	routes.SetAuthRoutes(router, authHandler)
-	routes.SetOrderRoutes(router, orderHandler)
+	routes.SetupRoutes(router, authHandler, otpHandler, accountHandler, profileHandler, jobHandler)
 
 	router.NoRoute(func(c *gin.Context) {
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") {

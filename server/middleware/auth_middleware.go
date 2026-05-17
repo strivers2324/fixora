@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"os"
 
 	"fixora-server/models"
 	"fixora-server/pkg/response"
+	"fixora-server/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -25,8 +25,7 @@ func RequireAuth() gin.HandlerFunc {
 
 		claims := &models.AppClaims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			secret := os.Getenv("JWT_SECRET")
-			return []byte(secret), nil
+			return utils.GetSecretKey(), nil
 		})
 
 		if err != nil {

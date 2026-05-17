@@ -1,4 +1,4 @@
 export enum Role {
-  USER = "user",
-  SERVICE_PROVIDER = "service_provider",
+  USER = "USER",
+  SERVICE_PROVIDER = "SERVICE_PROVIDER",
 }

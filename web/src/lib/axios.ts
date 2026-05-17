@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: "/api/v1",
   withCredentials: true,
 });
 
@@ -24,11 +24,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      originalRequest.url?.includes("/auth/refresh") ||
-      originalRequest.url?.includes("/login") ||
-      originalRequest.url?.includes("/verify")
-    ) {
+    if (originalRequest.url?.includes("/auth/refresh") || originalRequest.url?.includes("/login")) {
       return Promise.reject(error);
     }
 
@@ -45,7 +41,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        await axios.post("/api/v1/auth/refresh", {}, { withCredentials: true });
 
         isRefreshing = false;
         processQueue(null);
@@ -56,10 +52,7 @@ api.interceptors.response.use(
         processQueue(refreshError);
 
         localStorage.removeItem("accountinfo");
-
-        if (!window.location.pathname.includes("/login")) {
-          window.location.href = "/login";
-        }
+        localStorage.removeItem("auth-storage");
 
         return Promise.reject(refreshError);
       }

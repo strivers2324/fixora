@@ -3,7 +3,6 @@ module fixora-server
 go 1.25.3
 
 require (
-	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-contrib/static v1.1.5
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.0

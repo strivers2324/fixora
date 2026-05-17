@@ -1,8 +1,6 @@
-CREATE TYPE status AS ENUM ('pending', 'accepted', 'rejected');
+CREATE TYPE nid_status_enum AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
 
-CREATE TABLE IF NOT EXISTS service_provider_nids (
+CREATE TABLE service_provider_nids (
     provider_id UUID PRIMARY KEY,
-    nid_number VARCHAR(50) NOT NULL,
-    storage_folder_id VARCHAR(255) NOT NULL,
-    nid_status status DEFAULT 'pending'
+    nid_status nid_status_enum DEFAULT 'PENDING'
 );

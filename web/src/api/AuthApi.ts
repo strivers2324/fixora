@@ -9,6 +9,14 @@ export interface ApiResponse<T> {
   code?: string;
 }
 
+export type SessionData = {
+  phone: string;
+  role: Role;
+  is_phone_verified: boolean;
+  profession?: string;
+  otp_id?: string;
+};
+
 type LoginCredentials = {
   phone: string;
   password: string;
@@ -49,12 +57,6 @@ type VerifyOtpResponseData = {
   reset_token?: string;
 };
 
-type OTPInfoResponseData = {
-  otp_id: string;
-  expires_at: string;
-  phone?: string;
-};
-
 type ForgotPasswordData = {
   phone: string;
   role: Role;
@@ -82,7 +84,7 @@ const handleApiError = (error: any, defaultMessage: string): never => {
 export async function GetProfessions() {
   try {
     const res = await api.get<ApiResponse<Profession[]>>("/auth/professions");
-    return res.data.data; // Return only the list
+    return res.data.data;
   } catch (error: any) {
     handleApiError(error, "Failed to fetch professions");
     throw error;
@@ -119,16 +121,6 @@ export async function RegisterServiceProvider(data: ServiceProviderRegistrationD
   }
 }
 
-export async function ResendOTP(otp_id: string): Promise<OtpResponseData> {
-  try {
-    const res = await api.post<ApiResponse<OtpResponseData>>("/auth/resend-otp", { otp_id });
-    return res.data.data;
-  } catch (error: any) {
-    handleApiError(error, "Failed to resend OTP");
-    throw error;
-  }
-}
-
 export async function UpdatePhoneAndResend(otp_id: string, new_phone: string): Promise<OtpResponseData> {
   try {
     const res = await api.put<ApiResponse<OtpResponseData>>("/auth/update-phone", { otp_id, new_phone });
@@ -155,16 +147,6 @@ export async function VerifyServiceProviderPhone(data: VerifyOtpData) {
     return res.data;
   } catch (error: any) {
     handleApiError(error, "Verification failed");
-    throw error;
-  }
-}
-
-export async function GetOTPInfo(otpID: string): Promise<OTPInfoResponseData> {
-  try {
-    const res = await api.get<ApiResponse<OTPInfoResponseData>>(`/auth/otp/info/${otpID}`);
-    return res.data.data;
-  } catch (error: any) {
-    handleApiError(error, "Failed to fetch OTP info");
     throw error;
   }
 }
@@ -204,5 +186,15 @@ export async function Logout() {
     return res.data;
   } catch (error: any) {
     handleApiError(error, "Failed to logout");
+  }
+}
+
+export async function VerifySession(): Promise<SessionData> {
+  try {
+    const res = await api.get<ApiResponse<SessionData>>("/auth/verify");
+    return res.data.data;
+  } catch (error: any) {
+    handleApiError(error, "Session verification failed");
+    throw error;
   }
 }
