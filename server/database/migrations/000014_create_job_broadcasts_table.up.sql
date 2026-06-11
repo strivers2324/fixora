@@ -7,6 +7,7 @@ CREATE TABLE job_broadcasts (
     job_broadcast_status broadcast_status DEFAULT 'PENDING',
     user_offer_price NUMERIC(10, 2), 
     provider_offer_price NUMERIC(10, 2),
+    provider_cancellation_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_broadcast_job

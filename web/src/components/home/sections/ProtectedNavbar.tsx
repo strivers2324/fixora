@@ -89,18 +89,6 @@ export default function UserNavbar() {
     }
   };
 
-  const handleOpenModal = (eventName: string) => {
-    sessionStorage.removeItem("updatePhoneToken");
-    if (location.pathname !== "/dashboard") {
-      navigate("/dashboard");
-      setTimeout(() => {
-        window.dispatchEvent(new Event(eventName));
-      }, 500);
-    } else {
-      window.dispatchEvent(new Event(eventName));
-    }
-  };
-
   const runFromDropdown = (action: () => void) => {
     setTimeout(() => {
       action();
@@ -115,7 +103,6 @@ export default function UserNavbar() {
             <img src={FixoraLogo} alt="Fixora" className="h-10 w-auto object-contain" />
             <span className="text-3xl font-bold italic tracking-tight text-white">Fixora</span>
           </div>
-
           <div className="flex items-center gap-x-2 md:gap-x-4">
             <div className="hidden md:flex items-center gap-1 mr-2">
               {userRole === Role.SERVICE_PROVIDER ? (
@@ -127,10 +114,9 @@ export default function UserNavbar() {
                   >
                     <Search className="mr-2 h-4 w-4" /> New Jobs
                   </Button>
-
                   <Button
                     variant="ghost"
-                    onClick={() => handleOpenModal("openHistoryModal")}
+                    onClick={() => handleNavigation("/history")}
                     className="text-teal-50 hover:text-white hover:bg-teal-600 font-medium"
                   >
                     <Briefcase className="mr-2 h-4 w-4" /> My Jobs
@@ -145,12 +131,11 @@ export default function UserNavbar() {
                     onClick={() => handleScrollToSection("popular-services")}
                     className="text-teal-50 hover:text-white hover:bg-teal-600 font-medium"
                   >
-                    <Grid className="mr-2 h-4 w-4" /> Service Categories
+                    <Grid className="mr-2 h-4 w-4" /> Services
                   </Button>
-
                   <Button
                     variant="ghost"
-                    onClick={() => handleOpenModal("openUserHistoryModal")}
+                    onClick={() => handleNavigation("/history")}
                     className="text-teal-50 hover:text-white hover:bg-teal-600 font-medium"
                   >
                     <CalendarDays className="mr-2 h-4 w-4" /> My Bookings
@@ -158,9 +143,7 @@ export default function UserNavbar() {
                 </>
               )}
             </div>
-
             <ModeToggle />
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -175,7 +158,6 @@ export default function UserNavbar() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-
               <DropdownMenuContent
                 className="w-56 mt-2 dark:bg-zinc-900 rounded-xl overflow-hidden dark:border-zinc-800"
                 align="end"
@@ -205,7 +187,6 @@ export default function UserNavbar() {
 
                 <DropdownMenuSeparator className="dark:bg-zinc-800" />
 
-                {/* Mobile Navigation */}
                 <div className="md:hidden">
                   {userRole === Role.SERVICE_PROVIDER ? (
                     <>
@@ -218,7 +199,7 @@ export default function UserNavbar() {
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
-                        onSelect={() => runFromDropdown(() => handleOpenModal("openHistoryModal"))}
+                        onSelect={() => runFromDropdown(() => handleNavigation("/history"))}
                         className="cursor-pointer py-2 dark:focus:bg-zinc-800 dark:text-gray-200 transition-colors"
                       >
                         <Briefcase className="mr-2 h-4 w-4 text-teal-600 dark:text-teal-400" />
@@ -236,11 +217,11 @@ export default function UserNavbar() {
                         className="cursor-pointer py-2 dark:focus:bg-zinc-800 dark:text-gray-200 transition-colors"
                       >
                         <Grid className="mr-2 h-4 w-4 text-teal-600 dark:text-teal-400" />
-                        <span>Service Categories</span>
+                        <span>Services</span>
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
-                        onSelect={() => runFromDropdown(() => handleOpenModal("openUserHistoryModal"))}
+                        onSelect={() => runFromDropdown(() => handleNavigation("/history"))}
                         className="cursor-pointer py-2 dark:focus:bg-zinc-800 dark:text-gray-200 transition-colors"
                       >
                         <CalendarDays className="mr-2 h-4 w-4 text-teal-600 dark:text-teal-400" />
@@ -251,7 +232,6 @@ export default function UserNavbar() {
                   <DropdownMenuSeparator className="dark:bg-zinc-800" />
                 </div>
 
-                {/* Common Items */}
                 <DropdownMenuItem
                   onSelect={() => runFromDropdown(() => handleNavigation("/dashboard"))}
                   className="cursor-pointer py-2 dark:focus:bg-zinc-800 dark:text-gray-200 transition-colors"

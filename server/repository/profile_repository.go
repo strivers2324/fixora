@@ -184,6 +184,16 @@ func (r *ProfileRepository) UpdateUserAddress(ctx context.Context, userID uuid.U
 	return &addr, nil
 }
 
+func (r *ProfileRepository) GetDefaultAddressInfo(ctx context.Context, userID uuid.UUID, addressID int) (bool, error) {
+	var isDefault bool
+	query := `SELECT is_default FROM user_addresses WHERE address_id = $1 AND user_id = $2`
+	err := r.db.QueryRowContext(ctx, query, addressID, userID).Scan(&isDefault)
+	if err != nil {
+		return false, err
+	}
+	return isDefault, nil
+}
+
 func (r *ProfileRepository) DeleteUserAddress(ctx context.Context, userID uuid.UUID, addressID int) error {
 	query := `DELETE FROM user_addresses WHERE address_id = $1 AND user_id = $2`
 	_, err := r.db.ExecContext(ctx, query, addressID, userID)

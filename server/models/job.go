@@ -25,26 +25,28 @@ const (
 )
 
 type JobRequest struct {
-	JobID              uuid.UUID  `json:"job_id" db:"job_id"`
-	UserID             uuid.UUID  `json:"user_id" db:"user_id"`
-	ProfessionID       int        `json:"profession_id" db:"profession_id"`
-	ProblemDetails     string     `json:"problem_details" db:"problem_details"`
-	AddressID          int        `json:"address_id" db:"address_id"`
-	JobStatus          JobStatus  `json:"status" db:"job_status"`
-	AcceptedProviderID *uuid.UUID `json:"accepted_provider_id" db:"accepted_provider_id"`
-	AcceptedAt         *time.Time `json:"accepted_at" db:"accepted_at"`
-	CancellationReason *string    `json:"cancellation_reason" db:"cancellation_reason"`
-	CreatedAt          time.Time  `json:"created_at" db:"created_at"`
+	JobID                  uuid.UUID  `json:"job_id" db:"job_id"`
+	UserID                 uuid.UUID  `json:"user_id" db:"user_id"`
+	ProfessionID           int        `json:"profession_id" db:"profession_id"`
+	ProblemDetails         string     `json:"problem_details" db:"problem_details"`
+	AddressID              int        `json:"address_id" db:"address_id"`
+	JobStatus              JobStatus  `json:"status" db:"job_status"`
+	AcceptedProviderID     *uuid.UUID `json:"accepted_provider_id" db:"accepted_provider_id"`
+	AcceptedAt             *time.Time `json:"accepted_at" db:"accepted_at"`
+	UserCancellationReason *string    `json:"user_cancellation_reason" db:"user_cancellation_reason"`
+	AgreedPrice            *float64   `json:"agreed_price" db:"agreed_price"`
+	CreatedAt              time.Time  `json:"created_at" db:"created_at"`
 }
 
 type JobBroadcast struct {
-	BroadcastID        uuid.UUID       `json:"broadcast_id" db:"broadcast_id"`
-	JobID              uuid.UUID       `json:"job_id" db:"job_id"`
-	ProviderID         uuid.UUID       `json:"provider_id" db:"provider_id"`
-	JobBroadcastStatus BroadcastStatus `json:"job_broadcast_status" db:"job_broadcast_status"`
-	UserOfferPrice     *float64        `json:"user_offer_price" db:"user_offer_price"`
-	ProviderOfferPrice *float64        `json:"provider_offer_price" db:"provider_offer_price"`
-	CreatedAt          time.Time       `json:"created_at" db:"created_at"`
+	BroadcastID                uuid.UUID       `json:"broadcast_id" db:"broadcast_id"`
+	JobID                      uuid.UUID       `json:"job_id" db:"job_id"`
+	ProviderID                 uuid.UUID       `json:"provider_id" db:"provider_id"`
+	JobBroadcastStatus         BroadcastStatus `json:"job_broadcast_status" db:"job_broadcast_status"`
+	UserOfferPrice             *float64        `json:"user_offer_price" db:"user_offer_price"`
+	ProviderOfferPrice         *float64        `json:"provider_offer_price" db:"provider_offer_price"`
+	ProviderCancellationReason *string         `json:"provider_cancellation_reason" db:"provider_cancellation_reason"`
+	CreatedAt                  time.Time       `json:"created_at" db:"created_at"`
 }
 
 type CreateJobRequest struct {
@@ -104,6 +106,7 @@ type JobSummaryForUser struct {
 	ProviderPhone      *string    `json:"provider_phone" db:"provider_phone"`
 	UserOfferPrice     *float64   `json:"user_offer_price" db:"user_offer_price"`
 	ProviderOfferPrice *float64   `json:"provider_offer_price" db:"provider_offer_price"`
+	AgreedPrice        *float64   `json:"agreed_price" db:"agreed_price"`
 	AcceptedAt         *time.Time `json:"accepted_at" db:"accepted_at"`
 	CreatedAt          time.Time  `json:"created_at" db:"created_at"`
 }
@@ -122,6 +125,7 @@ type JobSummaryForProvider struct {
 	Longitude          *float64         `json:"longitude" db:"longitude"`
 	UserOfferPrice     *float64         `json:"user_offer_price" db:"user_offer_price"`
 	ProviderOfferPrice *float64         `json:"provider_offer_price" db:"provider_offer_price"`
+	AgreedPrice        *float64         `json:"agreed_price" db:"agreed_price"`
 	BroadcastStatus    *BroadcastStatus `json:"broadcast_status" db:"job_broadcast_status"`
 	AcceptedAt         *time.Time       `json:"accepted_at" db:"accepted_at"`
 	CreatedAt          time.Time        `json:"created_at" db:"created_at"`

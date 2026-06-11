@@ -27,7 +27,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import JobLocationMap from "@/components/common/Map";
-import ServiceProviderJobHistory from "@/components/Dashboard/service-provider/ServiceProviderJobHistory";
 
 const showSuccessToast = (message: string) => {
   const alertDiv = document.createElement("div");
@@ -53,10 +52,9 @@ const showErrorToast = (message: string) => {
   setTimeout(() => alertDiv.remove(), 3000);
 };
 
-// --- Job Request Card Component ---
 const JobRequestCard = ({ request, onAcceptJob }: any) => {
   const { fetchProviderDashboard } = useJobStore();
-  const [offerPrice, setOfferPrice] = useState(request.provider_offer_price || "");
+  const [offerPrice, setOfferPrice] = useState("");
   const [isUpdatingOffer, setIsUpdatingOffer] = useState(false);
 
   const handleSendOffer = async () => {
@@ -323,7 +321,6 @@ export default function ProviderDashboard() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 font-sans pb-20 transition-colors duration-300">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {/* Warning Banners */}
         <div className="flex flex-col gap-4">
           {!isProfileComplete && (
             <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm transition-colors">
@@ -456,6 +453,37 @@ export default function ProviderDashboard() {
           </div>
         </div>
 
+        <section id="provider-new-jobs">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">New Job Requests</h2>
+              {requests.length > 0 && (
+                <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold px-2 py-0.5 rounded-full animate-pulse border border-red-200 dark:border-red-800">
+                  {requests.length} New
+                </span>
+              )}
+            </div>
+          </div>
+
+          {requests.length === 0 ? (
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-10 border border-dashed border-slate-300 dark:border-zinc-800 flex flex-col items-center justify-center text-center transition-colors">
+              <div className="bg-slate-50 dark:bg-zinc-800 p-4 rounded-full mb-3">
+                <ClipboardList className="text-slate-300 dark:text-zinc-500 h-10 w-10" />
+              </div>
+              <h3 className="text-slate-600 dark:text-slate-300 font-medium text-lg">No new job requests</h3>
+              <p className="text-slate-400 dark:text-zinc-500 mt-1 max-w-xs">
+                You will be notified when customers nearby book a service.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 w-full">
+              {requests.map((request: any) => (
+                <JobRequestCard key={request.job_id} request={request} onAcceptJob={handleAcceptJob} />
+              ))}
+            </div>
+          )}
+        </section>
+
         <div>
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
             Current Active Job
@@ -578,41 +606,7 @@ export default function ProviderDashboard() {
             </div>
           )}
         </div>
-
-        <section id="provider-new-jobs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">New Job Requests</h2>
-              {requests.length > 0 && (
-                <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold px-2 py-0.5 rounded-full animate-pulse border border-red-200 dark:border-red-800">
-                  {requests.length} New
-                </span>
-              )}
-            </div>
-          </div>
-
-          {requests.length === 0 ? (
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-10 border border-dashed border-slate-300 dark:border-zinc-800 flex flex-col items-center justify-center text-center transition-colors">
-              <div className="bg-slate-50 dark:bg-zinc-800 p-4 rounded-full mb-3">
-                <ClipboardList className="text-slate-300 dark:text-zinc-500 h-10 w-10" />
-              </div>
-              <h3 className="text-slate-600 dark:text-slate-300 font-medium text-lg">No new job requests</h3>
-              <p className="text-slate-400 dark:text-zinc-500 mt-1 max-w-xs">
-                You will be notified when customers nearby book a service.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4 w-full">
-              {requests.map((request: any) => (
-                <JobRequestCard key={request.job_id} request={request} onAcceptJob={handleAcceptJob} />
-              ))}
-            </div>
-          )}
-        </section>
       </main>
-
-      <ServiceProviderJobHistory jobs={recentJobs} />
-
       <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
         <DialogContent className="sm:max-w-[425px] dark:bg-zinc-950">
           <DialogHeader>

@@ -157,10 +157,23 @@ func (s *ProfileService) UpdateUserAddress(ctx context.Context, userID uuid.UUID
 }
 
 func (s *ProfileService) DeleteUserAddress(ctx context.Context, userID uuid.UUID, addressID int) error {
-	err := s.ProfileRepo.DeleteUserAddress(ctx, userID, addressID)
+	isDefault, err := s.ProfileRepo.GetDefaultAddressInfo(ctx, userID, addressID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return apperrors.NewCustomError(404, "Address not found", "NOT_FOUND")
+		}
+		return apperrors.ErrInternalServer
+	}
+
+	if isDefault {
+		return apperrors.ErrCannotDeleteDefaultAddress
+	}
+
+	err = s.ProfileRepo.DeleteUserAddress(ctx, userID, addressID)
 	if err != nil {
 		return apperrors.ErrInternalServer
 	}
+
 	return nil
 }
 

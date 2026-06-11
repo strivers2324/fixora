@@ -53,6 +53,8 @@ export default function AddressBook() {
     longitude: 0,
   });
 
+  const [initialFormData, setInitialFormData] = useState<any>(null);
+
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
@@ -97,7 +99,7 @@ export default function AddressBook() {
   };
 
   const handleAddNew = () => {
-    setFormData({
+    const newData = {
       full_name: "",
       phone_number: "",
       district: "",
@@ -107,7 +109,9 @@ export default function AddressBook() {
       is_default: userAddresses.length === 0,
       latitude: 0,
       longitude: 0,
-    });
+    };
+    setFormData(newData);
+    setInitialFormData(newData);
     setEditingId(null);
     setIsOpen(true);
   };
@@ -115,7 +119,7 @@ export default function AddressBook() {
   const handleEdit = (addr: any) => {
     const phone = addr.phone_number || "";
     const displayPhone = phone.startsWith("+88") ? phone.slice(3) : phone;
-    setFormData({
+    const editData = {
       full_name: addr.full_name,
       phone_number: displayPhone,
       district: addr.district,
@@ -125,7 +129,9 @@ export default function AddressBook() {
       is_default: addr.is_default,
       latitude: addr.latitude || 0,
       longitude: addr.longitude || 0,
-    });
+    };
+    setFormData(editData);
+    setInitialFormData(editData);
     setEditingId(addr.address_id);
     setIsOpen(true);
   };
@@ -143,6 +149,19 @@ export default function AddressBook() {
       formData.thana.trim() !== "" &&
       formData.area.trim() !== "" &&
       formData.address.trim() !== ""
+    );
+  };
+
+  const hasChanges = () => {
+    if (!initialFormData) return true;
+    return (
+      formData.full_name !== initialFormData.full_name ||
+      formData.phone_number !== initialFormData.phone_number ||
+      formData.district !== initialFormData.district ||
+      formData.thana !== initialFormData.thana ||
+      formData.area !== initialFormData.area ||
+      formData.address !== initialFormData.address ||
+      formData.is_default !== initialFormData.is_default
     );
   };
 
@@ -276,7 +295,10 @@ export default function AddressBook() {
         </Button>
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="max-w-4xl dark:bg-zinc-900 dark:border-zinc-800 transition-colors p-0 overflow-hidden">
+          <DialogContent
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            className="max-w-4xl dark:bg-zinc-900 dark:border-zinc-800 transition-colors p-0 overflow-hidden"
+          >
             <DialogHeader className="px-6 py-4 border-b dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-800/30">
               <DialogTitle className="text-xl text-teal-900 dark:text-teal-400">
                 {editingId ? "Edit Address" : "Add New Address"}
@@ -440,7 +462,7 @@ export default function AddressBook() {
                 </div>
               </div>
 
-              {userAddresses.length > 0 && (
+              {userAddresses.length > 0 && !(editingId && initialFormData?.is_default) && (
                 <div className="mt-6 flex items-center gap-2 bg-teal-50 dark:bg-teal-900/10 p-3 rounded-lg border border-teal-100 dark:border-teal-900/30">
                   <input
                     type="checkbox"
@@ -466,7 +488,7 @@ export default function AddressBook() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSaving || !isFormValid()}
+                  disabled={isSaving || !isFormValid() || !hasChanges()}
                   className="bg-teal-900 hover:bg-teal-800 dark:bg-teal-700 dark:hover:bg-teal-600 text-white w-full sm:w-auto h-11 px-8 transition-all disabled:opacity-50 disabled:pointer-events-auto disabled:cursor-not-allowed"
                 >
                   {isSaving ? (
@@ -608,12 +630,14 @@ export default function AddressBook() {
                     >
                       <Edit2 className="h-3.5 w-3.5" /> Edit
                     </button>
-                    <button
-                      onClick={() => handleDeleteClick(addr.address_id)}
-                      className="text-gray-500 hover:text-red-600 dark:hover:text-red-400 bg-gray-50 hover:bg-red-50 dark:bg-zinc-800 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" /> Delete
-                    </button>
+                    {!addr.is_default && (
+                      <button
+                        onClick={() => handleDeleteClick(addr.address_id)}
+                        className="text-gray-500 hover:text-red-600 dark:hover:text-red-400 bg-gray-50 hover:bg-red-50 dark:bg-zinc-800 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </CardContent>

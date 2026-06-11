@@ -6,6 +6,8 @@ import UserDashboard from "../components/Dashboard/user/UserDashboard";
 import ServiceProviderDashboard from "../components/Dashboard/service-provider/ServiceProviderDashboard";
 import UserUpdateProfile from "../components/profile/user/UpdateProfileForm";
 import ServiceProviderUpdateProfile from "../components/profile/service-provider/UpdateProfileForm";
+import UserBookingHistory from "../components/Dashboard/user/UserBookingHistory";
+import ServiceProviderJobHistoryPage from "../components/Dashboard/service-provider/ServiceProviderJobHistory";
 
 export function DashboardRedirect() {
   const { account } = useAccountStore();
@@ -26,6 +28,18 @@ export function ProfileRedirect() {
     return <UserUpdateProfile />;
   } else if (account?.role === Role.SERVICE_PROVIDER) {
     return <ServiceProviderUpdateProfile />;
+  } else {
+    return <Navigate to="/login" replace />;
+  }
+}
+
+export function HistoryRedirect() {
+  const { account } = useAccountStore();
+
+  if (account?.role === Role.USER) {
+    return <UserBookingHistory />;
+  } else if (account?.role === Role.SERVICE_PROVIDER) {
+    return <ServiceProviderJobHistoryPage />;
   } else {
     return <Navigate to="/login" replace />;
   }

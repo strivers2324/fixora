@@ -4,12 +4,13 @@ CREATE TABLE job_requests (
     job_id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     profession_id INT NOT NULL,
-    problem_details TEXT NOT NULL, 
-    address_id INT NOT NULL,   
+    problem_details TEXT NOT NULL,
+    address_id INT NOT NULL,
     job_status job_status DEFAULT 'PENDING',
     accepted_provider_id UUID,
-    accepted_at TIMESTAMP WITH TIME ZONE, 
-    cancellation_reason TEXT,
+    accepted_at TIMESTAMP WITH TIME ZONE,
+    user_cancellation_reason TEXT,
+    agreed_price NUMERIC(10, 2),
     
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 

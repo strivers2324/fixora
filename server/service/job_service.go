@@ -104,6 +104,22 @@ func (s *JobService) SubmitProviderOffer(ctx context.Context, providerID uuid.UU
 		return errors.New("job is no longer pending, cannot submit offer")
 	}
 
+	userOffer, providerOffer, err := s.JobRepo.GetBroadcastOfferDetails(ctx, jobID, providerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return apperrors.NewCustomError(404, "No pending request found for this job", "NOT_FOUND")
+		}
+		return apperrors.ErrInternalServer
+	}
+
+	if userOffer != nil && offerPrice < *userOffer {
+		return apperrors.ErrInvalidUserOffer
+	}
+
+	if providerOffer != nil && offerPrice > *providerOffer {
+		return apperrors.ErrInvalidProviderOffer
+	}
+
 	return s.JobRepo.UpdateProviderOffer(ctx, jobID, providerID, offerPrice)
 }
 
@@ -127,6 +143,22 @@ func (s *JobService) UpdateUserOffer(ctx context.Context, userID uuid.UUID, jobI
 		return apperrors.ErrOfferPriceTooLow
 	}
 
+	userOffer, providerOffer, err := s.JobRepo.GetBroadcastOfferDetails(ctx, jobID, providerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return apperrors.NewCustomError(404, "No pending request found for this provider", "NOT_FOUND")
+		}
+		return apperrors.ErrInternalServer
+	}
+
+	if providerOffer != nil && offerPrice > *providerOffer {
+		return apperrors.ErrInvalidOffer
+	}
+
+	if userOffer != nil && offerPrice < *userOffer {
+		return apperrors.ErrCannotDecreaseOffer
+	}
+
 	return s.JobRepo.UpdateUserOffer(ctx, jobID, providerID, offerPrice)
 }
 
@@ -139,7 +171,24 @@ func (s *JobService) AcceptJob(ctx context.Context, providerID uuid.UUID, jobID 
 		return errors.New("job is no longer pending")
 	}
 
-	return s.JobRepo.UpdateJobAndBroadcastStatus(ctx, jobID, providerID, models.JobStatusAccepted)
+	userOffer, providerOffer, err := s.JobRepo.GetBroadcastOfferDetails(ctx, jobID, providerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return apperrors.NewCustomError(404, "No pending request found to accept", "NOT_FOUND")
+		}
+		return apperrors.ErrInternalServer
+	}
+
+	var finalAgreedPrice float64
+	if providerOffer != nil && *providerOffer > 0 {
+		finalAgreedPrice = *providerOffer
+	} else if userOffer != nil && *userOffer > 0 {
+		finalAgreedPrice = *userOffer
+	} else {
+		finalAgreedPrice = 0
+	}
+
+	return s.JobRepo.UpdateJobAndBroadcastStatus(ctx, jobID, providerID, models.JobStatusAccepted, finalAgreedPrice)
 }
 
 func (s *JobService) CancelJobByUser(ctx context.Context, userID uuid.UUID, jobID uuid.UUID, reason string) error {

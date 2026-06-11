@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAccountStore } from "@/store/AccountStore";
 import { UpdateServiceProviderProfile } from "@/api/ProfileApi";
 import { RequestPhoneChange, VerifyOTPAndUpdatePhone } from "@/api/AccountApi";
-import { Logout } from "@/api/AuthApi";
 import { ResendOTP, GetOTPInfo } from "@/api/OTPApi";
 import {
   User,
-  LogOut,
   MapPin,
   ChevronRight,
   ShieldCheck,
@@ -26,16 +24,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-// Import other components
 import ServiceProviderAddressBook from "./AddressBook";
 import SecuritySettings from "./SecuritySettings";
 import NidVerification from "./NIDVerification";
 
 export default function ServiceProviderProfile() {
   const navigate = useNavigate();
-  const { account, profile, fetchProfile, logout } = useAccountStore();
-  const [activeMenu, setActiveMenu] = useState("profile");
-
+  const location = useLocation();
+  const { account, profile, fetchProfile } = useAccountStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -58,11 +54,20 @@ export default function ServiceProviderProfile() {
     phone: "",
   });
 
+  const activeMenu =
+    location.pathname === "/address"
+      ? "address"
+      : location.pathname === "/security"
+        ? "security"
+        : location.pathname === "/verify-identity"
+          ? "nid"
+          : "profile";
+
   const sidebarItems = [
-    { name: "Profile Settings", id: "profile", icon: User },
-    { name: "Address Book", id: "address", icon: MapPin },
-    { name: "Security Settings", id: "security", icon: ShieldCheck },
-    { name: "NID Verification", id: "nid", icon: CreditCard },
+    { name: "Profile Settings", id: "profile", path: "/profile", icon: User },
+    { name: "Address Book", id: "address", path: "/address", icon: MapPin },
+    { name: "Security Settings", id: "security", path: "/security", icon: ShieldCheck },
+    { name: "NID Verification", id: "nid", path: "/verify-identity", icon: CreditCard }, // এখানে পাথ আপডেট হলো
   ];
 
   useEffect(() => {
@@ -117,21 +122,7 @@ export default function ServiceProviderProfile() {
   };
 
   const handleMenuClick = (item: any) => {
-    if (item.path) {
-      navigate(item.path);
-    } else {
-      setActiveMenu(item.id);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await Logout();
-    } catch (error) {
-    } finally {
-      logout();
-      navigate("/login");
-    }
+    navigate(item.path);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -349,7 +340,7 @@ export default function ServiceProviderProfile() {
                     Full Name <span className="text-red-500 dark:text-red-400">*</span>
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                     <Input
                       name="name"
                       value={formData.name}
@@ -367,7 +358,7 @@ export default function ServiceProviderProfile() {
                     <span className="text-gray-400 dark:text-gray-500 font-normal text-xs ml-1">(Optional)</span>
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                     <Input
                       id="email"
                       name="email"
@@ -614,16 +605,6 @@ export default function ServiceProviderProfile() {
                     </Button>
                   ))}
                 </nav>
-                <div className="mt-6 pt-6 border-t dark:border-zinc-800 transition-colors">
-                  <Button
-                    variant="outline"
-                    onClick={handleLogout}
-                    className="w-full h-11 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200 dark:border-red-900/50 rounded-xl font-medium transition-colors"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log Out
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </div>

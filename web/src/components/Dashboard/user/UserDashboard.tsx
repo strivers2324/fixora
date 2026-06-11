@@ -32,7 +32,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ServiceSearch from "./ServiceSearch";
-import UserBookingHistory from "@/components/Dashboard/user/UserBookingHistory";
 
 const showSuccessToast = (message: string) => {
   const alertDiv = document.createElement("div");
@@ -75,7 +74,7 @@ const allServices = [
   },
   {
     id: 3,
-    name: "Refrigerator",
+    name: "Refrigerator Mechanic",
     icon: <Snowflake size={24} />,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-100 dark:bg-blue-900/30",
@@ -103,28 +102,28 @@ const allServices = [
   },
   {
     id: 7,
-    name: "Broadband",
+    name: "Broadband Internet Provider",
     icon: <Wifi size={24} />,
     color: "text-sky-600 dark:text-sky-400",
     bgColor: "bg-sky-100 dark:bg-sky-900/30",
   },
   {
     id: 8,
-    name: "IPS/Inverter",
+    name: "IPS/Inverter Technician",
     icon: <BatteryCharging size={24} />,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-100 dark:bg-green-900/30",
   },
   {
     id: 9,
-    name: "Washing Machine",
+    name: "Washing Machine Technician",
     icon: <Disc size={24} />,
     color: "text-blue-500 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-900/20",
   },
   {
     id: 10,
-    name: "Computer Tech",
+    name: "Computer Technician",
     icon: <Monitor size={24} />,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-100 dark:bg-purple-900/30",
@@ -138,7 +137,7 @@ const allServices = [
   },
   {
     id: 12,
-    name: "Auto Mechanic",
+    name: "Automobile Mechanic",
     icon: <Car size={24} />,
     color: "text-rose-600 dark:text-rose-400",
     bgColor: "bg-rose-100 dark:bg-rose-900/30",
@@ -152,14 +151,14 @@ const allServices = [
   },
   {
     id: 14,
-    name: "Water Pump",
+    name: "Water Pump Technician",
     icon: <Waves size={24} />,
     color: "text-teal-600 dark:text-teal-400",
     bgColor: "bg-teal-100 dark:bg-teal-900/30",
   },
   {
     id: 15,
-    name: "Home Appliance",
+    name: "Home Appliance Technician",
     icon: <Plug size={24} />,
     color: "text-emerald-600 dark:text-emerald-400",
     bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
@@ -193,7 +192,7 @@ const ActiveJobCard = ({ item, index, variant, cancellingId, onCancelClick }: an
 
   const { fetchUserDashboard } = useJobStore();
 
-  const [offerPrice, setOfferPrice] = useState(item.user_offer_price || "");
+  const [offerPrice, setOfferPrice] = useState("");
   const [isUpdatingOffer, setIsUpdatingOffer] = useState(false);
 
   const handleUpdateOffer = async () => {
@@ -381,7 +380,6 @@ export default function UserDashboard() {
   const isProfileComplete = !!profile?.name && !!defaultAddress;
 
   const activeBookings = userDashboard?.active_jobs || [];
-  const recentServices = userDashboard?.history || [];
 
   const requestedJobs = useMemo(() => activeBookings.filter((j) => j.status === JobStatus.PENDING), [activeBookings]);
   const acceptedJobs = useMemo(() => activeBookings.filter((j) => j.status === JobStatus.ACCEPTED), [activeBookings]);
@@ -490,62 +488,9 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Active Bookings</h2>
-          </div>
-
-          {activeBookings.length === 0 ? (
-            <div className="bg-white dark:bg-zinc-900/50 border border-dashed border-gray-300 dark:border-zinc-800 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-2 transition-colors">
-              <ClipboardList className="text-gray-300" size={32} />
-              <p className="text-gray-500 text-sm font-medium">No active booking found yet</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {acceptedJobs.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-teal-500" />
-                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Accepted Jobs</h3>
-                  </div>
-                  {acceptedJobs.map((item, idx) => (
-                    <ActiveJobCard
-                      key={item.job_id}
-                      item={item}
-                      index={idx}
-                      variant="accepted"
-                      cancellingId={cancellingId}
-                      onCancelClick={handleCancelClick}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {requestedJobs.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-amber-500" />
-                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Requested Jobs</h3>
-                  </div>
-                  {requestedJobs.map((item, idx) => (
-                    <ActiveJobCard
-                      key={item.job_id}
-                      item={item}
-                      index={idx}
-                      variant="requested"
-                      cancellingId={cancellingId}
-                      onCancelClick={handleCancelClick}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-
         <section id="popular-services" className="scroll-mt-30">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-300">Service Categories</h2>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-300">Services</h2>
             <Button
               variant="link"
               className="text-teal-700 font-medium"
@@ -603,6 +548,59 @@ export default function UserDashboard() {
             )}
           </div>
         </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Active Bookings</h2>
+          </div>
+
+          {activeBookings.length === 0 ? (
+            <div className="bg-white dark:bg-zinc-900/50 border border-dashed border-gray-300 dark:border-zinc-800 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-2 transition-colors">
+              <ClipboardList className="text-gray-300" size={32} />
+              <p className="text-gray-500 text-sm font-medium">No active booking found yet</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {acceptedJobs.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-teal-500" />
+                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Accepted Jobs</h3>
+                  </div>
+                  {acceptedJobs.map((item, idx) => (
+                    <ActiveJobCard
+                      key={item.job_id}
+                      item={item}
+                      index={idx}
+                      variant="accepted"
+                      cancellingId={cancellingId}
+                      onCancelClick={handleCancelClick}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {requestedJobs.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-amber-500" />
+                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Requested Jobs</h3>
+                  </div>
+                  {requestedJobs.map((item, idx) => (
+                    <ActiveJobCard
+                      key={item.job_id}
+                      item={item}
+                      index={idx}
+                      variant="requested"
+                      cancellingId={cancellingId}
+                      onCancelClick={handleCancelClick}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
       </main>
 
       <ServiceSearch
@@ -613,8 +611,6 @@ export default function UserDashboard() {
         profileData={profile}
         onContinueWithData={handleSearchContinue}
       />
-
-      <UserBookingHistory jobs={recentServices} />
 
       {jobToCancel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">

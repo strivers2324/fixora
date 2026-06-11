@@ -205,12 +205,12 @@ func (r *JobRepository) UpdateUserOffer(ctx context.Context, jobID uuid.UUID, pr
 
 func (r *JobRepository) GetJobInfo(ctx context.Context, jobID uuid.UUID) (*models.JobRequest, error) {
 	query := `
-		SELECT job_id, user_id, profession_id, problem_details, address_id, job_status, accepted_provider_id, accepted_at, cancellation_reason, created_at
+		SELECT job_id, user_id, profession_id, problem_details, address_id, job_status, accepted_provider_id, accepted_at, agreed_price, created_at
 		FROM job_requests WHERE job_id = $1
 	`
 	var job models.JobRequest
 	err := r.DB.QueryRowContext(ctx, query, jobID).Scan(
-		&job.JobID, &job.UserID, &job.ProfessionID, &job.ProblemDetails, &job.AddressID, &job.JobStatus, &job.AcceptedProviderID, &job.AcceptedAt, &job.CancellationReason, &job.CreatedAt,
+		&job.JobID, &job.UserID, &job.ProfessionID, &job.ProblemDetails, &job.AddressID, &job.JobStatus, &job.AcceptedProviderID, &job.AcceptedAt, &job.AgreedPrice, &job.CreatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -218,14 +218,14 @@ func (r *JobRepository) GetJobInfo(ctx context.Context, jobID uuid.UUID) (*model
 	return &job, nil
 }
 
-func (r *JobRepository) UpdateJobAndBroadcastStatus(ctx context.Context, jobID uuid.UUID, providerID uuid.UUID, status models.JobStatus) error {
+func (r *JobRepository) UpdateJobAndBroadcastStatus(ctx context.Context, jobID uuid.UUID, providerID uuid.UUID, status models.JobStatus, agreedPrice float64) error {
 	tx, err := r.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
 	now := time.Now()
-	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, accepted_provider_id = $2, accepted_at = $3 WHERE job_id = $4`, status, providerID, now, jobID)
+	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, accepted_provider_id = $2, accepted_at = $3, agreed_price = $4 WHERE job_id = $5`, status, providerID, now, agreedPrice, jobID)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -252,7 +252,7 @@ func (r *JobRepository) CancelJobByUser(ctx context.Context, jobID uuid.UUID, re
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, cancellation_reason = $2 WHERE job_id = $3`, models.JobStatusCancelled, reason, jobID)
+	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, user_cancellation_reason = $2 WHERE job_id = $3`, models.JobStatusCancelled, reason, jobID)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -273,13 +273,13 @@ func (r *JobRepository) ResetJobToPending(ctx context.Context, jobID uuid.UUID, 
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, accepted_provider_id = NULL, accepted_at = NULL, cancellation_reason = $2 WHERE job_id = $3`, models.JobStatusPending, reason, jobID)
+	_, err = tx.ExecContext(ctx, `UPDATE job_requests SET job_status = $1, accepted_provider_id = NULL, accepted_at = NULL, agreed_price = NULL WHERE job_id = $2`, models.JobStatusPending, jobID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, `UPDATE job_broadcasts SET job_broadcast_status = $1 WHERE job_id = $2 AND provider_id = $3`, models.BroadcastStatusCancelled, jobID, providerID)
+	_, err = tx.ExecContext(ctx, `UPDATE job_broadcasts SET job_broadcast_status = $1, provider_cancellation_reason = $2 WHERE job_id = $3 AND provider_id = $4`, models.BroadcastStatusCancelled, reason, jobID, providerID)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -312,11 +312,15 @@ func (r *JobRepository) GetUserActiveJobs(ctx context.Context, userID uuid.UUID)
 			ua.latitude, ua.longitude,
 			jb.provider_id,
 			spp.name as provider_name, sp.phone as provider_phone,
-			jb.user_offer_price, jb.provider_offer_price, -- ADDED
+			jb.user_offer_price, jb.provider_offer_price,
+			jr.agreed_price,
 			jr.accepted_at, jr.created_at
 		FROM job_requests jr
 		JOIN user_addresses ua ON jr.address_id = ua.address_id
-		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND (jr.accepted_provider_id IS NULL OR jb.provider_id = jr.accepted_provider_id) -- ADDED
+		-- EKHYANE CHANGE: jb.job_broadcast_status IN ('PENDING', 'ACCEPTED') add kora hoyeche
+		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id 
+			AND (jr.accepted_provider_id IS NULL OR jb.provider_id = jr.accepted_provider_id)
+			AND jb.job_broadcast_status IN ('PENDING', 'ACCEPTED')
 		LEFT JOIN service_provider_profiles spp ON jr.accepted_provider_id = spp.provider_id
 		LEFT JOIN service_providers sp ON jr.accepted_provider_id = sp.provider_id
 		WHERE jr.user_id = $1 AND jr.job_status IN ('PENDING', 'ACCEPTED')
@@ -338,6 +342,7 @@ func (r *JobRepository) GetUserActiveJobs(ctx context.Context, userID uuid.UUID)
 			&job.ProviderID,
 			&job.ProviderName, &job.ProviderPhone,
 			&job.UserOfferPrice, &job.ProviderOfferPrice,
+			&job.AgreedPrice,
 			&job.AcceptedAt, &job.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -358,12 +363,14 @@ func (r *JobRepository) GetUserJobHistory(ctx context.Context, userID uuid.UUID)
 			COALESCE(ua.area, ''), 
 			COALESCE(ua.address, ''), 
 			ua.latitude, ua.longitude,
+			jb.provider_id,
 			spp.name as provider_name, sp.phone as provider_phone,
-			jb.user_offer_price, jb.provider_offer_price, -- ADDED
+			jb.user_offer_price, jb.provider_offer_price,
+			jr.agreed_price,
 			jr.accepted_at, jr.created_at
 		FROM job_requests jr
 		JOIN user_addresses ua ON jr.address_id = ua.address_id
-		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND (jr.accepted_provider_id IS NULL OR jb.provider_id = jr.accepted_provider_id) -- ADDED
+		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND (jr.accepted_provider_id IS NULL OR jb.provider_id = jr.accepted_provider_id)
 		LEFT JOIN service_provider_profiles spp ON jr.accepted_provider_id = spp.provider_id
 		LEFT JOIN service_providers sp ON jr.accepted_provider_id = sp.provider_id
 		WHERE jr.user_id = $1 AND jr.job_status IN ('COMPLETED', 'CANCELLED')
@@ -382,8 +389,10 @@ func (r *JobRepository) GetUserJobHistory(ctx context.Context, userID uuid.UUID)
 			&job.JobID, &job.ProblemDetails, &job.JobStatus,
 			&job.District, &job.Thana, &job.Area, &job.Address,
 			&job.Latitude, &job.Longitude,
+			&job.ProviderID,
 			&job.ProviderName, &job.ProviderPhone,
-			&job.UserOfferPrice, &job.ProviderOfferPrice, // ADDED
+			&job.UserOfferPrice, &job.ProviderOfferPrice,
+			&job.AgreedPrice,
 			&job.AcceptedAt, &job.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -406,11 +415,12 @@ func (r *JobRepository) GetProviderActiveJob(ctx context.Context, providerID uui
 			COALESCE(ua.area, ''), 
 			COALESCE(ua.address, ''), 
 			ua.latitude, ua.longitude,
-			jb.user_offer_price, jb.provider_offer_price, -- ADDED
+			jb.user_offer_price, jb.provider_offer_price,
+			jr.agreed_price,
 			jr.accepted_at, jr.created_at
 		FROM job_requests jr
 		JOIN user_addresses ua ON jr.address_id = ua.address_id
-		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND jb.provider_id = $1 -- ADDED
+		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND jb.provider_id = $1
 		WHERE jr.accepted_provider_id = $1 AND jr.job_status = 'ACCEPTED'
 		LIMIT 1
 	`
@@ -420,7 +430,8 @@ func (r *JobRepository) GetProviderActiveJob(ctx context.Context, providerID uui
 		&job.FullName, &job.PhoneNumber,
 		&job.District, &job.Thana, &job.Area, &job.Address,
 		&job.Latitude, &job.Longitude,
-		&job.UserOfferPrice, &job.ProviderOfferPrice, // ADDED
+		&job.UserOfferPrice, &job.ProviderOfferPrice,
+		&job.AgreedPrice,
 		&job.AcceptedAt, &job.CreatedAt,
 	)
 	if err != nil {
@@ -445,7 +456,8 @@ func (r *JobRepository) GetPendingBroadcasts(ctx context.Context, providerID uui
 			COALESCE(ua.area, ''), 
 			COALESCE(ua.address, ''), 
 			ua.latitude, ua.longitude,
-			jb.user_offer_price, jb.provider_offer_price, -- ADDED
+			jb.user_offer_price, jb.provider_offer_price,
+			jr.agreed_price,
 			jr.created_at, jb.job_broadcast_status
 		FROM job_broadcasts jb
 		JOIN job_requests jr ON jb.job_id = jr.job_id
@@ -467,7 +479,8 @@ func (r *JobRepository) GetPendingBroadcasts(ctx context.Context, providerID uui
 			&job.FullName, &job.PhoneNumber,
 			&job.District, &job.Thana, &job.Area, &job.Address,
 			&job.Latitude, &job.Longitude,
-			&job.UserOfferPrice, &job.ProviderOfferPrice, // ADDED
+			&job.UserOfferPrice, &job.ProviderOfferPrice,
+			&job.AgreedPrice,
 			&job.CreatedAt, &job.BroadcastStatus,
 		); err != nil {
 			return nil, err
@@ -475,6 +488,17 @@ func (r *JobRepository) GetPendingBroadcasts(ctx context.Context, providerID uui
 		jobs = append(jobs, job)
 	}
 	return jobs, nil
+}
+
+func (r *JobRepository) GetBroadcastOfferDetails(ctx context.Context, jobID uuid.UUID, providerID uuid.UUID) (*float64, *float64, error) {
+	var userOffer, providerOffer *float64
+	query := `SELECT user_offer_price, provider_offer_price FROM job_broadcasts WHERE job_id = $1 AND provider_id = $2 AND job_broadcast_status = 'PENDING'`
+
+	err := r.DB.QueryRowContext(ctx, query, jobID, providerID).Scan(&userOffer, &providerOffer)
+	if err != nil {
+		return nil, nil, err
+	}
+	return userOffer, providerOffer, nil
 }
 
 func (r *JobRepository) GetProviderJobHistory(ctx context.Context, providerID uuid.UUID) ([]models.JobSummaryForProvider, error) {
@@ -490,11 +514,12 @@ func (r *JobRepository) GetProviderJobHistory(ctx context.Context, providerID uu
 			COALESCE(ua.area, ''), 
 			COALESCE(ua.address, ''), 
 			ua.latitude, ua.longitude,
-			jb.user_offer_price, jb.provider_offer_price, -- ADDED
+			jb.user_offer_price, jb.provider_offer_price,
+			jr.agreed_price,
 			jr.accepted_at, jr.created_at
 		FROM job_requests jr
 		JOIN user_addresses ua ON jr.address_id = ua.address_id
-		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND jb.provider_id = $1 -- ADDED
+		LEFT JOIN job_broadcasts jb ON jr.job_id = jb.job_id AND jb.provider_id = $1
 		WHERE jr.accepted_provider_id = $1 AND jr.job_status IN ('COMPLETED', 'CANCELLED')
 		ORDER BY jr.created_at DESC
 	`
@@ -513,6 +538,7 @@ func (r *JobRepository) GetProviderJobHistory(ctx context.Context, providerID uu
 			&job.District, &job.Thana, &job.Area, &job.Address,
 			&job.Latitude, &job.Longitude,
 			&job.UserOfferPrice, &job.ProviderOfferPrice,
+			&job.AgreedPrice,
 			&job.AcceptedAt, &job.CreatedAt,
 		); err != nil {
 			return nil, err

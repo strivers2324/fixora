@@ -11,7 +11,7 @@ import AuthLayout from "./components/layout/AuthLayout";
 import MainLayout from "./components/layout/MainLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import PublicLayout from "./components/layout/PublicLayout";
-import { DashboardRedirect, HomeRedirect, ProfileRedirect } from "./routes/AppRoutes";
+import { DashboardRedirect, HistoryRedirect, HomeRedirect, ProfileRedirect } from "./routes/AppRoutes";
 import { Role } from "./enums/UserRole";
 import { useAccountStore } from "./store/AccountStore";
 import SplashScreen from "./components/ui/SplashScreen";
@@ -69,7 +69,11 @@ function App() {
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<DashboardRedirect />} />
               <Route path="/profile" element={<ProfileRedirect />} />
+              <Route path="/address" element={<ProfileRedirect />} />
+              <Route path="/security" element={<ProfileRedirect />} />
+              <Route path="/verify-identity" element={<ProfileRedirect />} />
               <Route path="/find-providers" element={<FindProviders />} />
+              <Route path="/history" element={<HistoryRedirect />} />
             </Route>
           </Route>
         </Routes>

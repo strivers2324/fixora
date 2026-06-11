@@ -56,6 +56,7 @@ export type JobSummaryForUser = {
   provider_phone?: string | null;
   user_offer_price?: number | null;
   provider_offer_price?: number | null;
+  agreed_price?: number | null;
   accepted_at?: string | null;
   created_at: string;
 };
@@ -74,6 +75,7 @@ export type JobSummaryForProvider = {
   longitude?: number | null;
   user_offer_price?: number | null;
   provider_offer_price?: number | null;
+  agreed_price?: number | null;
   broadcast_status?: BroadcastStatus | null;
   accepted_at?: string | null;
   created_at: string;

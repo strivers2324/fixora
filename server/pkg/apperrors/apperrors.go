@@ -32,6 +32,12 @@ var (
 
 	ErrAlreadyRequested = NewCustomError(http.StatusConflict, "Request already sent to this provider for this job.", "ALREADY_REQUESTED")
 	ErrOfferPriceTooLow = NewCustomError(http.StatusBadRequest, "Offering price cannot be less than provider's minimum charge.", "OFFER_PRICE_TOO_LOW")
+
+	ErrCannotDeleteDefaultAddress = NewCustomError(http.StatusBadRequest, "Cannot delete the default address. Please set another address as default first.", "BAD_REQUEST")
+	ErrInvalidUserOffer           = NewCustomError(http.StatusBadRequest, "You cannot offer less than the user's current offer", "INVALID_OFFER")
+	ErrInvalidProviderOffer       = NewCustomError(http.StatusBadRequest, "You cannot increase your previous offer price", "INVALID_OFFER")
+	ErrInvalidOffer               = NewCustomError(http.StatusBadRequest, "You do not need to offer more than the provider's asking price", "INVALID_OFFER")
+	ErrCannotDecreaseOffer        = NewCustomError(http.StatusBadRequest, "You cannot decrease your offer", "INVALID_OFFER")
 )
 
 type AppError struct {
