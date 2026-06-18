@@ -4,11 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
-import Toolbox from "@/assets/images/Tools.png";
-import NID from "@/assets/images/Nid.png";
-import Phone from "@/assets/images/Smartphone.png";
-import logo1 from "@/assets/images/LogoLogin.png";
-
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RegisterServiceProvider, GetProfessions } from "@/api/AuthApi";
@@ -136,15 +131,27 @@ export function SpRegistrationForm() {
         </p>
         <ul className="inline-flex flex-col items-center gap-y-2 md:gap-y-4 text-gray-700 font-serif text-base md:text-lg dark:text-white transition-colors">
           <li className="flex items-center gap-x-3">
-            <img src={Toolbox} alt="Toolbox" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Tools.webp"
+              alt="Toolbox"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>Own toolbox</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img src={NID} alt="NID Card" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Nid.webp"
+              alt="NID Card"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>National ID</span>
           </li>
           <li className="flex items-center gap-x-3">
-            <img src={Phone} alt="Smartphone" className="h-16 w-16 md:h-20 md:w-20 object-contain" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Smartphone.webp"
+              alt="Smartphone"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain"
+            />
             <span>Smartphone</span>
           </li>
         </ul>
@@ -158,7 +165,7 @@ export function SpRegistrationForm() {
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
                     <img
-                      src={logo1}
+                      src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LogoLogin.webp"
                       alt="Fixora Logo"
                       className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
                     />

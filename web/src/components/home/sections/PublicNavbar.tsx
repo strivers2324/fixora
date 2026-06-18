@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { SignUpRolePopup } from "../../auth/registration/selection/SignUpPopup";
 import { Link, useLocation } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-import Fixoralogo from "@/assets/images/Logo.png";
 import { Button } from "../../ui/button";
 import { Menu, X } from "lucide-react";
 import { ModeToggle } from "@/components/theme/ModeToggle";
@@ -20,7 +19,11 @@ export default function Navbar() {
       <div className="flex flex-row justify-between items-center h-16">
         <div className="flex items-center gap-x-2 font-bold text-3xl text-white">
           <HashLink smooth to="/#" className="flex items-center gap-x-2">
-            <img src={Fixoralogo} alt="Fixora logo" className="h-12 w-auto object-contain" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Logo.webp"
+              alt="Fixora logo"
+              className="h-12 w-auto object-contain"
+            />
             <span className="italic">Fixora</span>
           </HashLink>
         </div>

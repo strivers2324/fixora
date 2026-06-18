@@ -1,13 +1,10 @@
-import LogoSrc from "../../assets/images/Logo.png";
 import { FaTwitter, FaInstagram, FaLinkedin, FaCcVisa, FaCcMastercard, FaFacebook } from "react-icons/fa";
-import BkashLogo from "../../assets/images/bkash.png";
-import NagadLogo from "../../assets/images/nagad.png";
 
 interface MenuItem {
   title: string;
   links: {
     text: string;
-    url: string;
+    url?: string;
   }[];
 }
 
@@ -29,7 +26,7 @@ interface FooterProps {
 
 export default function Footer({
   logo = {
-    src: LogoSrc,
+    src: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Logo.webp",
     alt: "Fixora Logo",
     title: "FIXORA",
     url: "/",
@@ -39,38 +36,25 @@ export default function Footer({
     {
       title: "Our Services",
       links: [
-        { text: "Electrician", url: "/services/electrician" },
-        { text: "Plumber", url: "/services/plumber" },
-        { text: "AC Technician", url: "/services/ac-technician" },
-        {
-          text: "Refrigerator Mechanic",
-          url: "/services/refrigerator-mechanic",
-        },
-        { text: "Carpenter", url: "/services/carpenter" },
-        { text: "All Services", url: "/services" },
+        { text: "Electrician" },
+        { text: "Plumber" },
+        { text: "AC Technician" },
+        { text: "Refrigerator Mechanic" },
+        { text: "Carpenter" },
+        { text: "All Services" },
       ],
     },
     {
       title: "Company",
-      links: [
-        { text: "About", url: "/about" },
-        { text: "Contact", url: "/contact" },
-        { text: "Careers", url: "/careers" },
-      ],
+      links: [{ text: "About" }, { text: "Contact" }, { text: "Careers" }],
     },
     {
       title: "Resources",
-      links: [
-        { text: "Help & FAQ", url: "/help" },
-        { text: "Privacy Policy", url: "/privacy" },
-      ],
+      links: [{ text: "Help & FAQ" }, { text: "Privacy Policy" }],
     },
     {
       title: "Join Fixora",
-      links: [
-        { text: "Become a Provider", url: "/join-provider" },
-        { text: "Download App", url: "/app" },
-      ],
+      links: [{ text: "Become a Provider" }, { text: "Download App" }],
     },
   ],
   copyright = "© 2024 FIXORA. All rights reserved.",
@@ -135,10 +119,8 @@ export default function Footer({
               <h3 className="mb-3 font-bold text-white">{section.title}</h3>
               <ul className="space-y-2 text-sm">
                 {section.links.map((link, linkIdx) => (
-                  <li key={linkIdx} className="font-normal">
-                    <a href={link.url} className="hover:text-white hover:underline transition-colors duration-300">
-                      {link.text}
-                    </a>
+                  <li key={linkIdx} className="font-normal text-gray-400">
+                    <span>{link.text}</span>
                   </li>
                 ))}
               </ul>
@@ -162,8 +144,16 @@ export default function Footer({
             <span className="hidden text-sm md:block">We accept:</span>
             <FaCcVisa size={24} />
             <FaCcMastercard size={24} />
-            <img src={BkashLogo} alt="bKash" className="h-6" />
-            <img src={NagadLogo} alt="Nagad" className="h-6" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/bkash.webp"
+              alt="bKash"
+              className="h-6"
+            />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/nagad.webp"
+              alt="Nagad"
+              className="h-6"
+            />
           </div>
         </div>
       </div>

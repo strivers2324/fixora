@@ -6,7 +6,7 @@ import { GetNIDStatus } from "@/api/ProfileApi";
 import { Role } from "@/enums/UserRole";
 import { NIDStatus } from "@/enums/NIDStatus";
 import { LayoutDashboard, LogOut, User as UserIcon, CalendarDays, Grid, Briefcase, Search } from "lucide-react";
-import FixoraLogo from "@/assets/images/Logo.png";
+//import FixoraLogo from "@/assets/images/Logo.webp";
 import { ModeToggle } from "@/components/theme/ModeToggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +100,11 @@ export default function UserNavbar() {
       <div className="w-full px-4 md:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-x-2 cursor-pointer" onClick={() => handleNavigation("/dashboard")}>
-            <img src={FixoraLogo} alt="Fixora" className="h-10 w-auto object-contain" />
+            <img
+              src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Logo.webp"
+              alt="Fixora"
+              className="h-10 w-auto object-contain"
+            />
             <span className="text-3xl font-bold italic tracking-tight text-white">Fixora</span>
           </div>
           <div className="flex items-center gap-x-2 md:gap-x-4">

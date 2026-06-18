@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Role } from "@/enums/UserRole";
 import { toast } from "sonner";
-import logo1 from "@/assets/images/LogoLogin.png";
 
 import { VerifyServiceProviderPhone, VerifyUserPhone, UpdatePhoneAndResend, VerifyOTP } from "@/api/AuthApi";
 import { GetOTPInfo, ResendOTP } from "@/api/OTPApi";
@@ -339,7 +338,7 @@ export default function MobileVerification({ type, isForgotPassword = false }: M
             <div className="text-center mb-6">
               <div className="flex items-center justify-center mt-2 mb-4">
                 <img
-                  src={logo1}
+                  src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LogoLogin.webp"
                   alt="Fixora Logo"
                   className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
                 />

@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import logo1 from "@/assets/images/LogoLogin.png";
-import LoginImg from "@/assets/images/LoginForm.png";
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
@@ -69,7 +67,7 @@ export default function LoginForm() {
     <div className="min-h-screen w-full flex flex-col md:flex-row items-center justify-center px-4 bg-gray-200 dark:bg-zinc-800 gap-y-6 md:gap-x-8 transition-colors duration-300">
       <div className="flex-1 flex flex-col items-center justify-start">
         <img
-          src={LoginImg}
+          src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LoginForm.webp"
           alt="Login Illustration"
           className="h-24 w-auto object-contain mb-2 md:max-h-80 md:h-auto"
           draggable={false}
@@ -89,7 +87,7 @@ export default function LoginForm() {
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex items-center justify-center mt-2 mb-4">
                     <img
-                      src={logo1}
+                      src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LogoLogin.webp"
                       alt="Fixora Logo"
                       className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
                     />

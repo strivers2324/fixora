@@ -1,30 +1,27 @@
 import { useState, useEffect } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import ACTechnician from "@/assets/images/AC.jpg";
-import Refrigerator from "@/assets/images/Refrigerator.webp";
-import CeilingFan from "@/assets/images/CeilingFanRepair.webp";
 
 export default function Hero() {
   const summerServices = [
     {
       id: 1,
       title: "Expert AC Servicing",
-      image: ACTechnician,
+      image: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/AC.webp",
       color: "from-blue-600/30 to-cyan-400/20",
       border: "border-blue-500/30",
     },
     {
       id: 2,
       title: "Fridge & Freezer Repair",
-      image: Refrigerator,
+      image: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Refrigerator.webp",
       color: "from-teal-600/30 to-emerald-400/20",
       border: "border-teal-500/30",
     },
     {
       id: 3,
       title: "Ceiling Fan Fix",
-      image: CeilingFan,
+      image: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/CeilingFanRepair.webp",
       color: "from-indigo-600/30 to-purple-400/20",
       border: "border-indigo-500/30",
     },

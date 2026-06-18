@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import popupupper from "@/assets/images/Popup.png";
 import { useNavigate } from "react-router-dom";
 
 interface SignUpRolePopupProps {
@@ -27,7 +26,11 @@ export const SignUpRolePopup: React.FC<SignUpRolePopupProps> = ({ children }) =>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md p-0 rounded-2xl overflow-hidden shadow-2xl bg-gray-300">
         <div className="relative h-32 w-70 bg-teal-900 flex items-center justify-center">
-          <img src={popupupper} alt="Banner" className="absolute inset-0 w-full h-full object-cover opacity-90" />
+          <img
+            src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Popup.webp"
+            alt="Banner"
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
+          />
           <button
             className="absolute top-3 right-3 z-10 bg-teal-900 rounded-md w-7 h-7 flex items-center justify-center hover:bg-teal-700 transition"
             onClick={() => setOpen(false)}

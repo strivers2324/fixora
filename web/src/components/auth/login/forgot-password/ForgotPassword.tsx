@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import logo1 from "@/assets/images/LogoLogin.png";
 import { User, Briefcase } from "lucide-react";
 import { Role } from "@/enums/UserRole";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -66,7 +65,7 @@ export default function ForgotPasswordPage() {
           <div className="flex flex-col items-center gap-2 text-center mb-6">
             <div className="flex items-center justify-center mt-2 mb-2">
               <img
-                src={logo1}
+                src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LogoLogin.webp"
                 alt="Fixora Logo"
                 className="h-16 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
               />

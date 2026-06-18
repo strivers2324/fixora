@@ -3,51 +3,81 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
-import ACTechnician from "@/assets/images/AC.jpg";
-import Refrigerator from "@/assets/images/Refrigerator.webp";
-import WashingMachine from "@/assets/images/Washing machine.png";
-import TV from "@/assets/images/TV.jpg";
-import IPSInverter from "@/assets/images/IPS.webp";
-import HomeAppliance from "@/assets/images/Home Appliance.jpg";
-import Electrician from "@/assets/images/Electrician.jpg";
-import Plumber from "@/assets/images/Plumber.webp";
-import Carpenter from "@/assets/images/Carpenter.jpg";
-import WaterPump from "@/assets/images/WaterPump.jpg";
-import Lift from "@/assets/images/Lift.webp";
-import Automobile from "@/assets/images/Auto Mobile.jpg";
-import CCTV from "@/assets/images/CCTV.webp";
-import Broadband from "@/assets/images/Broadband Internet.jpg";
-import Computer from "@/assets/images/Computer Technitian.jpg";
 
 const serviceCategories = [
   {
     categoryName: "Appliance Repair",
     services: [
-      { title: "AC Technician", img: ACTechnician },
-      { title: "Refrigerator Mechanic", img: Refrigerator },
-      { title: "Washing Machine Technician", img: WashingMachine },
-      { title: "TV Technician", img: TV },
-      { title: "IPS/Inverter Technician", img: IPSInverter },
-      { title: "Home Appliance Technician", img: HomeAppliance },
+      {
+        title: "AC Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/AC.webp",
+      },
+      {
+        title: "Refrigerator Mechanic",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Refrigerator.webp",
+      },
+      {
+        title: "Washing Machine Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Washing%20machine.webp",
+      },
+      {
+        title: "TV Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/TV.webp",
+      },
+      {
+        title: "IPS/Inverter Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/IPS.webp",
+      },
+      {
+        title: "Home Appliance Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Home%20Appliance.webp",
+      },
     ],
   },
   {
     categoryName: "Home Maintenance",
     services: [
-      { title: "Electrician", img: Electrician },
-      { title: "Plumber", img: Plumber },
-      { title: "Carpenter", img: Carpenter },
-      { title: "Water Pump Technician", img: WaterPump },
-      { title: "Lift Technician", img: Lift },
-      { title: "Automobile Mechanic", img: Automobile },
+      {
+        title: "Electrician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Electrician.webp",
+      },
+      {
+        title: "Plumber",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Plumber.webp",
+      },
+      {
+        title: "Carpenter",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Carpenter.webp",
+      },
+      {
+        title: "Water Pump Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/WaterPump.webp",
+      },
+      {
+        title: "Lift Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Lift.webp",
+      },
+      {
+        title: "Automobile Mechanic",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Auto%20Mobile.webp",
+      },
     ],
   },
   {
     categoryName: "IT & Security",
     services: [
-      { title: "CCTV Installer", img: CCTV },
-      { title: "Broadband Internet Provider", img: Broadband },
-      { title: "Computer Technician", img: Computer },
+      {
+        title: "CCTV Installer",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/CCTV.webp",
+      },
+      {
+        title: "Broadband Internet Provider",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Broadband%20Internet.webp",
+      },
+      {
+        title: "Computer Technician",
+        img: "https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/Computer%20Technician.webp",
+      },
     ],
   },
 ];

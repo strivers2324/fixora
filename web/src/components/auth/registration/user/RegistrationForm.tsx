@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
-import logo1 from "@/assets/images/LogoLogin.png";
 import { RegisterUser } from "@/api/AuthApi";
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 
@@ -61,7 +60,10 @@ export function UserRegistrationForm() {
       try {
         const formattedPhone = "+88" + phone;
 
-        const response = await RegisterUser({ phone: formattedPhone, password });
+        const response = await RegisterUser({
+          phone: formattedPhone,
+          password,
+        });
         if (response && response.otp_id) {
           navigate(`/user/verify/otp/${response.otp_id}`, {
             state: {
@@ -87,7 +89,7 @@ export function UserRegistrationForm() {
               <FieldGroup>
                 <div className="flex flex-col items-center mb-6">
                   <img
-                    src={logo1}
+                    src="https://fqrizkinvolsebociwtt.supabase.co/storage/v1/object/public/images/LogoLogin.webp"
                     alt="Fixora Logo"
                     className="h-20 w-auto transition-all duration-300 dark:bg-white dark:p-2 dark:rounded-xl dark:shadow-sm"
                   />
