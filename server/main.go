@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	smsSercrets := utils.GetSmsSercrets()
+	smsSecrets := utils.GetSmsSecrets()
 	router := gin.Default()
 	distFS := getFileSystem("dist")
 	router.Use(static.Serve("/", distFS))
@@ -44,7 +44,7 @@ func main() {
 	profileRepo := repository.NewProfileRepository(db)
 	jobRepo := repository.NewJobRepository(db)
 
-	smsService := service.NewSmsService(smsSercrets)
+	smsService := service.NewSmsService(smsSecrets)
 	otpService := service.NewOTPService(otpRepo, smsService)
 	profileService := service.NewProfileService(profileRepo)
 	accountService := service.NewAccountService(accountRepo, otpService, nil)

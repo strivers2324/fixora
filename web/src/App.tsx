@@ -17,6 +17,7 @@ import { useAccountStore } from "./store/AccountStore";
 import SplashScreen from "./components/ui/SplashScreen";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import FindProviders from "./components/Dashboard/user/FindProviders";
+import TermsAndConditions from "./components/policy/TermsAndConditions";
 
 function App() {
   const location = useLocation();
@@ -56,6 +57,7 @@ function App() {
 
               <Route path="/registration/service-provider" element={<SpRegistrationForm />} />
               <Route path="/registration/user" element={<UserRegistrationForm />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
             </Route>
 
             <Route

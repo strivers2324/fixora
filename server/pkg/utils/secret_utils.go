@@ -16,7 +16,7 @@ type SmsSecrets struct {
 	SenderID string
 }
 
-func GetSmsSercrets() SmsSecrets {
+func GetSmsSecrets() SmsSecrets {
 	apiUrl := os.Getenv("SMS_API_URL")
 	apiKey := os.Getenv("SMS_API_KEY")
 	senderID := os.Getenv("SMS_SENDER_ID")

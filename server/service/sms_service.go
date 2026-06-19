@@ -7,6 +7,7 @@ import (
 	"fixora-server/pkg/utils"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -22,12 +23,24 @@ func NewSmsService(smsSecrets utils.SmsSecrets) *SmsService {
 	}
 }
 
+func (s *SmsService) getRandomSenderID() string {
+	senderIDs := strings.Split(s.smsSecret.SenderID, ",")
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	return senderIDs[r.Intn(len(senderIDs))]
+}
+
 func (s *SmsService) SendSMS(phone, otp string) error {
 	formattedPhone := strings.TrimPrefix(phone, "+")
 
+	selectedSenderID := s.getRandomSenderID()
+
+	fmt.Printf(">>> [DEBUG SMS] Sending OTP via SenderID: %s to %s\n", selectedSenderID, phone)
+
 	payload := models.SMSPayload{
 		APIKey:   s.smsSecret.ApiKey,
-		SenderID: s.smsSecret.SenderID,
+		SenderID: selectedSenderID,
 		Number:   formattedPhone,
 		Message:  fmt.Sprintf("Your Fixora OTP code is: %s. This code is valid for 3 minutes.", otp),
 	}

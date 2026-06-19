@@ -304,7 +304,7 @@ export function SpRegistrationForm() {
                     >
                       I agree to all the{" "}
                       <Link
-                        to="/terms"
+                        to="/terms-and-conditions"
                         className="text-teal-900 hover:text-teal-700 hover:underline font-serif dark:text-teal-400 dark:hover:text-teal-300 cursor-pointer transition-colors"
                       >
                         Terms & Conditions
