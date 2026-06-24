@@ -5,10 +5,14 @@ import (
 	"embed"
 	"fixora-server/database"
 	"fixora-server/handlers"
+	"fixora-server/handlers/admin_handler"
 	"fixora-server/pkg/utils"
 	"fixora-server/repository"
+	"fixora-server/repository/admin_repository"
 	"fixora-server/routes"
 	"fixora-server/service"
+	"fixora-server/service/admin_service"
+
 	"log"
 	"net/http"
 	"os"
@@ -43,6 +47,8 @@ func main() {
 	accountRepo := repository.NewAccountRepository(db)
 	profileRepo := repository.NewProfileRepository(db)
 	jobRepo := repository.NewJobRepository(db)
+	adminAuthRepo := admin_repository.NewAdminAuthRepository(db)
+	adminIdentityRepo := admin_repository.NewIdentityVerificationRepository(db)
 
 	smsService := service.NewSmsService(smsSecrets)
 	otpService := service.NewOTPService(otpRepo, smsService)
@@ -51,14 +57,18 @@ func main() {
 	authService := service.NewAuthService(authRepo, otpService, accountService)
 	accountService.AuthService = authService
 	jobService := service.NewJobService(jobRepo)
+	adminAuthService := admin_service.NewAdminAuthService(adminAuthRepo)
+	adminIdentityService := admin_service.NewIdentityVerificationService(adminIdentityRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	otpHandler := handlers.NewOTPHandler(otpService)
 	accountHandler := handlers.NewAccountHandler(accountService)
 	profileHandler := handlers.NewProfileHandler(profileService)
 	jobHandler := handlers.NewJobHandler(jobService)
+	adminAuthHandler := admin_handler.NewAdminAuthHandler(adminAuthService)
+	adminIdentityHandler := admin_handler.NewIdentityVerificationHandler(adminIdentityService)
 
-	routes.SetupRoutes(router, authHandler, otpHandler, accountHandler, profileHandler, jobHandler)
+	routes.SetupRoutes(router, authHandler, otpHandler, accountHandler, profileHandler, jobHandler, adminAuthHandler, adminIdentityHandler)
 
 	router.NoRoute(func(c *gin.Context) {
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") {

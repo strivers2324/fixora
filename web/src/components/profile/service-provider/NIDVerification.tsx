@@ -55,10 +55,17 @@ export default function NidVerification() {
   const handleNidFileChange = (e: React.ChangeEvent<HTMLInputElement>, side: "front" | "back") => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setFormError("File size must be less than 5MB");
+      const fileName = file.name.toLowerCase();
+      if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png")) {
+        setFormError("Only JPG and PNG files are allowed");
         return;
       }
+
+      if (file.size > 500 * 1024) {
+        setFormError("File size must be less than 500KB");
+        return;
+      }
+
       setFormError("");
 
       const reader = new FileReader();
@@ -181,7 +188,6 @@ export default function NidVerification() {
                   className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50 text-red-800 dark:text-red-400 animate-in fade-in slide-in-from-top-2 transition-colors"
                 >
                   <XCircle className="h-4 w-4" />
-                  <AlertTitle>Validation Error</AlertTitle>
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
@@ -200,7 +206,7 @@ export default function NidVerification() {
                         type="file"
                         ref={nidFrontRef}
                         className="hidden"
-                        accept="image/*"
+                        accept=".jpg,.png"
                         onChange={(e) => handleNidFileChange(e, "front")}
                       />
                       {nidData.frontPreview ? (
@@ -225,7 +231,7 @@ export default function NidVerification() {
                           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Click to upload front side
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG up to 500KB</p>
                         </>
                       )}
                     </div>
@@ -243,7 +249,7 @@ export default function NidVerification() {
                         type="file"
                         ref={nidBackRef}
                         className="hidden"
-                        accept="image/*"
+                        accept=".jpg,.png"
                         onChange={(e) => handleNidFileChange(e, "back")}
                       />
                       {nidData.backPreview ? (
@@ -268,7 +274,7 @@ export default function NidVerification() {
                           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Click to upload back side
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG up to 500KB</p>
                         </>
                       )}
                     </div>

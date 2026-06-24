@@ -6,7 +6,6 @@ import { GetNIDStatus } from "@/api/ProfileApi";
 import { Role } from "@/enums/UserRole";
 import { NIDStatus } from "@/enums/NIDStatus";
 import { LayoutDashboard, LogOut, User as UserIcon, CalendarDays, Grid, Briefcase, Search } from "lucide-react";
-//import FixoraLogo from "@/assets/images/Logo.webp";
 import { ModeToggle } from "@/components/theme/ModeToggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ServicePanel from "@/components/Dashboard/service-provider/ServicePanel";
+import ServicePanel from "@/components/dashboard/service-provider/ServicePanel";
 
 export default function UserNavbar() {
   const { account, profile, spAddress, logout } = useAccountStore();

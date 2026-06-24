@@ -2,11 +2,13 @@ package supabase
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func UploadToSupabase(fileHeader *multipart.FileHeader, bucketName string, filePath string) (string, error) {
@@ -62,4 +64,54 @@ func UploadToSupabase(fileHeader *multipart.FileHeader, bucketName string, fileP
 
 	publicURL := fmt.Sprintf("%s/storage/v1/object/public/%s/%s", supabaseURL, bucketName, filePath)
 	return publicURL, nil
+}
+
+func GetSignedURL(bucketName string, filePath string, expiresInSeconds int) (string, error) {
+	supabaseURL := strings.TrimRight(os.Getenv("SUPABASE_URL"), "/")
+	supabaseKey := os.Getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+	if supabaseURL == "" || supabaseKey == "" {
+		return "", fmt.Errorf("supabase credentials are not set")
+	}
+
+	apiURL := fmt.Sprintf("%s/storage/v1/object/sign/%s/%s", supabaseURL, bucketName, filePath)
+	jsonBody := fmt.Sprintf(`{"expiresIn": %d}`, expiresInSeconds)
+
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBufferString(jsonBody))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+supabaseKey)
+	req.Header.Set("apiKey", supabaseKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("supabase error %d", resp.StatusCode)
+	}
+
+	var result struct {
+		SignedURL string `json:"signedUrl"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	fullSignedURL := result.SignedURL
+
+	if !strings.HasPrefix(fullSignedURL, "http") {
+		if strings.HasPrefix(fullSignedURL, "/object") {
+			fullSignedURL = "/storage/v1" + fullSignedURL
+		}
+		fullSignedURL = supabaseURL + fullSignedURL
+	}
+
+	return fullSignedURL, nil
 }

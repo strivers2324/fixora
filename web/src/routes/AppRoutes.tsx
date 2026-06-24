@@ -1,13 +1,14 @@
 import { Navigate } from "react-router-dom";
 import { useAccountStore } from "../store/AccountStore";
+import { useAdminAccountStore } from "../store/AdminAccountStore";
 import { Role } from "../enums/UserRole";
 import HomePage from "../components/home/HomePage";
-import UserDashboard from "../components/Dashboard/user/UserDashboard";
-import ServiceProviderDashboard from "../components/Dashboard/service-provider/ServiceProviderDashboard";
+import UserDashboard from "../components/dashboard/user/UserDashboard";
+import ServiceProviderDashboard from "../components/dashboard/service-provider/ServiceProviderDashboard";
 import UserUpdateProfile from "../components/profile/user/UpdateProfileForm";
 import ServiceProviderUpdateProfile from "../components/profile/service-provider/UpdateProfileForm";
-import UserBookingHistory from "../components/Dashboard/user/UserBookingHistory";
-import ServiceProviderJobHistoryPage from "../components/Dashboard/service-provider/ServiceProviderJobHistory";
+import UserBookingHistory from "../components/dashboard/user/UserBookingHistory";
+import ServiceProviderJobHistoryPage from "../components/dashboard/service-provider/ServiceProviderJobHistory";
 
 export function DashboardRedirect() {
   const { account } = useAccountStore();
@@ -46,6 +47,16 @@ export function HistoryRedirect() {
 }
 
 export function HomeRedirect() {
-  const { isAuthenticated } = useAccountStore();
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <HomePage />;
+  const { account } = useAccountStore();
+  const { adminAccount } = useAdminAccountStore();
+
+  if (adminAccount) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  if (account) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <HomePage />;
 }

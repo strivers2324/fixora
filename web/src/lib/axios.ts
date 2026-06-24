@@ -5,18 +5,25 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
+let isUserRefreshing = false;
+let isAdminRefreshing = false;
+let userFailedQueue: any[] = [];
+let adminFailedQueue: any[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+const processUserQueue = (error: any, token: string | null = null) => {
+  userFailedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
   });
-  failedQueue = [];
+  userFailedQueue = [];
+};
+
+const processAdminQueue = (error: any, token: string | null = null) => {
+  adminFailedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  adminFailedQueue = [];
 };
 
 api.interceptors.response.use(
@@ -29,32 +36,55 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => api(originalRequest))
-          .catch((err) => Promise.reject(err));
-      }
+      const isAdminApi = originalRequest.url?.includes("/admin");
 
-      originalRequest._retry = true;
-      isRefreshing = true;
+      if (isAdminApi) {
+        if (isAdminRefreshing) {
+          return new Promise((resolve, reject) => {
+            adminFailedQueue.push({ resolve, reject });
+          })
+            .then(() => api(originalRequest))
+            .catch((err) => Promise.reject(err));
+        }
 
-      try {
-        await axios.post("/api/v1/auth/refresh", {}, { withCredentials: true });
+        originalRequest._retry = true;
+        isAdminRefreshing = true;
 
-        isRefreshing = false;
-        processQueue(null);
+        try {
+          await axios.post(`${api.defaults.baseURL}/admin/auth/refresh`, {}, { withCredentials: true });
+          isAdminRefreshing = false;
+          processAdminQueue(null);
+          return api(originalRequest);
+        } catch (refreshError) {
+          isAdminRefreshing = false;
+          processAdminQueue(refreshError);
+          localStorage.removeItem("admin-storage");
+          return Promise.reject(refreshError);
+        }
+      } else {
+        if (isUserRefreshing) {
+          return new Promise((resolve, reject) => {
+            userFailedQueue.push({ resolve, reject });
+          })
+            .then(() => api(originalRequest))
+            .catch((err) => Promise.reject(err));
+        }
 
-        return api(originalRequest);
-      } catch (refreshError) {
-        isRefreshing = false;
-        processQueue(refreshError);
+        originalRequest._retry = true;
+        isUserRefreshing = true;
 
-        localStorage.removeItem("accountinfo");
-        localStorage.removeItem("auth-storage");
-
-        return Promise.reject(refreshError);
+        try {
+          await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+          isUserRefreshing = false;
+          processUserQueue(null);
+          return api(originalRequest);
+        } catch (refreshError) {
+          isUserRefreshing = false;
+          processUserQueue(refreshError);
+          localStorage.removeItem("accountinfo");
+          localStorage.removeItem("auth-storage");
+          return Promise.reject(refreshError);
+        }
       }
     }
 

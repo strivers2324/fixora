@@ -4,6 +4,11 @@ import { Role } from "@/enums/UserRole";
 
 export default function PublicLayout() {
   const { isAuthenticated, account, otpId } = useAccountStore();
+  const appRole = localStorage.getItem("app_role");
+
+  if (appRole === "ADMIN") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   if (isAuthenticated && account) {
     if (!account.is_phone_verified && otpId) {
