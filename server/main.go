@@ -32,7 +32,7 @@ var embeddedFiles embed.FS
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Warning: No .env file found. Falling back to system/docker environment variables.")
 	}
 	smsSecrets := utils.GetSmsSecrets()
 	router := gin.Default()
@@ -85,11 +85,11 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":80",
 		Handler: router,
 	}
 	go func() {
-		log.Println("Server is starting on port :8080")
+		log.Println("Server is starting on port :80")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
