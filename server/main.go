@@ -71,17 +71,18 @@ func main() {
 	routes.SetupRoutes(router, authHandler, otpHandler, accountHandler, profileHandler, jobHandler, adminAuthHandler, adminIdentityHandler)
 
 	router.NoRoute(func(c *gin.Context) {
-		if !strings.HasPrefix(c.Request.RequestURI, "/api") {
-			index, err := distFS.Open("index.html")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer index.Close()
-			stat, _ := index.Stat()
-			http.ServeContent(c.Writer, c.Request, "index.html", stat.ModTime(), index)
+		if strings.HasPrefix(c.Request.RequestURI, "/api") || strings.Contains(c.Request.RequestURI, ".") {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Resource not found"})
 			return
 		}
-		c.JSON(http.StatusNotFound, gin.H{"message": "API route not found"})
+
+		index, err := distFS.Open("index.html")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer index.Close()
+		stat, _ := index.Stat()
+		http.ServeContent(c.Writer, c.Request, "index.html", stat.ModTime(), index)
 	})
 
 	srv := &http.Server{

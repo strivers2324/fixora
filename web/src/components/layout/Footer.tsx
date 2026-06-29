@@ -1,4 +1,5 @@
 import { FaTwitter, FaInstagram, FaLinkedin, FaCcVisa, FaCcMastercard, FaFacebook } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 interface MenuItem {
   title: string;
@@ -50,7 +51,7 @@ export default function Footer({
     },
     {
       title: "Resources",
-      links: [{ text: "Help & FAQ" }, { text: "Privacy Policy" }],
+      links: [{ text: "Help & FAQ" }],
     },
     {
       title: "Join Fixora",
@@ -58,20 +59,17 @@ export default function Footer({
     },
   ],
   copyright = "© 2024 FIXORA. All rights reserved.",
-  bottomLinks = [
-    { text: "Terms and Conditions", url: "/terms" },
-    { text: "Privacy Policy", url: "/privacy" },
-  ],
+  bottomLinks = [{ text: "Terms & Conditions", url: "/terms-and-conditions" }],
 }: FooterProps) {
   return (
     <footer className="pt-12 pb-8 bg-gray-950 text-gray-400">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-12">
           <div className="col-span-2 lg:col-span-4">
-            <a href={logo.url} className="flex items-center gap-2 lg:justify-start">
+            <Link to={logo.url} className="flex items-center gap-2 lg:justify-start">
               <img src={logo.src} alt={logo.alt} title={logo.title} className="h-9" />
               <span className="text-xl font-bold text-white">{logo.title}</span>
-            </a>
+            </Link>
             <p className="mt-3 font-medium max-w-xs">{tagline}</p>
 
             <div className="flex mt-5 space-x-4">
@@ -134,7 +132,7 @@ export default function Footer({
             <ul className="flex gap-4 justify-center md:justify-start mt-2">
               {bottomLinks.map((link, linkIdx) => (
                 <li key={linkIdx} className="hover:text-white underline">
-                  <a href={link.url}>{link.text}</a>
+                  <Link to={link.url}>{link.text}</Link>
                 </li>
               ))}
             </ul>

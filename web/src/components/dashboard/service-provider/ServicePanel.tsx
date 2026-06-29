@@ -190,7 +190,7 @@ export default function MyServicePanel({ disabled = false }: MyServicePanelProps
         </DialogTrigger>
       </span>
 
-      <DialogContent className="fixed top-4 left-[50%] translate-x-[-50%] translate-y-0 sm:top-10 sm:max-w-[650px] rounded-[24px] border-0 p-0 overflow-hidden bg-white dark:bg-zinc-800 shadow-2xl animate-in slide-in-from-top-10 duration-300 [&>button[data-dialog-close]]:hidden">
+      <DialogContent className="fixed top-4 left-[50%] translate-x-[-50%] translate-y-0 sm:top-10 w-[95vw] sm:w-full sm:max-w-[650px] rounded-[24px] border-0 p-0 overflow-hidden bg-white dark:bg-zinc-800 shadow-2xl animate-in slide-in-from-top-10 duration-300 max-h-[92vh] sm:max-h-[90vh] flex flex-col [&>button[data-dialog-close]]:hidden">
         <DialogHeader className="bg-gradient-to-r from-teal-900 to-teal-800 p-6 text-white relative">
           <Settings2 className="absolute right-6 top-6 opacity-10 rotate-12" size={80} />
           <div className="flex items-center gap-3">
@@ -206,7 +206,7 @@ export default function MyServicePanel({ disabled = false }: MyServicePanelProps
           </div>
         </DialogHeader>
 
-        <div className="p-8 space-y-6 max-h-[85vh] overflow-y-auto scrollbar-hide relative">
+        <div className="p-8 space-y-6 flex-1 overflow-y-auto scrollbar-hide relative pb-10">
           {isFetching ? (
             <div className="flex flex-col items-center justify-center py-10 space-y-4">
               <Loader2 className="h-8 w-8 text-teal-600 animate-spin" />

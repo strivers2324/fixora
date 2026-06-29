@@ -85,7 +85,7 @@ export default function ServiceSearch({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="fixed top-4 left-[50%] translate-x-[-50%] translate-y-0 sm:top-10 w-[95vw] sm:w-full sm:max-w-[800px] rounded-[24px] border-0 p-0 overflow-hidden bg-white dark:bg-zinc-900 shadow-2xl animate-in slide-in-from-top-10 duration-300">
+      <DialogContent className="fixed top-4 left-[50%] translate-x-[-50%] translate-y-0 sm:top-10 w-[95vw] sm:w-full sm:max-w-[800px] rounded-[24px] border-0 p-0 overflow-hidden bg-white dark:bg-zinc-900 shadow-2xl animate-in slide-in-from-top-10 duration-300 max-h-[92vh] sm:max-h-[90vh] flex flex-col">
         <DialogHeader className="bg-gradient-to-r from-teal-900 to-teal-800 dark:from-teal-950 dark:to-teal-900 p-6 text-white relative">
           <Wrench className="absolute right-6 top-6 opacity-10 rotate-12" size={80} />
           <div className="flex items-center gap-3 relative z-10">
@@ -103,10 +103,8 @@ export default function ServiceSearch({
           </div>
         </DialogHeader>
 
-        <div className="p-5 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto scrollbar-hide pb-8 sm:pb-10">
-          {/* 🚀 Side-by-Side Layout for Desktop */}
+        <div className="p-5 sm:p-8 space-y-6 flex-1 overflow-y-auto scrollbar-hide pb-8 sm:pb-10">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Left Side: Problem Description */}
             <div className="space-y-3 md:w-2/3 flex flex-col">
               <Label className="text-gray-700 dark:text-gray-200 font-bold flex items-center gap-1">
                 Problem Description <span className="text-red-500">*</span>
@@ -119,7 +117,6 @@ export default function ServiceSearch({
               />
             </div>
 
-            {/* Right Side: Offer Price */}
             <div className="space-y-3 md:w-1/3">
               <Label className="text-gray-700 dark:text-gray-200 font-bold flex items-center gap-1">
                 Your Offer Price (BDT) <span className="text-red-500">*</span>
@@ -138,7 +135,6 @@ export default function ServiceSearch({
                   min="1"
                 />
               </div>
-              {/* Helper text to balance the height */}
               <div className="flex gap-2 items-start mt-2 p-3 bg-teal-50 dark:bg-teal-950/30 rounded-xl border border-teal-100 dark:border-teal-900/50">
                 <Info size={14} className="text-teal-600 dark:text-teal-400 mt-0.5 shrink-0" />
                 <p className="text-[11px] leading-tight text-teal-700 dark:text-teal-400 font-medium">
@@ -148,7 +144,6 @@ export default function ServiceSearch({
             </div>
           </div>
 
-          {/* Address Section */}
           <div className="space-y-4">
             <Label className="text-gray-700 dark:text-gray-200 font-bold flex items-center gap-2">
               <MapPin size={18} className="text-teal-700 dark:text-teal-500" /> Select Service Address{" "}

@@ -297,7 +297,7 @@ export default function AddressBook() {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="max-w-4xl dark:bg-zinc-900 dark:border-zinc-800 transition-colors p-0 overflow-hidden"
+            className="max-w-4xl dark:bg-zinc-900 dark:border-zinc-800 transition-colors p-0 overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col"
           >
             <DialogHeader className="px-6 py-4 border-b dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-800/30">
               <DialogTitle className="text-xl text-teal-900 dark:text-teal-400">
@@ -305,7 +305,7 @@ export default function AddressBook() {
               </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="px-6 py-6">
+            <form onSubmit={handleSubmit} className="px-6 py-6 overflow-y-auto flex-1">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-5">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
