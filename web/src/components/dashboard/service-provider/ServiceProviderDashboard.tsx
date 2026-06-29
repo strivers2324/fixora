@@ -138,7 +138,7 @@ const JobRequestCard = ({ request, onAcceptJob }: any) => {
                   size="sm"
                   onClick={handleSendOffer}
                   disabled={isUpdatingOffer || Number(offerPrice) === request.provider_offer_price}
-                  className="w-full sm:w-auto bg-teal-900 hover:bg-teal-800 text-white rounded-xl h-10 px-4 text-xs font-bold transition-all disabled:opacity-50 shadow-sm shrink-0"
+                  className="flex-1 sm:flex-none sm:w-auto bg-teal-900 hover:bg-teal-800 text-white rounded-xl h-10 px-4 text-xs font-bold transition-all disabled:opacity-50 shadow-sm shrink-0"
                 >
                   {isUpdatingOffer ? "..." : "Send Offer"}
                 </Button>
@@ -146,7 +146,7 @@ const JobRequestCard = ({ request, onAcceptJob }: any) => {
                 <Button
                   size="sm"
                   onClick={() => onAcceptJob(request)}
-                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white rounded-xl h-10 px-6 text-xs font-bold transition-all shadow-sm shrink-0"
+                  className="flex-1 sm:flex-none sm:w-auto bg-teal-600 hover:bg-teal-700 text-white rounded-xl h-10 px-6 text-xs font-bold transition-all shadow-sm shrink-0"
                 >
                   Accept Job
                 </Button>
