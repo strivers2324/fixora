@@ -41,11 +41,11 @@ An on-demand service marketplace connecting customers with verified technicians 
 ## 🛠️ Tech Stack
 
 ### Frontend
-* **Framework:** React.js, TypeScript, Vite 
-* **Styling & UI:** Tailwind CSS, Shadcn UI Components 
+* **Framework:** React.js, TypeScript, Vite
+* **Styling & UI:** Tailwind CSS, Shadcn UI Components
 * **State Management:** Custom Global Stores (Zustand)
 * **Icons:** Lucide React
-* **Map Integration:** Leaflet Map (openstreetmap) 
+* **Map Integration:** Leaflet Map (openstreetmap)
 
 ### Backend
 * **Language & Runtime:** Golang (Go) 
@@ -53,8 +53,8 @@ An on-demand service marketplace connecting customers with verified technicians 
 * **Middleware Layers:** Customized middleware handles secure authentication and request tracking.
 
 ### Database
-* **Relational Database:** PostgreSQL 
-* **Object Storage:** Supabase Storage for storing user profile pictures and NID documents 
+* **Relational Database:** PostgreSQL.
+* **Object Storage:** Supabase Storage for storing user profile pictures and NID documents.
 
 ### DevOps & Tools
-* **Container:** Docker (Containerized setup ensuring environment consistency for seamless production deployment) 
+* **Container:** Docker (Containerized setup ensuring environment consistency for seamless production deployment).
